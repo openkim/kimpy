@@ -1,0 +1,4 @@
+build/
+dist/
+ase_kim_calculator.egg-info/
+*.so
