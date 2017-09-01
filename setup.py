@@ -40,6 +40,6 @@ setup(name = 'ase_kim_calculator',
     version = '0.0.1',
     description = 'This is a demo package',
     ext_modules = [kimapi_module],
-    install_requires=['pybind11>=2.0'],
+    install_requires=['pybind11==2.1'],
     #zip_safe = False,
     )
