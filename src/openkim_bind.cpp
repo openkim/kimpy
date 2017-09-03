@@ -37,11 +37,14 @@ PYBIND11_PLUGIN(openkim) {
   );
 
   m.def("model_info",
-    [](void* kimmdl, char* modelname) {
-      int status =  KIM_API_model_info(kimmdl, modelname);
-      return status;
+    [](char* modelname) {
+      void* kimmdl;
+      int status =  KIM_API_model_info(&kimmdl, modelname);
+      py::tuple t(2);
+      t[0] = kimmdl;
+      t[1] = status;
+      return t;
     },
-    py::arg("kimmdl"),
     py::arg("modelname")
   );
 
