@@ -1,0 +1,5 @@
+1. 09/01/2017
+  Replace python implementation of `set_padding' with c implementation for
+  speed.  Possibly also `assemble_padding_force'.                              Not yet
+
+2.

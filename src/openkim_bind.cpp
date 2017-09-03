@@ -2,8 +2,9 @@
 #include <pybind11/numpy.h>
 #include <string>
 #include <iostream>
-#include <KIM_API_C.h>
-#include <KIM_API_status.h>
+
+#include "KIM_API_C.h"
+#include "KIM_API_status.h"
 
 namespace py = pybind11;
 
@@ -319,7 +320,7 @@ PYBIND11_PLUGIN(openkim) {
     py::arg("kimmdl"),
     py::arg("name"),
     py::arg("size"),
-    py::arg("data")
+    py::arg("data").noconvert()
   );
 
   m.def("set_data_double",
@@ -331,7 +332,7 @@ PYBIND11_PLUGIN(openkim) {
     py::arg("kimmdl"),
     py::arg("name"),
     py::arg("size"),
-    py::arg("data")
+    py::arg("data").noconvert()
   );
 
 // TODO tempalte this and get_data_double
