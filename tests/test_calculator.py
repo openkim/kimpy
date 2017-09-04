@@ -1,6 +1,5 @@
 from __future__ import print_function
 import numpy as np
-from kimpy import kimapi as km
 from kimpy.calculator import KIMModelCalculator
 from ase.lattice.cubic import SimpleCubic
 
