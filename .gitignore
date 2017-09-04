@@ -2,4 +2,5 @@ build/
 dist/
 ase_kim_calculator.egg-info/
 *.so
+*.pyc
 kim.log

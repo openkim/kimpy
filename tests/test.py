@@ -1,5 +1,5 @@
 from __future__ import print_function
-import openkim as km
+from kimpy import kimapi as km
 
 
 def test_kim_api():

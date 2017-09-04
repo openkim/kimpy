@@ -11,7 +11,7 @@ namespace py = pybind11;
 using namespace py::literals;
 
 
-PYBIND11_MODULE(openkim, m) {
+PYBIND11_MODULE(kimapi, m) {
   m.doc() = "A python interface to KIM API";
 
   m.attr("STATUS_OK") = KIM_STATUS_OK;
@@ -302,14 +302,14 @@ PYBIND11_MODULE(openkim, m) {
     [](char* usermsg, int error) {
       auto locals = py::dict("usermsg"_a=usermsg, "error"_a=error);
 
-//TODO we need to import the module `openkim'. It would be good that we can call
+//TODO we need to import the module `kimapi'. It would be good that we can call
 // reprot_error_wrapper directly.
 // see 'Adding embedded modules' at the following page for some instinct
 // http://pybind11.readthedocs.io/en/master/advanced/embedding.html
 
       // embed python code
       py::exec(R"(
-        import openkim
+        from kimpy import kimapi
         import inspect
         callerframe = inspect.stack()[1]  # 0 represents this line
                                           # 1 represents line at caller
@@ -319,7 +319,7 @@ PYBIND11_MODULE(openkim, m) {
         errfile = info.filename
         usermsg = locals()['usermsg']
         error = locals()['error']
-        status = openkim.report_error_wrapper(errline, errfile, usermsg, error)
+        status = kimapi.report_error_wrapper(errline, errfile, usermsg, error)
       )", py::globals(), locals);
 
       int status = locals["status"].cast<int>();

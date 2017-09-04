@@ -40,8 +40,8 @@ def get_kim_extra_link_args():
 
 
 
-kimapi_module = Extension('openkim',
-    sources = ['src/openkim_bind.cpp'],
+kimapi_module = Extension('kimpy.kimapi',
+    sources = ['kimpy/kim_api_bind.cpp'],
     include_dirs = get_kim_includes(),
     library_dirs = get_kim_libdirs(),
     libraries = get_kim_ldlibs(),
@@ -50,8 +50,8 @@ kimapi_module = Extension('openkim',
     language = 'c++',
     )
 
-neigh_module = Extension('neighborlist',
-    sources = ['src/cvec.cpp', 'src/neigh.cpp', 'src/neigh_bind.cpp'],
+neigh_module = Extension('kimpy.neighborlist',
+    sources = ['kimpy/cvec.cpp', 'kimpy/neigh.cpp', 'kimpy/neigh_bind.cpp'],
     include_dirs = get_kim_includes(),
     library_dirs = get_kim_libdirs(),
     libraries = get_kim_ldlibs(),
@@ -66,7 +66,7 @@ setup(name = 'ase_kim_calculator',
     version = '0.0.1',
     description = 'This is a demo package',
     packages = ['kimpy'],
-    package_dir = {'kimpy':'src/'},
+    #package_dir = {'kimpy':'src/'},
     ext_modules = [kimapi_module, neigh_module],
     install_requires=['pybind11>=2.2'],
     setup_requires=['pybind11>=2.2'],  # ensures it be downloaded first

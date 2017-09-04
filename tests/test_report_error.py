@@ -1,5 +1,5 @@
 from __future__ import print_function
-import openkim as km
+from kimpy import kimapi as km
 import inspect
 
 # NOTE
