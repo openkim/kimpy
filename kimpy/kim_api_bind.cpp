@@ -352,26 +352,24 @@ PYBIND11_MODULE(kimapi, m) {
 
 // TODO tempalte this and set_data_double
   m.def("set_data_int",
-    [](void* kimmdl, char* name, int size, py::array_t<int> data) {
-      int status = KIM_API_set_data(kimmdl, name, static_cast<intptr_t> (size),
+    [](void* kimmdl, char* name, py::array_t<int> data) {
+      int status = KIM_API_set_data(kimmdl, name, static_cast<intptr_t> (data.size()),
           static_cast<void *> (data.mutable_data(0)));
       return status;
     },
     py::arg("kimmdl"),
     py::arg("name"),
-    py::arg("size"),
     py::arg("data").noconvert()
   );
 
   m.def("set_data_double",
-    [](void* kimmdl, char* name, int size, py::array_t<double> data) {
-      int status = KIM_API_set_data(kimmdl, name, static_cast <intptr_t>(size),
+    [](void* kimmdl, char* name, py::array_t<double> data) {
+      int status = KIM_API_set_data(kimmdl, name, static_cast <intptr_t> (data.size()),
           static_cast<void *> (data.mutable_data(0)));
       return status;
     },
     py::arg("kimmdl"),
     py::arg("name"),
-    py::arg("size"),
     py::arg("data").noconvert()
   );
 

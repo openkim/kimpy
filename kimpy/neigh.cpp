@@ -211,10 +211,11 @@ int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need
 
 
 /* get neigh function */
-int nbl_get_neigh(void* kimmdl, int* mode, int* request, int *atom, int* numnei,
+int nbl_get_neigh(void* pkim, int* mode, int* request, int *atom, int* numnei,
     int** nei1atom, double** rij)
 {
 
+  intptr_t* kimmdl = *((intptr_t**) pkim);
   int status;
   int* Natoms;
 
