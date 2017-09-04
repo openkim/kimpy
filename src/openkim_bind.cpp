@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#include <pybind11/embed.h>
 #include <string>
 #include <iostream>
 
@@ -7,10 +8,11 @@
 #include "KIM_API_status.h"
 
 namespace py = pybind11;
+using namespace py::literals;
 
 
-PYBIND11_PLUGIN(openkim) {
-  py::module m("openkim", "ASE calculator based on OpenKIM");
+PYBIND11_MODULE(openkim, m) {
+  m.doc() = "A python interface to KIM API";
 
   m.def("get_version",
     []() {
@@ -280,14 +282,47 @@ PYBIND11_PLUGIN(openkim) {
     "Return (status_msg, status)"
   );
 
-//TODO, let fl and ln be determined in this file, not python
-  m.def("report_error",
+  // a wrapper of the KIM_API_report_error function
+  m.def("report_error_wrapper",
     [](int ln, char* fl, char* usermsg, int error) {
       int status =  KIM_API_report_error(ln, fl, usermsg, error);
       return status;
     },
     py::arg("line"),
     py::arg("file"),
+    py::arg("usermsg"),
+    py::arg("status_code")
+  );
+
+  // use embedded python code that calls 'report_error_wrapper'
+  // this python code determines error line no. and error line automatically
+  m.def("report_error",
+    [](char* usermsg, int error) {
+      auto locals = py::dict("usermsg"_a=usermsg, "error"_a=error);
+
+//TODO we need to import the module `openkim'. It would be good that we can call
+// reprot_error_wrapper directly.
+// see 'Adding embedded modules' at the following page for some instinct
+// http://pybind11.readthedocs.io/en/master/advanced/embedding.html
+
+      // embed python code
+      py::exec(R"(
+        import openkim
+        import inspect
+        callerframe = inspect.stack()[1]  # 0 represents this line
+                                          # 1 represents line at caller
+        frame = callerframe[0]
+        info = inspect.getframeinfo(frame)
+        errline = info.lineno
+        errfile = info.filename
+        usermsg = locals()['usermsg']
+        error = locals()['error']
+        status = openkim.report_error_wrapper(errline, errfile, usermsg, error)
+      )", py::globals(), locals);
+
+      int status = locals["status"].cast<int>();
+      return status;
+    },
     py::arg("usermsg"),
     py::arg("status_code")
   );
@@ -426,6 +461,5 @@ PYBIND11_PLUGIN(openkim) {
   );
 
 
-  return m.ptr();
 }
 

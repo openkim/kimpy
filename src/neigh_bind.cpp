@@ -5,8 +5,8 @@
 namespace py = pybind11;
 
 
-PYBIND11_PLUGIN(neighborlist) {
-  py::module m("neighborlist", "KIM API neighborlist utility");
+PYBIND11_MODULE(neighborlist, m) {
+  m.doc() = "KIM API neighborlist utility";
 
   m.def("initialize",
     [](void* kimmdl) {
@@ -39,7 +39,5 @@ PYBIND11_PLUGIN(neighborlist) {
   );
 
 
-
-  return m.ptr();
 }
 

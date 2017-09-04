@@ -68,7 +68,7 @@ setup(name = 'ase_kim_calculator',
     packages = ['kimpy'],
     package_dir = {'kimpy':'src/'},
     ext_modules = [kimapi_module, neigh_module],
-    install_requires=['pybind11==2.1'],
-    setup_requires=['pybind11==2.1'],  # ensures it be downloaded first
-    #zip_safe = False,
+    install_requires=['pybind11>=2.2'],
+    setup_requires=['pybind11>=2.2'],  # ensures it be downloaded first
+    zip_safe = False,
     )
