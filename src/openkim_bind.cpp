@@ -14,6 +14,8 @@ using namespace py::literals;
 PYBIND11_MODULE(openkim, m) {
   m.doc() = "A python interface to KIM API";
 
+  m.attr("STATUS_OK") = KIM_STATUS_OK;
+
   m.def("get_version",
     []() {
       const char* version;
