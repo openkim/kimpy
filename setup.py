@@ -30,10 +30,7 @@ def inquire_kim_api(option, key, mode):
 
 
 def get_kim_includes():
-  import pybind11
-  pybind11_inc = pybind11.get_include()
-  kim_inc = inquire_kim_api('--includes', '-I', 0)[0]
-  return [kim_inc, pybind11_inc]
+  return inquire_kim_api('--includes', '-I', 0)
 
 def get_kim_libdirs():
   return inquire_kim_api('--ldflags', '-L', 0)
@@ -48,10 +45,19 @@ def get_kim_extra_link_args():
 def get_extra_compile_args():
   return ['-std=c++11']
 
+def get_pybind11_includes():
+  import pybind11
+  return [pybind11.get_include()]
+
+def get_includes():
+  kim_inc = get_kim_includes()
+  pybind11_inc = get_pybind11_includes()
+  return kim_inc + pybind11_inc
+
 
 kimapi_module = Extension('kimpy.kimapi',
     sources = ['kimpy/kim_api_bind.cpp'],
-    include_dirs = get_kim_includes(),
+    include_dirs = get_includes(),
     library_dirs = get_kim_libdirs(),
     libraries = get_kim_ldlibs(),
     extra_compile_args = get_extra_compile_args(),
@@ -62,7 +68,7 @@ kimapi_module = Extension('kimpy.kimapi',
 
 neigh_module = Extension('kimpy.neighborlist',
     sources = ['kimpy/cvec.cpp', 'kimpy/neigh.cpp', 'kimpy/neigh_bind.cpp'],
-    include_dirs = get_kim_includes(),
+    include_dirs = get_includes(),
     library_dirs = get_kim_libdirs(),
     libraries = get_kim_ldlibs(),
     extra_compile_args = get_extra_compile_args(),
