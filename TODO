@@ -2,4 +2,7 @@
   Replace python implementation of `set_padding' with c implementation for
   speed.  Possibly also `assemble_padding_force'.                              Not yet
 
-2.
+2. 09/04/2107
+  Enable set compute flags in calculator constructor. e.g. `compute_forces
+  = False`. And then initialize KIM accordingly. This can help to speedup
+  the computation.                                                             Not yet

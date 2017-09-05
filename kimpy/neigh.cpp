@@ -31,8 +31,8 @@ int nbl_initialize(void* kimmdl) {
     return status;
   }
 
-//TODO do not need this
-//  nbl_free_neigh_object(kimmdl);
+  // free neighbor list content, and the neighbor list itself
+  nbl_clean(kimmdl);
 
   // setup a blank neighborlist
   NeighList *nl = (NeighList*) malloc(sizeof(NeighList));
@@ -66,7 +66,6 @@ int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need
   NeighList *nl;
 
 
-
   /* local vars */
   int i, j, k, ii, jj, kk;
   int neighbors;
@@ -84,7 +83,6 @@ int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need
   char msg[512];
 
 
-
   // get neigh object
   nl = (NeighList*) KIM_API_get_data(kimmdl, "neighObject", &status);
   if (KIM_STATUS_OK != status) {
@@ -93,7 +91,7 @@ int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need
   }
 
   // get necessary data for constructing neighborlist
-  KIM_API_getm_data(kimmdl, &status, 3*3,
+  KIM_API_getm_data(kimmdl,  &status,  3*3,
       "numberOfParticles",    &Natoms,    1,
       "coordinates",          &coords,    1,
       "cutoff",               &cutoff,    1);
@@ -102,8 +100,8 @@ int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need
     return status;
   }
 
-  /* reset neigh object to refill */
-  nbl_free_neigh_object(kimmdl);
+  /* reset neigh object to refill, in cause the user forget to do it */
+  nbl_free_neigh_content(kimmdl);
   nl->Nneighbors = (int*) malloc((*Natoms)*sizeof(int));
   nl->beginIndex = (int*) malloc((*Natoms)*sizeof(int));
 
@@ -271,13 +269,26 @@ int nbl_get_neigh(void* pkim, int* mode, int* request, int *atom, int* numnei,
 }
 
 
+//  free both the content in the neighbor list and the neighbor list itself
 int nbl_clean(void* kimmdl) {
-  int status = nbl_free_neigh_object(kimmdl);
-  return status;
+  int status = nbl_free_neigh_content(kimmdl);
+
+  // free neighbor list content
+  NeighList *nl = (NeighList*) KIM_API_get_data(kimmdl, "neighObject", &status);
+  if (KIM_STATUS_OK != status) {
+    KIM_API_report_error(__LINE__, __FILE__,"KIM_API_get_data", status);
+    return status;
+  }
+
+  // free neighbor list itself
+  safefree(nl);
+
+  return KIM_STATUS_OK;
 }
 
 
-int nbl_free_neigh_object(void* kimmdl)
+// only free the content in the neighbor list, not the neighbor list itself
+int nbl_free_neigh_content(void* kimmdl)
 {
   int status;
 
