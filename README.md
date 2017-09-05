@@ -5,25 +5,30 @@ of Interatomic Models.
 
 ## Installation
 
+0. Virtual environment (Optional)
+
+Create a virtual environment using `conda` (see [here](https://conda.io/miniconda.html)
+for more information about `conda` and `Miniconda`.)
+
+    $ conda create -n kimcalculator
+
+and then activate the environment
+
+    $ source activate kimcalulator
+
 1. install from source
 
-Clone this repo by
+Clone this repo
 
     $ git clone git@github.com:mjwen/ase_kim_calculator.git
 
 and then install by
 
-    $ python setup.py install
+    $ pip install ./ase_kim_calculator
 
-2. pip
-```
-$ pip install ase_kim_calculator
-```
+2. pip (to come)
 
-3. conda
-```
-$ conda install ase_kim_calculator
-```
+3. conda (to come)
 
 TO check that this package `kimpy` is sussessfully installed, you can do
 
@@ -31,15 +36,15 @@ TO check that this package `kimpy` is sussessfully installed, you can do
     $ pytest
 
 and you will get something like
+```
+...
+collected 2 items
 
-    ...
-    collected 2 items
+test_calculator.py .
+test_report_error.py .
 
-    test_calculator.py .
-    test_report_error.py .
-
-    ==================== 2 passed in 0.18 seconds ====================
-
+==================== 2 passed in 0.18 seconds ====================
+```
 
 ## Example
 

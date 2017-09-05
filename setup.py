@@ -43,10 +43,7 @@ def get_kim_extra_link_args():
   return inquire_kim_api('--ldflags', '-L', 1)
 
 def get_extra_compile_args():
-  if sys.platform == 'linux2':
-    return ['-std=c++11']
-  if sys.platform == 'darwin':
-    return ['-std=c++11', '-stdlib=libc++', '-mmacosx-version-min=10.7']
+  return ['-std=c++11']
 
 
 kimapi_module = Extension('kimpy.kimapi',
@@ -76,7 +73,7 @@ setup(name = 'ase_kim_calculator',
     description = 'This is a demo package',
     packages = ['kimpy'],
     ext_modules = [kimapi_module, neigh_module],
-    install_requires=['pybind11>=2.2'],
+    install_requires=['pybind11>=2.2', 'numpy', 'ase'],
     setup_requires=['pybind11>=2.2'],  # ensures it be downloaded first
     zip_safe = False,
     )
