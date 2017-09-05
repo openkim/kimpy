@@ -1,6 +1,6 @@
 build:
 	python setup.py build
-dev:
+develop:
 	python setup.py develop
 inplace:
 	python setup.py build_ext --inplace

@@ -99,11 +99,25 @@ class KIMModelCalculator(Calculator):
   def update_kim(self, atoms):
     """ Register KIM input and output data pointers, and build neighbor list.
 
+    Each time called, new KIM input data arrays will be created according to the
+    atoms object, and then registered in KIM API.
+
     Parameter
     ---------
 
     atoms: ASE Atoms instance
     """
+#NOTE ask Prof. Elliott, about garbage collection. New pointers will be registered
+# in the KIM object, Will the previous registerd one be freed automatically?
+# Provided that KIM object is the only one that has reference to the data?
+# 1. python is passed by reference.
+# 2. Maintain reference count. when referneced, counts++, when deferenced, counts--,
+# when counts == 0. Free.
+#
+# What I did, pass numpy array, and obtained the pointer to the numpy array data, and
+# then register in KIM.
+# Q: does this counts are reference, and when pointer deattached, does it count as
+# dereference.
 
     # get info from Atoms object
     nparticles = atoms.get_number_of_atoms()
@@ -131,13 +145,11 @@ class KIMModelCalculator(Calculator):
       is_padding[nparticles:] = np.ones(npad, dtype=np.intc)
 
     else:
+      self.pad_image = None
       self.km_nparticles = np.array([nparticles], dtype=np.intc)
       km_particle_species = particle_species
       self.km_coords = np.array(coords, dtype=np.double)
       is_padding = np.zeros(nparticles, dtype=np.intc)
-
-    # NOTE for debug use only
-    #write_extxyz(cell, particle_species, self.km_coords, fname='check_set_padding.xyz')
 
     # species code
     self.km_nspecies = np.array([nspecies], dtype=np.intc)
@@ -294,7 +306,7 @@ def generate_kimstr(modelname, species):
   return kimstr
 
 
-def assemble_padding_forces(forces, Ncontrib, pad_image):
+def assemble_padding_forces(forces, Ncontrib, pad_image=None):
   """
   Assemble forces on padding atoms back to contributing atoms.
 
@@ -434,6 +446,5 @@ def set_padding(cell, PBC, species, coords, rcut):
       abs_coords = np.dot(pad_coords, tcell.T).ravel()
 
   return abs_coords, pad_spec, pad_image
-
 
 
