@@ -340,7 +340,7 @@ def assemble_padding_forces(forces, Ncontrib, pad_image=None):
     forces[i] += np.sum(pad_forces[idx], axis=0)
 
   # return forces of contributing atoms
-  return np.reshape(forces[:Ncontrib], DIM*Ncontrib)
+  return forces[:Ncontrib, :]
 
 
 
