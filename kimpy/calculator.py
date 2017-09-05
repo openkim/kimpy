@@ -173,7 +173,7 @@ class KIMModelCalculator(Calculator):
 
     # initialize and register KIM API object output pointers
     self.km_energy = np.array([0.], dtype=np.double)
-    self.km_forces = np.array([0.0]*(3*self.km_nparticles[0]), dtype=np.double)
+    self.km_forces = np.zeros(3*self.km_nparticles[0], dtype=np.double)
     km.set_data_double(self.pkim, "energy", self.km_energy)
     km.set_data_double(self.pkim, "forces", self.km_forces)
 
@@ -332,12 +332,12 @@ def assemble_padding_forces(forces, Ncontrib, pad_image=None):
 
   forces = np.reshape(forces, (-1, DIM))
   pad_forces = forces[Ncontrib:, :]
-  pad_iamge = np.array(pad_image)
+  pad_image = np.array(pad_image)
 
   for i in xrange(Ncontrib):
     # idx: the indices of padding atoms that are images of contributing atom i
-    idx = np.where(pad_image == i)
-    forces[i] += np.sum(pad_forces[idx], axis=0)
+    indices = np.where(pad_image == i)
+    forces[i] += np.sum(pad_forces[indices], axis=0)
 
   # return forces of contributing atoms
   return forces[:Ncontrib, :]
@@ -408,9 +408,9 @@ def set_padding(cell, PBC, species, coords, rcut):
   pad_coords = []
   pad_spec = []
   pad_image = []
-  for i in range(-size0, size0+1):
-    for j in range(-size1, size1+1):
-      for k in range(-size2, size2+1):
+  for i in xrange(-size0, size0+1):
+    for j in xrange(-size1, size1+1):
+      for k in xrange(-size2, size2+1):
         if i==0 and j==0 and k==0:  # do not create contributing atoms
           continue
         if not PBC[0] and i != 0:   # apply BC

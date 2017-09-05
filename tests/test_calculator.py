@@ -15,7 +15,7 @@ def print_values(atoms, msg):
   print(msg)
   print('\ncoords:\n', pos)
   print('\nenergy:\n', energy)
-  print('\nforces:\n', np.reshape(forces, (-1, 3)))
+  print('\nforces:\n', forces)
   print ('\nrunning time:', time.time() - start)
 
 
