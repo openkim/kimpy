@@ -9,4 +9,4 @@ install:
 clean:
 	python setup.py clean
 clean_all:
-	rm -rf build/ dist/ ase_kim_calculator.egg-info/ *.so
+	rm -rf build/ dist/ ase_kim_calculator.egg-info/ *.so kimpy/*.so kimpy/*pyc
