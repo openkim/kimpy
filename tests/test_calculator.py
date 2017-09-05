@@ -2,6 +2,7 @@ from __future__ import print_function
 import numpy as np
 from kimpy.calculator import KIMModelCalculator
 from ase.lattice.cubic import SimpleCubic
+import time
 
 def test_calculator():
 
@@ -16,14 +17,34 @@ def test_calculator():
   # attach calculator to atoms
   argon.set_calculator(calc)
 
+  # compute energy and forces
+  start = time.time()
   pos = argon.get_positions()
   energy = argon.get_potential_energy()
   forces = argon.get_forces()
-
+  print('='*80)
   print('KIM model:', modelname)
   print('\ncoords:\n', pos)
   print('\nenergy:\n', energy)
   print('\nforces:\n', np.reshape(forces, (-1, 3)))
+  print ('\nrunning time:', time.time() - start)
+
+
+  # change pbc
+  argon.set_pbc([1,1,1])
+
+  # compute energy and forces
+  start = time.time()
+  pos = argon.get_positions()
+  energy = argon.get_potential_energy()
+  forces = argon.get_forces()
+  print()
+  print('='*80)
+  print('KIM model:', modelname)
+  print('\ncoords:\n', pos)
+  print('\nenergy:\n', energy)
+  print('\nforces:\n', np.reshape(forces, (-1, 3)))
+  print ('\nrunning time:', time.time() - start)
 
 if __name__ == '__main__':
   test_calculator()

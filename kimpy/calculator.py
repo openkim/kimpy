@@ -56,20 +56,11 @@ class KIMModelCalculator(Calculator):
     """
     if self.pkim is not None:
       self.free_kim()
-    else:
-      self.init_kim(atoms)
-
-
-  def free_kim(self):
-    """Free KIM neigh object, KIM Model and KIM object. """
-    nl.clean(self.pkim)
-    km.model_destroy(self.pkim)
-    km.free(self.pkim)
-    km.pkim = None
+    self.init_kim(atoms)
 
 
   def init_kim(self, atoms):
-    """Initialize KIM object.
+    """Initialize KIM object and neighbor list.
 
     Parameter
     ---------
@@ -77,24 +68,16 @@ class KIMModelCalculator(Calculator):
     atoms: ASE Atoms instance
     """
 
-    # get info form Atoms object
-    nparticles = atoms.get_number_of_atoms()
-    coords = np.ravel(atoms.get_positions())
-    cell = atoms.get_cell()
-    pbc = atoms.get_pbc()
+    # get species info from Atoms object
     particle_species = atoms.get_chemical_symbols()
     unique_species = list(set(particle_species))
     nspecies = len(unique_species)
 
-    self.ncontrib = nparticles
-
     # create kim object
     test_kimstr = generate_kimstr(self.modelname, unique_species)
-
     self.pkim, status = km.string_init(test_kimstr, self.modelname)
     if status != km.STATUS_OK:
       km.report_error('km.string_init', status)
-
 
     # init model
     # memory for `cutoff' must be allocated and registered before calling model_init
@@ -107,8 +90,33 @@ class KIMModelCalculator(Calculator):
     if status != km.STATUS_OK:
       km.report_error('km.model_init', status)
 
+    # initialize neighbor list
+    status = nl.initialize(self.pkim)
+    if status != km.STATUS_OK:
+      km.report_error('nl.initialize', status)
 
-    # init kim data
+
+  def update_kim(self, atoms):
+    """ Register KIM input and output data pointers, and build neighbor list.
+
+    Parameter
+    ---------
+
+    atoms: ASE Atoms instance
+    """
+
+    # get info from Atoms object
+    nparticles = atoms.get_number_of_atoms()
+    coords = np.ravel(atoms.get_positions())
+    cell = atoms.get_cell()
+    pbc = atoms.get_pbc()
+    particle_species = atoms.get_chemical_symbols()
+    unique_species = list(set(particle_species))
+    nspecies = len(unique_species)
+    self.ncontrib = nparticles
+
+
+    # init KIM API input data
     if any(pbc):
       # create padding atoms if necessary
       # NOTE this is implemented in python, replace by c for effience
@@ -131,7 +139,6 @@ class KIMModelCalculator(Calculator):
     # NOTE for debug use only
     #write_extxyz(cell, particle_species, self.km_coords, fname='check_set_padding.xyz')
 
-
     # species code
     self.km_nspecies = np.array([nspecies], dtype=np.intc)
 
@@ -145,27 +152,25 @@ class KIMModelCalculator(Calculator):
     self.km_particle_code = np.array(tmp, dtype=np.intc)
 
 
-    # set KIM API object input pointers
+    # register KIM API object input pointers
     km.set_data_int(self.pkim, "numberOfParticles", self.km_nparticles)
     km.set_data_double(self.pkim, "coordinates", self.km_coords)
     km.set_data_int(self.pkim, "numberOfSpecies", self.km_nspecies)
     km.set_data_int(self.pkim, "particleSpecies", self.km_particle_code)
 
-    # initialize energy and forces and register their KIM pointer (output of KIM object)
+
+    # initialize and register KIM API object output pointers
     self.km_energy = np.array([0.], dtype=np.double)
     self.km_forces = np.array([0.0]*(3*self.km_nparticles[0]), dtype=np.double)
     km.set_data_double(self.pkim, "energy", self.km_energy)
     km.set_data_double(self.pkim, "forces", self.km_forces)
 
 
-    # initialize and create neighbor list
-    status = nl.initialize(self.pkim)
-    if status != km.STATUS_OK:
-      km.report_error('nl.initialize', status)
-
+    # create neighbor list
     nl.build_neighborlist(self.pkim, is_padding, self.padding_need_neigh)
     if status != km.STATUS_OK:
       km.report_error('nl.build_neighborlist', status)
+
 
 
   def calculate(self, atoms=None,
@@ -191,9 +196,12 @@ class KIMModelCalculator(Calculator):
 
     Calculator.calculate(self, atoms, properties, system_changes)
 
-    status = km.model_compute(self.pkim)
-    if status != km.STATUS_OK:
-      km.report_error('km.model_compute', status)
+    # update KIM API input data and neighbor list if necessary
+    if system_changes:
+      self.update_kim(atoms)
+      status = km.model_compute(self.pkim)
+      if status != km.STATUS_OK:
+        km.report_error('km.model_compute', status)
 
     energy = self.km_energy[0]
     forces = self.km_forces
@@ -201,8 +209,25 @@ class KIMModelCalculator(Calculator):
 
     # return values
     self.results['energy'] = energy
-    if 'forces' in properties:
-      self.results['forces'] = forces
+    self.results['forces'] = forces
+
+
+  def free_kim(self):
+    """Free KIM neigh object, KIM Model and KIM object. """
+    nl.clean(self.pkim)
+    km.model_destroy(self.pkim)
+    km.free(self.pkim)
+    self.pkim = None
+
+
+  def __str__(self):
+    """Print this object shows the following message."""
+    return 'KIMModelCalculator(modelname = {})'.format(self.modelname)
+
+
+  def __del__(self):
+    """Garbage collects the KIM neigh objects and KIM object."""
+    self.free_kim()
 
 
 
@@ -409,5 +434,6 @@ def set_padding(cell, PBC, species, coords, rcut):
       abs_coords = np.dot(pad_coords, tcell.T).ravel()
 
   return abs_coords, pad_spec, pad_image
+
 
 
