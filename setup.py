@@ -30,7 +30,10 @@ def inquire_kim_api(option, key, mode):
 
 
 def get_kim_includes():
-  return inquire_kim_api('--includes', '-I', 0)
+  import pybind11
+  pybind11_inc = pybind11.get_include()
+  kim_inc = inquire_kim_api('--includes', '-I', 0)[0]
+  return [kim_inc, pybind11_inc]
 
 def get_kim_libdirs():
   return inquire_kim_api('--ldflags', '-L', 0)
