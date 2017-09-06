@@ -85,7 +85,7 @@ PYBIND11_MODULE(kimapi, m) {
     py::arg("kimmdl")
   );
 
-  m.def("print",
+  m.def("print_kim",
     [](void* kimmdl) {
       int status;
       KIM_API_print(kimmdl, &status);

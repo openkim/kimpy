@@ -224,6 +224,41 @@ class KIMModelCalculator(Calculator):
     self.results['forces'] = forces
 
 
+  def get_kim_model_supported_species(self):
+    """Create a temporary KIM object to inqure the supported species of the model.
+
+    Return
+    ------
+
+    species_list: list of str
+      A list of all the supported species by the KIM model.
+    """
+
+    pkim, status = km.model_info(self.modelname)
+    if status != km.STATUS_OK:
+      km.report_error('km.model_info', status)
+
+    km.print_kim(pkim)
+
+
+    # number of model species
+    numberSpecies, maxStrLen, status = km.get_num_model_species(pkim)
+    if status != km.STATUS_OK:
+      km.report_error('km.get_num_model_species', status)
+
+    for i in xrange(numberSpecies):
+      spec, maxStrLen, status = km.get_model_species(pkim)
+      if status != km.STATUS_OK:
+        km.report_error('km.get_model_species', status)
+      species_list.append(spec)
+
+    # destroy the temporary model and the KIM object
+    km.model_destroy(pkim)
+    km.free(pkim)
+
+    return species_list
+
+
   def free_kim(self):
     """Free KIM neigh object, KIM Model and KIM object. """
     nl.clean(self.pkim)
