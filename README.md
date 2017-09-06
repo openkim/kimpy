@@ -20,7 +20,7 @@ and then activate the environment
 
 Clone this repo
 
-    $ git clone git@github.com:mjwen/kimpy.git
+    $ git clone https://github.com/mjwen/kimpy.git
 
 and then install by
 
