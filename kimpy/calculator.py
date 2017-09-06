@@ -225,36 +225,7 @@ class KIMModelCalculator(Calculator):
 
 
   def get_kim_model_supported_species(self):
-    """Create a temporary KIM object to inqure the supported species of the model.
-
-    Return
-    ------
-
-    species_list: list of str
-      A list of all the supported species by the KIM model.
-    """
-
-    pkim, status = km.model_info(self.modelname)
-    if status != km.STATUS_OK:
-      km.report_error('km.model_info', status)
-
-    # number of model species
-    numberSpecies, maxStrLen, status = km.get_num_model_species(pkim)
-    if status != km.STATUS_OK:
-      km.report_error('km.get_num_model_species', status)
-
-    # get species list
-    species_list = []
-    for i in xrange(numberSpecies):
-      spec, status = km.get_model_species(pkim, i)
-      if status != km.STATUS_OK:
-        km.report_error('km.get_model_species', status)
-      species_list.append(spec)
-
-    # destroy the temporary model and the KIM object
-    km.free(pkim)
-
-    return species_list
+    return get_model_species_list(self.modelname)
 
 
   def free_kim(self):
@@ -338,6 +309,39 @@ def generate_kimstr(modelname, species):
   #kimstr += 'particleEnergy  double  energy  [numberOfParticles]\n'
 
   return kimstr
+
+
+def get_model_species_list(modelname):
+  """Create a temporary KIM object to inqure the supported species of the model.
+
+  Return
+  ------
+
+  species_list: list of str
+    A list of all the supported species by the KIM model.
+  """
+
+  pkim, status = km.model_info(modelname)
+  if status != km.STATUS_OK:
+    km.report_error('km.model_info', status)
+
+  # number of model species
+  numberSpecies, maxStrLen, status = km.get_num_model_species(pkim)
+  if status != km.STATUS_OK:
+    km.report_error('km.get_num_model_species', status)
+
+  # get species list
+  species_list = []
+  for i in xrange(numberSpecies):
+    spec, status = km.get_model_species(pkim, i)
+    if status != km.STATUS_OK:
+      km.report_error('km.get_model_species', status)
+    species_list.append(spec)
+
+  # destroy the temporary model and the KIM object
+  km.free(pkim)
+
+  return species_list
 
 
 def assemble_padding_forces(forces, Ncontrib, pad_image=None):
