@@ -238,22 +238,20 @@ class KIMModelCalculator(Calculator):
     if status != km.STATUS_OK:
       km.report_error('km.model_info', status)
 
-    km.print_kim(pkim)
-
-
     # number of model species
     numberSpecies, maxStrLen, status = km.get_num_model_species(pkim)
     if status != km.STATUS_OK:
       km.report_error('km.get_num_model_species', status)
 
+    # get species list
+    species_list = []
     for i in xrange(numberSpecies):
-      spec, maxStrLen, status = km.get_model_species(pkim)
+      spec, status = km.get_model_species(pkim, i)
       if status != km.STATUS_OK:
         km.report_error('km.get_model_species', status)
       species_list.append(spec)
 
     # destroy the temporary model and the KIM object
-    km.model_destroy(pkim)
     km.free(pkim)
 
     return species_list
@@ -272,9 +270,10 @@ class KIMModelCalculator(Calculator):
     return 'KIMModelCalculator(modelname = {})'.format(self.modelname)
 
 
-  def __del__(self):
+  #def __del__(self):
     """Garbage collects the KIM neigh objects and KIM object."""
-    self.free_kim()
+    if self.pkim is not None:
+      self.free_kim()
 
 
 
