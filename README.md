@@ -20,19 +20,19 @@ and then activate the environment
 
 Clone this repo
 
-    $ git clone git@github.com:mjwen/ase_kim_calculator.git
+    $ git clone git@github.com:mjwen/kimpy.git
 
 and then install by
 
-    $ pip install ./ase_kim_calculator
+    $ pip install ./kimpy
 
 2. pip (to come)
 
 3. conda (to come)
 
-TO check that this package `kimpy` is sussessfully installed, you can do
+TO check that `kimpy` is sussessfully installed, you can do
 
-    $ cd kim_ase_caculator/tests
+    $ cd kimpy/tests
     $ pytest
 
 and you will get something like

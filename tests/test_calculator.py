@@ -39,11 +39,11 @@ def test_calculator():
   argon.set_pbc([0,0,0])
   print_values(argon, 'SC argon, pbc=(0,0,0)')
 
-  # create an FCC crystal
+  # create a FCC crystal
   argon2 = FaceCenteredCubic(directions=[[1,0,0], [0,1,0], [0,0,1]], size=(2,2,2),
                              symbol='Ar', pbc=(1,1,0), latticeconstant=3.0)
 
-  # attach the SAME calculator to the new atoms object
+  # attach the SAME calculator to the new atoms
   argon2.set_calculator(calc)
 
   # compute energy and forces

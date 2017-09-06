@@ -77,7 +77,7 @@ neigh_module = Extension('kimpy.neighborlist',
     )
 
 
-setup(name = 'ase_kim_calculator',
+setup(name = 'kimpy',
     version = '0.0.1',
     description = 'This is a demo package',
     packages = ['kimpy'],
