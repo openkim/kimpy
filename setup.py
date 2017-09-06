@@ -45,13 +45,27 @@ def get_kim_extra_link_args():
 def get_extra_compile_args():
   return ['-std=c++11']
 
-def get_pybind11_includes():
-  import pybind11
-  return [pybind11.get_include()]
+
+class get_pybind11_includes(object):
+  """Helper class to determine the pybind11 include path
+
+  The purpose of this class is to postpone importing pybind11 until it is actually
+  installed, so that the ``get_include()`` method can be invoked.
+
+  Borrowd from: https://github.com/pybind/python_example/blob/master/setup.py
+  """
+
+  def __init__(self, user=False):
+    self.user = user
+
+  def __str__(self):
+    import pybind11
+    return pybind11.get_include(self.user)
+
 
 def get_includes():
   kim_inc = get_kim_includes()
-  pybind11_inc = get_pybind11_includes()
+  pybind11_inc =[get_pybind11_includes(), get_pybind11_includes(user=True)]
   return kim_inc + pybind11_inc
 
 
