@@ -4,9 +4,8 @@ from ase.calculators.calculator import Calculator
 from kimpy import kimapi as km
 from kimpy import neighborlist as nl
 
-__version__ = '0.0.1'
-__anthor__ = 'Mingjian Wen'
 
+__anthor__ = 'Mingjian Wen'
 
 
 class KIMModelCalculator(Calculator):
@@ -20,17 +19,22 @@ class KIMModelCalculator(Calculator):
 
   padding_need_neigh: bool
     Flag to indicate whether need to create neighbors for padding atoms.
+
+  debug: bool
+    Flag to indicate wheter to use debug mode or not. If Yes, the latest
+    configuraton with padding atoms setting will be written to 'config.xyz'.
   """
 
   implemented_properties = ['energy', 'forces']
 
 
-  def __init__(self, modelname, padding_need_neigh=False, **kwargs):
+  def __init__(self, modelname, padding_need_neigh=False, debug=False, **kwargs):
     Calculator.__init__(self, **kwargs)
 
     # kim attributes
     self.modelname = modelname
     self.padding_need_neigh = padding_need_neigh
+    self.debug = debug
     self.pkim = None
 
     # pointers registed to kim object
@@ -150,6 +154,10 @@ class KIMModelCalculator(Calculator):
       km_particle_species = particle_species
       self.km_coords = np.array(coords, dtype=np.double)
       is_padding = np.zeros(nparticles, dtype=np.intc)
+
+    if self.debug:
+      # write configuratons with paddings
+      write_extxyz(cell, km_particle_species, self.km_coords, fname='config.xyz')
 
     # species code
     self.km_nspecies = np.array([nspecies], dtype=np.intc)
@@ -485,4 +493,47 @@ def set_padding(cell, PBC, species, coords, rcut):
 
   return abs_coords, pad_spec, pad_image
 
+
+
+def write_extxyz(cell, species, coords, fname='config.xyz'):
+  """Output configurations as xyz file.
+
+  Parameters
+  ----------
+
+  cell: 3x3 array
+    Supercell lattice vectors.
+
+  species: list of str
+    atom species
+
+  coords: 1D array of size 3*natoms
+    atomic coordinates
+  """
+  with open (fname, 'w') as fout:
+    # first line (num of atoms)
+    natoms = len(species)
+    fout.write('{}\n'.format(natoms))
+
+    # second line
+    # lattice
+    fout.write('Lattice="')
+    for line in cell:
+      for item in line:
+        fout.write('{} '.format(item))
+    fout.write('" ')
+    # properties
+    fout.write('Properties=species:S:1:pos:R:3\n')
+
+    # species, coords
+    if natoms != len(coords)//3:
+      print ('Number of atoms is inconsistent from species nad coords.')
+      print ('len(specis)=', natoms)
+      print ('len(coords)=', len(coords)//3)
+      sys.exit(1)
+    for i in range(natoms):
+      fout.write('{:4}'.format(species[i]))
+      fout.write('{:12.5e} '.format(coords[3*i+0]))
+      fout.write('{:12.5e} '.format(coords[3*i+1]))
+      fout.write('{:12.5e}\n'.format(coords[3*i+2]))
 

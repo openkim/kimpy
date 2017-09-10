@@ -14,8 +14,8 @@ def inquire_kim_api(option, key, mode):
   try:
     config = subprocess.check_output(['kim-api-build-config', option])
   except:
-    raise Exception('"kim_api_build_config" not found on PATH; make sure kim-api '
-                    'is installed and "kim_api_build_config" is on PATH.')
+    raise Exception('"kim-api-build-config" not found on PATH; make sure kim-api '
+                    'is installed and "kim-api-build-config" is on PATH.')
 
   # remove `\n' at end and then split at white space
   split_config = [s for s in config.strip().split(' ')]
