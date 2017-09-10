@@ -81,7 +81,7 @@ kimapi_module = Extension('kimpy.kimapi',
 
 
 neigh_module = Extension('kimpy.neighborlist',
-    sources = ['kimpy/cvec.cpp', 'kimpy/neigh.cpp', 'kimpy/neigh_bind.cpp'],
+    sources = ['kimpy/neigh.cpp', 'kimpy/neigh_bind.cpp'],
     include_dirs = get_includes(),
     library_dirs = get_kim_libdirs(),
     libraries = get_kim_ldlibs(),

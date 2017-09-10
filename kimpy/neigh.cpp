@@ -1,11 +1,11 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
+#include <cstring>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <new>
 
 #include "KIM_API_C.h"
 #include "KIM_API_status.h"
-#include "cvec.h"
 #include "neigh.h"
 
 #define DIM 3
@@ -31,10 +31,10 @@ int nbl_initialize(void* kimmdl) {
   nbl_clean(kimmdl);
 
   // setup a blank neighborlist
-  NeighList *nl = (NeighList*) malloc(sizeof(NeighList));
-  nl->Nneighbors = NULL;
-  nl->neighborList = NULL;
-  nl->beginIndex = NULL;
+  NeighList *nl = new NeighList[1];
+  nl->Nneighbors = nullptr;
+  nl->neighborList = nullptr;
+  nl->beginIndex = nullptr;
 
   // register neigh object and get_neigh method in KIM API
   status = KIM_API_set_data(kimmdl, "neighObject", 1, nl);
@@ -52,94 +52,7 @@ int nbl_initialize(void* kimmdl) {
 }
 
 
-
-// // A naive method to build neighborlist by loop through all atoms.
-// // In efficient but sure to be correct.
-//
-//int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need_neigh)
-//{
-//
-//  int status;
-//  int* Natoms;
-//  double* coords;
-//  double* cutoff;
-//  NeighList *nl;
-//
-//  /* local vars */
-//  int i, j, k;
-//  int neighbors;
-//  double dx[DIM];
-//  double R, R2, dist;
-//  int total;
-//
-//
-//  // get neigh object
-//  nl = (NeighList*) KIM_API_get_data(kimmdl, "neighObject", &status);
-//  if (KIM_STATUS_OK != status) {
-//    KIM_API_report_error(__LINE__, __FILE__, "KIM_API_get_data", status);
-//    return status;
-//  }
-//
-//  // get necessary data for constructing neighborlist
-//  KIM_API_getm_data(kimmdl,  &status,  3*3,
-//      "numberOfParticles",    &Natoms,    1,
-//      "coordinates",          &coords,    1,
-//      "cutoff",               &cutoff,    1);
-//  if (KIM_STATUS_OK != status) {
-//    KIM_API_report_error(__LINE__, __FILE__, "KIM_API_getm_data", status);
-//    return status;
-//  }
-//
-//  /* reset neigh object to refill, in cause the user forget to do it */
-//  nbl_free_neigh_content(kimmdl);
-//  nl->Nneighbors = (int*) malloc((*Natoms)*sizeof(int));
-//  nl->beginIndex = (int*) malloc((*Natoms)*sizeof(int));
-//  nl->neighborList = NULL;
-//
-//
-//  R = *cutoff;
-//  R2 = R*R;
-//
-//
-//  total = 0;
-//  /* create neighbors */
-//  for (i=0; i<*Natoms; i++){
-//    neighbors = 0;
-//    nl->beginIndex[i] = total;
-//
-//    // padding atom needs no neighbors
-//    if (is_padding[i] && !padding_need_neigh) {
-//      nl->Nneighbors[i] = neighbors;
-//      nl->beginIndex[i] = total;
-//      total += neighbors;
-//      continue;
-//    }
-//
-//    for (j=0; j<*Natoms; j++) {
-//      if (j != i) {
-//        dist = 0.0;
-//        for (k=0; k<DIM; k++) {
-//          dx[k] = coords[DIM*j+k] - coords[DIM*i+k];
-//          dist += dx[k]*dx[k];
-//        }
-//        if (dist < R2) {
-//          total++;
-//          nl->neighborList = (int*) realloc(nl->neighborList, total*sizeof(double));
-//          nl->neighborList[total-1] = j;
-//          neighbors++;
-//        }
-//      }
-//    }
-//
-//    nl->Nneighbors[i] = neighbors;
-//  }
-//
-//  return KIM_STATUS_OK;
-//}
-//
-
-
-
+// set up the neighbor list
 int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need_neigh)
 {
 
@@ -150,17 +63,17 @@ int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need
   NeighList *nl;
 
   int i, j, k, ii, jj, kk;
-  int neighbors;
+  int num_neigh;
   double dx[DIM];
-  double R, R2, dist;
+  double rcut, cutsq, rsq;
   int size[DIM];
   int size_total;
   int index[DIM];
-  int ind;
+  int idx;
   int total;
   int n;
-  double min[3];
-  double max[3];
+  double min[DIM];
+  double max[DIM];
 
 
   // get neigh object
@@ -172,120 +85,104 @@ int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need
 
   // get necessary data for constructing neighborlist
   KIM_API_getm_data(kimmdl,  &status,  3*3,
-      "numberOfParticles",    &Natoms,    1,
-      "coordinates",          &coords,    1,
-      "cutoff",               &cutoff,    1);
+      "numberOfParticles",   &Natoms,  1,
+      "coordinates",         &coords,  1,
+      "cutoff",              &cutoff,  1);
   if (KIM_STATUS_OK != status) {
     KIM_API_report_error(__LINE__, __FILE__, "KIM_API_getm_data", status);
     return status;
   }
 
-  /* reset neigh object to refill, in cause the user forget to do it */
-  nbl_free_neigh_content(kimmdl);
-  nl->Nneighbors = (int*) malloc((*Natoms)*sizeof(int));
-  nl->beginIndex = (int*) malloc((*Natoms)*sizeof(int));
+  rcut = *cutoff;
+  cutsq = rcut*rcut;
 
-  R = *cutoff;
-  R2 = R*R;
-
-  // init max and min of coords values to that of the first atom
+// init max and min of coords to that of the first atom
   for (k=0; k<DIM; k++){
     min[k] = coords[k];
     max[k] = coords[k] + 1; // +1 to prevent max==min for 1D and 2D case
   }
 
   for (i=0; i<*Natoms; i++){
-    for (j=0; j<3; j++){
-      if (max[j] < coords[3*i+j]) max[j] = coords[3*i+j];
-      if (min[j] > coords[3*i+j]) min[j] = coords[3*i+j];
+    for (j=0; j<DIM; j++){
+      if (max[j] < coords[DIM*i+j]) max[j] = coords[DIM*i+j];
+      if (min[j] > coords[DIM*i+j]) min[j] = coords[DIM*i+j];
     }
   }
 
   /* make the cell box */
   size_total = 1;
-  for (i=0; i<3; i++){
-    size[i] = (int)((max[i]-min[i])/R);
+  for (i=0; i<DIM; i++){
+    size[i] = (int)((max[i]-min[i])/rcut);
     size[i] = size[i] <= 0 ? 1 : size[i];
     size_total *= size[i];
   }
-
   if (size_total > 1000000000) {
-    fprintf(stderr, "kimpy: Cell size %i x %i x %i ? You thinks me a bit ambitious.\n",
-        size[0], size[1], size[2]);
-    fprintf(stderr, "kimpy: Check if you have particles at 1e10.\n");
-    fprintf(stderr, "kimpy: Attempting to proceed...\n");
+    std::cerr << "kimpy: Cell size" << size[0]<<" x " <<size[1]<<" x "<<size[2]<<
+        "? You thinks me a bit ambitious." <<std::endl;
+    std::cerr << "kimpy: Check if you have particles at 1e10." << std::endl;
+    std::cerr << "kimpy: Attempting to proceed..." << std::endl;
   }
 
-  cvec **cells = (cvec**)malloc(sizeof(cvec*)*size_total);
-  for (i=0; i<size_total; i++){
-    cells[i] = (cvec*)malloc(sizeof(cvec));
-    cvec_init(cells[i], 4);
-  }
 
+  // assign atoms into cells
+  std::vector<std::vector<int>> cells(size_total);
   for (i=0; i<*Natoms; i++){
-    coords_to_index(&coords[3*i], size, index, max, min);
-    cvec_insert_back(cells[index[0] + index[1]*size[0] + index[2]*size[0]*size[1]], i);
+    coords_to_index(&coords[DIM*i], size, index, max, min);
+    idx = index[0] + index[1]*size[0] + index[2]*size[0]*size[1];
+    cells[idx].push_back(i);
   }
 
-  cvec *temp_neigh = (cvec*)malloc(sizeof(cvec));
-  cvec_init(temp_neigh, 4);
+
+  // create neighbors
+
+  // free previous neigh content first
+  nbl_free_neigh_content(kimmdl);
+  nl->Nneighbors = new int[*Natoms];
+  nl->beginIndex = new int[*Natoms];
+
+  // temporary neigh container
+  std::vector<int> tmp_neigh;
 
   total = 0;
-  /* create neighbors */
   for (i=0; i<*Natoms; i++){
-    neighbors = 0;
+    num_neigh = 0;
 
-    // padding atom needs no neighbors
-    if (is_padding[i] && !padding_need_neigh) {
-      nl->Nneighbors[i] = neighbors;
-      nl->beginIndex[i] = total;
-      total += neighbors;
-      continue;
-    }
+    if (!is_padding[i] || (is_padding[i] && padding_need_neigh)) {
 
-    coords_to_index(&coords[DIM*i], size, index, max, min);
+      coords_to_index(&coords[DIM*i], size, index, max, min);
 
-    for (ii=MAX(0, index[0]-1); ii<=MIN(index[0]+1, size[0]-1); ii++){
-      for (jj=MAX(0, index[1]-1); jj<=MIN(index[1]+1, size[1]-1); jj++){
-        for (kk=MAX(0, index[2]-1); kk<=MIN(index[2]+1, size[2]-1); kk++){
-          ind = ii + jj*size[0] + kk*size[0]*size[1];
+      // loop over neighborling cells and the cell atom i resides
+      for (ii=std::max(0, index[0]-1); ii<=std::min(index[0]+1, size[0]-1); ii++)
+      for (jj=std::max(0, index[1]-1); jj<=std::min(index[1]+1, size[1]-1); jj++)
+      for (kk=std::max(0, index[2]-1); kk<=std::min(index[2]+1, size[2]-1); kk++){
 
-          cvec *cell = cells[ind];
-          for (j=0; j<cell->elems; j++) {
-            n = cvec_at(cell, j);
-            if (i != n) {
-              dist = 0.0;
-              for (k=0; k<DIM; k++) {
-                dx[k] = coords[DIM*n+k] - coords[DIM*i+k];
-                dist += dx[k]*dx[k];
-              }
-              if (dist < R2) {
-                cvec_insert_back(temp_neigh, n);
-                neighbors++;
-              }
+        idx = ii + jj*size[0] + kk*size[0]*size[1];
+
+        for (j=0; j<(int)cells[idx].size(); j++) {
+          n = cells[idx][j];
+          if (n != i) {
+            rsq = 0.0;
+            for (k=0; k<DIM; k++) {
+              dx[k] = coords[DIM*n+k] - coords[DIM*i+k];
+              rsq += dx[k]*dx[k];
+            }
+            if (rsq < cutsq) {
+              tmp_neigh.push_back(n);
+              num_neigh++;
             }
           }
         }
       }
     }
 
-    nl->Nneighbors[i] = neighbors;
+    nl->Nneighbors[i] = num_neigh;
     nl->beginIndex[i] = total;
-    total += neighbors;
+    total += num_neigh;
   }
 
-
-  nl->neighborList = (int*)malloc(sizeof(int)*total);
-  memcpy(nl->neighborList, temp_neigh->array, sizeof(int)*total);
-
-  /* cleanup all the memory usage */
-  cvec_destroy(temp_neigh);
-  for (i=0; i<size_total; i++) {
-    cvec_destroy(cells[i]);
-    safefree(cells[i]);
-  }
-  safefree(cells);
-  safefree(temp_neigh);
+  // copy tmp_neigh to NeighList
+  nl->neighborList = new int[total];
+  std::memcpy(nl->neighborList, tmp_neigh.data(), sizeof(int)*total);
 
 
   return KIM_STATUS_OK;
@@ -336,17 +233,11 @@ int nbl_get_neigh(void* pkim, int* mode, int* request, int *atom, int* numnei,
   *numnei = nl->Nneighbors[*atom];
 
   /* set the location for the returned neighbor list */
-//  idx = 0;
-//  for(i = 0; i < request; i++) {
-//    idx += nl->Nneighbors[i];
-//  }
-//  *nei1atom = nl->neighborList + idx;
 
   *nei1atom = nl->neighborList + nl->beginIndex[*atom];
 
-
   // set rij
-  *rij = NULL;
+  *rij = nullptr;
 
   return KIM_STATUS_OK;
 }
@@ -354,7 +245,7 @@ int nbl_get_neigh(void* pkim, int* mode, int* request, int *atom, int* numnei,
 
 void coords_to_index(double *x, int *size, int *index, double *max, double *min){
   int i;
-  for (i=0; i<3; i++) {
+  for (i=0; i<DIM; i++) {
     index[i] = (int)(((x[i]-min[i])/(max[i]-min[i]) - 1e-14) * size[i]);
   }
 }
@@ -389,7 +280,7 @@ int nbl_free_neigh_content(void* kimmdl)
     return status;
   }
 
-  if (nl != NULL) {
+  if (nl != nullptr) {
     safefree(nl->Nneighbors);
     safefree(nl->neighborList);
     safefree(nl->beginIndex);
@@ -401,9 +292,9 @@ int nbl_free_neigh_content(void* kimmdl)
 
 void safefree(void *ptr)
 {
-  if (ptr != NULL) {
-    free(ptr);
+  if (ptr != nullptr) {
+    delete[] ptr;
   }
-  ptr = NULL;
+  ptr = nullptr;
 }
 
