@@ -308,7 +308,7 @@ def generate_kimstr(modelname, species):
   # model output
   kimstr += "MODEL_OUTPUT:\n"
   kimstr += 'compute  method  none    []\n'
-  kimstr += 'reinit   method  none    []\n'
+  #kimstr += 'reinit   method  none    []\n'
   kimstr += 'destroy  method  none    []\n'
   kimstr += 'cutoff   double  length  []\n'
   kimstr += 'energy   double  energy  []\n'

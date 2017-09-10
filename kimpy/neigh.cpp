@@ -293,7 +293,7 @@ int nbl_free_neigh_content(void* kimmdl)
 void safefree(void *ptr)
 {
   if (ptr != nullptr) {
-    delete[] ptr;
+    free(ptr);
   }
   ptr = nullptr;
 }
