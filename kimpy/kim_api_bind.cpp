@@ -24,7 +24,8 @@ PYBIND11_MODULE(kimapi, m) {
       t[0] = version;
       t[1] = status;
       return t;
-    }
+    },
+    "Return (version, status)"
   );
 
   m.def("file_init",
@@ -37,7 +38,8 @@ PYBIND11_MODULE(kimapi, m) {
       return t;
     },
     py::arg("simkimfile"),
-    py::arg("modelname")
+    py::arg("modelname"),
+    "Return (pkim, status)"
   );
 
   m.def("model_info",
@@ -49,7 +51,8 @@ PYBIND11_MODULE(kimapi, m) {
       t[1] = status;
       return t;
     },
-    py::arg("modelname")
+    py::arg("modelname"),
+    "Return (pkim, status)"
   );
 
   m.def("string_init",
@@ -62,7 +65,8 @@ PYBIND11_MODULE(kimapi, m) {
       return t;
     },
     py::arg("siminputstring"),
-    py::arg("modelname")
+    py::arg("modelname"),
+    "Return (pkim, status)"
   );
 
   m.def("allocate",
@@ -147,7 +151,8 @@ PYBIND11_MODULE(kimapi, m) {
       t[1] = status;
       return t;
     },
-    py::arg("modelname")
+    py::arg("modelname"),
+    "Return (modelKIMStr, status)"
   );
 
   m.def("get_num_model_species",
@@ -161,7 +166,8 @@ PYBIND11_MODULE(kimapi, m) {
       t[2] = status;
       return t;
     },
-    py::arg("kimmdl")
+    py::arg("kimmdl"),
+    "Return (numberSpecies, maxStrLen, status)"
   );
 
   m.def("get_model_species",
@@ -174,7 +180,8 @@ PYBIND11_MODULE(kimapi, m) {
       return t;
     },
     py::arg("kimmdl"),
-    py::arg("index")
+    py::arg("index"),
+    "Return (Species, status)"
   );
 
   m.def("get_species_code",
@@ -187,7 +194,8 @@ PYBIND11_MODULE(kimapi, m) {
       return t;
     },
     py::arg("kimmdl"),
-    py::arg("species")
+    py::arg("species"),
+    "Return (code, status)"
   );
 
   m.def("set_species_code",
@@ -212,7 +220,8 @@ PYBIND11_MODULE(kimapi, m) {
       t[2] = status;
       return t;
     },
-    py::arg("kimmdl")
+    py::arg("kimmdl"),
+    "Return (numberParameters, maxStrLen, status)"
   );
 
   m.def("get_parameter",
