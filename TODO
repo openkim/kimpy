@@ -6,3 +6,6 @@
   Enable set compute flags in calculator constructor. e.g. `compute_forces
   = False`. And then initialize KIM accordingly. This can help to speedup
   the computation.                                                             Not yet
+
+3. 09/10/2017
+  get_data_int() and get_data_double() yet to be checked in kim_api_bind.cpp.  Not yet

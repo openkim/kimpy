@@ -1,8 +1,6 @@
-#include <string.h>
 #include <math.h>
-#include <stdlib.h>
-
-#include "padding.h"
+#include <stdio.h>
+#include <vector>
 
 #define DIM 3
 
@@ -65,27 +63,29 @@ void inverse(double *mat, double *inv)
   }
 }
 
-/* transpose of a 3 by 3 matrix */
+/* transpose of a DIM by DIM matrix */
 void transpose(double *mat, double* trans)
 {
   int i,j;
-  for (i=0; i<3; i++) {
-    for (j=0; j<3; j++) {
-      trans[3*i+j] = mat[3*j+i];
+  for (i=0; i<DIM; i++) {
+    for (j=0; j<DIM; j++) {
+      trans[DIM*i+j] = mat[DIM*j+i];
     }
   }
 }
 
 
 /* create padding atoms */
-void set_padding(int Natoms, double* cell, int* PBC, double cutoff, double** coords,
-    char (**species)[4], int** pad_image, int* Npad)
+void set_padding(double* cell, int* PBC, double cutoff,
+    int Natoms, const double* coords, const int* species,
+    std::vector<double>& pad_coords, std::vector<int>& pad_species,
+    std::vector<int>& pad_image)
 {
 
   int i,j,k;
   double tcell[9];
   double fcell[9];
-  double atom_coords[3];
+  double atom_coords[DIM];
   double frac_coords[DIM*Natoms];
 
   double xprod[3];
@@ -104,28 +104,24 @@ void set_padding(int Natoms, double* cell, int* PBC, double cutoff, double** coo
   double x,y,z;
   double xmin, ymin, zmin;
   double xmax, ymax, zmax;
-  double* pad_coords = NULL;
-  char (*pad_species)[4] = NULL;
-  *pad_image = NULL;
-
 
 
   /* transform coords into fractional coords */
   transpose(cell, tcell);
   inverse(tcell, fcell);
-  xmin=0;
-  ymin=0;
-  zmin=0;
-  xmax=0;
-  ymax=0;
-  zmax=0;
+  xmin=1e10;
+  ymin=1e10;
+  zmin=1e10;
+  xmax=-1e10;
+  ymax=-1e10;
+  zmax=-1e10;
   for (i=0; i<Natoms; i++) {
-    atom_coords[0] = (*coords)[DIM*i+0];
-    atom_coords[1] = (*coords)[DIM*i+1];
-    atom_coords[2] = (*coords)[DIM*i+2];
-    x = dot(&fcell[0],atom_coords);
-    y = dot(&fcell[3],atom_coords);
-    z = dot(&fcell[6],atom_coords);
+    atom_coords[0] = coords[DIM*i+0];
+    atom_coords[1] = coords[DIM*i+1];
+    atom_coords[2] = coords[DIM*i+2];
+    x = dot(fcell, atom_coords);
+    y = dot(fcell+3, atom_coords);
+    z = dot(fcell+6, atom_coords);
     frac_coords[DIM*i+0] = x;
     frac_coords[DIM*i+1] = y;
     frac_coords[DIM*i+2] = z;
@@ -139,15 +135,15 @@ void set_padding(int Natoms, double* cell, int* PBC, double cutoff, double** coo
 
 
   /* volume of cell */
-  cross(&cell[3], &cell[6], xprod);
-  volume = dot(&cell[0], xprod);
+  cross(cell+3, cell+6, xprod);
+  volume = dot(cell, xprod);
 
   /* distance between parallelpiped faces */
-  cross(&cell[3], &cell[6], xprod);
+  cross(cell+3, cell+6, xprod);
   dist0 = volume/norm(xprod);
-  cross(&cell[6], &cell[0], xprod);
+  cross(cell+6, cell+0, xprod);
   dist1 = volume/norm(xprod);
-  cross(&cell[0], &cell[3], xprod);
+  cross(cell, cell+3, xprod);
   dist2 = volume/norm(xprod);
 
   ratio0 = cutoff/dist0;
@@ -158,7 +154,6 @@ void set_padding(int Natoms, double* cell, int* PBC, double cutoff, double** coo
   size2 = (int)ceil(ratio2);
 
   /* creating padding atoms */
-  *Npad = 0;
   for (i=-size0; i<=size0; i++)
   for (j=-size1; j<=size1; j++)
   for (k=-size2; k<=size2; k++) {
@@ -176,6 +171,14 @@ void set_padding(int Natoms, double* cell, int* PBC, double cutoff, double** coo
       y = frac_coords[DIM*at+1];
       z = frac_coords[DIM*at+2];
 
+
+      if (i==-size0) {
+        printf("x=%f, xmin=%f, size0=%f, ratio=%f\n", x,xmin,(double)size0, ratio0);
+        if (i == -size0 && x - xmin < (double)size0 - ratio0)
+          printf("    < satisfied\n");
+      }
+
+
       /* select the necessary atoms to repeate for the most outside bins */
       /* the follwing few lines can be easily understood when assuming size=1 */
       if (i == -size0 && x - xmin < (double)size0 - ratio0) continue;
@@ -186,35 +189,21 @@ void set_padding(int Natoms, double* cell, int* PBC, double cutoff, double** coo
       if (k == size2 &&  zmax - z < (double)size2 - ratio2) continue;
 
 
-      /* add a padding atom */
-      *Npad += 1;
-      pad_coords = (double*) realloc(pad_coords, (*Npad)*DIM*sizeof(double));
-      pad_species =  (char(*)[4]) realloc(pad_species, (*Npad)*sizeof(char[4]));
-      *pad_image =  (int*) realloc(*pad_image, (*Npad)*sizeof(int));
-
       /* fractional coords of padding atom at */
       atom_coords[0] = i+x;
       atom_coords[1] = j+y;
       atom_coords[2] = k+z;
 
-      /* absolute coords of padding atoms */
-      pad_coords[DIM*(*Npad-1)+0] = dot(&tcell[0], atom_coords);
-      pad_coords[DIM*(*Npad-1)+1] = dot(&tcell[3], atom_coords);
-      pad_coords[DIM*(*Npad-1)+2] = dot(&tcell[6], atom_coords);
+      // absolute coords of padding atoms
+      pad_coords.push_back(dot(tcell, atom_coords));
+      pad_coords.push_back(dot(tcell+3, atom_coords));
+      pad_coords.push_back(dot(tcell+6, atom_coords));
 
-      strcpy(pad_species[*Npad-1], (*species)[at]);
-      (*pad_image)[*Npad-1] = at;
+      // padding species code and image
+      pad_species.push_back(species[at]);
+      pad_image.push_back(at);
+
     }
   }
 
-  /* concatenate coords and species of padding to that of contributing atoms */
-  *coords = (double*) realloc(*coords, DIM*(Natoms + *Npad)*sizeof(double));
-  memcpy(*coords+DIM*Natoms, pad_coords, DIM*(*Npad)*sizeof(double));
-  *species = (char(*)[4]) realloc((*species), (Natoms + *Npad)*sizeof(char[4]));
-  memcpy(*species+Natoms, pad_species, (*Npad)*sizeof(char[4]));
-
-
-  /* free local memory */
-  free(pad_coords);
-  free(pad_species);
 }

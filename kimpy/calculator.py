@@ -141,25 +141,36 @@ class KIMModelCalculator(Calculator):
 
     # get info from Atoms object
     nparticles = atoms.get_number_of_atoms()
+    self.ncontrib = nparticles
     coords = np.ravel(atoms.get_positions())
     cell = atoms.get_cell()
     pbc = atoms.get_pbc()
     particle_species = atoms.get_chemical_symbols()
+
+    # number of species
     unique_species = list(set(particle_species))
     nspecies = len(unique_species)
-    self.ncontrib = nparticles
+    self.km_nspecies = np.array([nspecies], dtype=np.intc)
 
-    # init KIM API input data
+    # species code
+    species_map = dict()
+    for s in unique_species:
+      code, status = km.get_species_code(self.pkim, s)
+      if status != km.STATUS_OK:
+        km.report_error('km.get_species_code', status)
+      species_map[s] = code
+    particle_code = [species_map[s] for s in particle_species]
+
 
     # create padding atoms if necessary
     if any(pbc):
-      # NOTE this is implemented in python, replace by c for effience
-      pad_coords, pad_species, self.pad_image = set_padding(
-          cell, pbc, particle_species, coords, self.cutoff)
-      npad = len(pad_species)
+
+      pad_coords, pad_code, self.pad_image = nl.set_padding(
+          cell, pbc, self.cutoff, coords, particle_code)
+      npad = len(pad_code)
 
       self.km_nparticles = np.array([nparticles + npad], dtype=np.intc)
-      km_particle_species = np.concatenate((particle_species, pad_species))
+      self.km_particle_code = np.concatenate((particle_code, pad_code)).astype(np.intc)
       self.km_coords = np.concatenate((coords, pad_coords)).astype(np.double)
       self.is_padding = np.zeros(self.km_nparticles[0], dtype=np.intc)
       self.is_padding[nparticles:] = np.ones(npad, dtype=np.intc)
@@ -167,33 +178,21 @@ class KIMModelCalculator(Calculator):
     else:
       self.pad_image = None
       self.km_nparticles = np.array([nparticles], dtype=np.intc)
-      km_particle_species = particle_species
+      self.km_particle_code = np.array(particle_code, dtype=np.intc)
       self.km_coords = np.array(coords, dtype=np.double)
       self.is_padding = np.zeros(nparticles, dtype=np.intc)
 
+
     if self.debug:
       # write configuratons with paddings
-      write_extxyz(cell, km_particle_species, self.km_coords, fname='config.xyz')
-
-
-    # species code
-    self.km_nspecies = np.array([nspecies], dtype=np.intc)
-
-    species_map = dict()
-    for s in unique_species:
-      code, status = km.get_species_code(self.pkim, s)
-      if status != km.STATUS_OK:
-        km.report_error('km.get_species_code', status)
-      species_map[s] = code
-    tmp = [species_map[s] for s in km_particle_species]
-    self.km_particle_code = np.array(tmp, dtype=np.intc)
+      write_extxyz(cell, self.km_particle_code, self.km_coords, fname='config.xyz')
 
 
     # register KIM API object input pointers
     km.set_data_int(self.pkim, "numberOfParticles", self.km_nparticles)
-    km.set_data_double(self.pkim, "coordinates", self.km_coords)
     km.set_data_int(self.pkim, "numberOfSpecies", self.km_nspecies)
     km.set_data_int(self.pkim, "particleSpecies", self.km_particle_code)
+    km.set_data_double(self.pkim, "coordinates", self.km_coords)
 
 
     # initialize and register KIM API object output pointers
@@ -253,14 +252,18 @@ class KIMModelCalculator(Calculator):
           if sum(delta[ind]) <= self.skin:
             need_update_neigh = False
 
+
+#TODO update KIM needs to be moved before need_update_neigh check.
+#TODO and the following is not good since neigh is updated every time
     # update KIM API input data and neighbor list if necessary
     if system_changes:
       self.update_kim(atoms)
-      if need_update_neigh:
-        if self.debug:
-          print ('neighbor list updated')
-        self.update_neigh()
-        self.last_update_positions = atoms.get_positions()
+      self.update_neigh()
+      #if need_update_neigh:
+      #  if self.debug:
+      #    print ('neighbor list updated')
+      #  self.update_neigh()
+      #  self.last_update_positions = atoms.get_positions()
       status = km.model_compute(self.pkim)
       if status != km.STATUS_OK:
         km.report_error('km.model_compute', status)
@@ -430,7 +433,7 @@ def assemble_padding_forces(forces, Ncontrib, pad_image=None):
 
 
 
-def set_padding(cell, PBC, species, coords, rcut):
+def set_padding(cell, PBC, rcut, coords, species):
   """ Create padding atoms for PURE PBC so as to generate neighbor list.
   This works no matter rcut is larger or smaller than the boxsize.
 
@@ -443,14 +446,14 @@ def set_padding(cell, PBC, species, coords, rcut):
   PBC: list
     flag to indicate whether periodic or not in x,y,z diretion
 
-  species: list of string
-    atom species symbol
+  rcut: float
+    cutoff
 
   coords: list
     atom coordiantes
 
-  rcut: float
-    cutoff
+  species: list of int
+    atom species code
 
   Returns
   -------
@@ -458,8 +461,8 @@ def set_padding(cell, PBC, species, coords, rcut):
   abs_coords: list
     absolute (not fractional) coords of padding atoms
 
-  pad_spec: list of string
-    species of padding atoms
+  pad_spec: list of int
+    species code of padding atoms
 
   pad_image: list of int
     atom number, of which the padding atom is an image
@@ -572,7 +575,7 @@ def write_extxyz(cell, species, coords, fname='config.xyz'):
       print ('len(coords)=', len(coords)//3)
       sys.exit(1)
     for i in range(natoms):
-      fout.write('{:4}'.format(species[i]))
+      fout.write('{:<d} '.format(species[i]))
       fout.write('{:12.5e} '.format(coords[3*i+0]))
       fout.write('{:12.5e} '.format(coords[3*i+1]))
       fout.write('{:12.5e}\n'.format(coords[3*i+2]))
