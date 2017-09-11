@@ -132,6 +132,13 @@ void set_padding(double* cell, int* PBC, double cutoff,
     if (y > ymax) ymax = y;
     if (z > zmax) zmax = z;
   }
+  // add some extra value to deal with edge case
+  xmin -= 1e-6;
+  ymin -= 1e-6;
+  zmin -= 1e-6;
+  xmax += 1e-6;
+  ymax += 1e-6;
+  zmax += 1e-6;
 
 
   /* volume of cell */
