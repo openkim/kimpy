@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 import numpy as np
 from ase.calculators.calculator import Calculator
 from kimpy import kimapi as km
@@ -17,6 +17,9 @@ class KIMModelCalculator(Calculator):
   modelname: str
     KIM model name
 
+  neigh_skin_ratio: double
+    The neighbor list is build using r_neigh = (1+neigh_skin_ratio)*rcut.
+
   padding_need_neigh: bool
     Flag to indicate whether need to create neighbors for padding atoms.
 
@@ -28,30 +31,39 @@ class KIMModelCalculator(Calculator):
   implemented_properties = ['energy', 'forces']
 
 
-  def __init__(self, modelname, padding_need_neigh=False, debug=False, **kwargs):
+  def __init__(self, modelname, neigh_skin_ratio=0.2, padding_need_neigh=False,
+               debug=False, **kwargs):
     Calculator.__init__(self, **kwargs)
 
-    # kim attributes
     self.modelname = modelname
-    self.padding_need_neigh = padding_need_neigh
     self.debug = debug
-    self.pkim = None
+
+    # neigh attributes
+    if neigh_skin_ratio < 0:
+      neigh_skin_ratio = 0
+    self.neigh_skin_ratio = neigh_skin_ratio
+    self.padding_need_neigh = padding_need_neigh
+    self.skin = None
+    self.cutoff = None
+    self.last_update_positions = None
+
+    # padding related
+    self.is_padding = None
+    self.pad_image = None
+    self.ncontrib = None
 
     # pointers registed to kim object
+    self.pkim = None
     self.km_nparticles = None
     self.km_nspecies = None
     self.km_particle_code = None
     self.km_coords = None
     self.km_cutoff = None
 
-    # number of contributing atoms and padding image
-    self.ncontrib = None
-    self.pad_image = None
-
 
   def set_atoms(self, atoms):
     """Initialize KIM object.
-    Called by Atoms class in function set_calculator.
+    Called by set_calculator() of Atoms class.
 
     Parameter
     ---------
@@ -59,11 +71,11 @@ class KIMModelCalculator(Calculator):
     atoms: ASE Atoms instance
     """
     if self.pkim is not None:
-      self.free_kim()
-    self.init_kim(atoms)
+      self.free_neigh_and_kim()
+    self.init_kim_and_neigh(atoms)
 
 
-  def init_kim(self, atoms):
+  def init_kim_and_neigh(self, atoms):
     """Initialize KIM object and neighbor list.
 
     Parameter
@@ -93,6 +105,10 @@ class KIMModelCalculator(Calculator):
     status = km.model_init(self.pkim)
     if status != km.STATUS_OK:
       km.report_error('km.model_init', status)
+
+    # set cutoff
+    self.skin = self.neigh_skin_ratio * self.km_cutoff[0]
+    self.cutoff = (1+self.neigh_skin_ratio) * self.km_cutoff[0]
 
     # initialize neighbor list
     status = nl.initialize(self.pkim)
@@ -133,31 +149,32 @@ class KIMModelCalculator(Calculator):
     nspecies = len(unique_species)
     self.ncontrib = nparticles
 
-
     # init KIM API input data
+
+    # create padding atoms if necessary
     if any(pbc):
-      # create padding atoms if necessary
       # NOTE this is implemented in python, replace by c for effience
       pad_coords, pad_species, self.pad_image = set_padding(
-          cell, pbc, particle_species, coords, self.km_cutoff[0])
+          cell, pbc, particle_species, coords, self.cutoff)
       npad = len(pad_species)
 
       self.km_nparticles = np.array([nparticles + npad], dtype=np.intc)
       km_particle_species = np.concatenate((particle_species, pad_species))
       self.km_coords = np.concatenate((coords, pad_coords)).astype(np.double)
-      is_padding = np.zeros(self.km_nparticles[0], dtype=np.intc)
-      is_padding[nparticles:] = np.ones(npad, dtype=np.intc)
+      self.is_padding = np.zeros(self.km_nparticles[0], dtype=np.intc)
+      self.is_padding[nparticles:] = np.ones(npad, dtype=np.intc)
 
     else:
       self.pad_image = None
       self.km_nparticles = np.array([nparticles], dtype=np.intc)
       km_particle_species = particle_species
       self.km_coords = np.array(coords, dtype=np.double)
-      is_padding = np.zeros(nparticles, dtype=np.intc)
+      self.is_padding = np.zeros(nparticles, dtype=np.intc)
 
     if self.debug:
       # write configuratons with paddings
       write_extxyz(cell, km_particle_species, self.km_coords, fname='config.xyz')
+
 
     # species code
     self.km_nspecies = np.array([nspecies], dtype=np.intc)
@@ -186,11 +203,20 @@ class KIMModelCalculator(Calculator):
     km.set_data_double(self.pkim, "forces", self.km_forces)
 
 
-    # create neighbor list
-    nl.build_neighborlist(self.pkim, is_padding, self.padding_need_neigh)
+  def update_neigh(self):
+    """ (Re-)create the neighbor list"""
+    status = nl.build_neighborlist(self.pkim, self.cutoff, self.is_padding,
+                                   self.padding_need_neigh)
     if status != km.STATUS_OK:
       km.report_error('nl.build_neighborlist', status)
 
+
+  def free_neigh_and_kim(self):
+    """Free KIM neigh object, KIM Model and KIM object. """
+    nl.clean(self.pkim)
+    km.model_destroy(self.pkim)
+    km.free(self.pkim)
+    self.pkim = None
 
 
   def calculate(self, atoms=None,
@@ -216,9 +242,25 @@ class KIMModelCalculator(Calculator):
 
     Calculator.calculate(self, atoms, properties, system_changes)
 
+    need_update_neigh = True
+    if len(system_changes) == 1 and 'positions' in system_changes:
+      if self.last_update_positions is not None:
+        a = self.last_update_positions
+        b = atoms.positions
+        if a.shape == b.shape:
+          delta = np.linalg.norm(a - b, axis=1)
+          ind = np.argpartition(delta, -2)[-2:]   # indices of the two largest element
+          if sum(delta[ind]) <= self.skin:
+            need_update_neigh = False
+
     # update KIM API input data and neighbor list if necessary
     if system_changes:
       self.update_kim(atoms)
+      if need_update_neigh:
+        if self.debug:
+          print ('neighbor list updated')
+        self.update_neigh()
+        self.last_update_positions = atoms.get_positions()
       status = km.model_compute(self.pkim)
       if status != km.STATUS_OK:
         km.report_error('km.model_compute', status)
@@ -236,23 +278,15 @@ class KIMModelCalculator(Calculator):
     return get_model_species_list(self.modelname)
 
 
-  def free_kim(self):
-    """Free KIM neigh object, KIM Model and KIM object. """
-    nl.clean(self.pkim)
-    km.model_destroy(self.pkim)
-    km.free(self.pkim)
-    self.pkim = None
-
-
   def __str__(self):
     """Print this object shows the following message."""
     return 'KIMModelCalculator(modelname = {})'.format(self.modelname)
 
 
-  #def __del__(self):
+  def __del__(self):
     """Garbage collects the KIM neigh objects and KIM object."""
     if self.pkim is not None:
-      self.free_kim()
+      self.free_neigh_and_kim()
 
 
 
@@ -376,17 +410,23 @@ def assemble_padding_forces(forces, Ncontrib, pad_image=None):
 
   DIM = 3
 
-  forces = np.reshape(forces, (-1, DIM))
-  pad_forces = forces[Ncontrib:, :]
-  pad_image = np.array(pad_image)
+  forces = np.array(forces).reshape(-1, DIM)
+  contrib_forces = forces[:Ncontrib]
 
-  for i in xrange(Ncontrib):
-    # idx: the indices of padding atoms that are images of contributing atom i
-    indices = np.where(pad_image == i)
-    forces[i] += np.sum(pad_forces[indices], axis=0)
+  if pad_image is None:
+    return contrib_forces
 
-  # return forces of contributing atoms
-  return forces[:Ncontrib, :]
+  else:
+    pad_forces = forces[Ncontrib:]
+    pad_image = np.array(pad_image)
+
+    for i in xrange(Ncontrib):
+      # idx: the indices of padding atoms that are images of contributing atom i
+      indices = np.where(pad_image == i)
+      contrib_forces[i] += np.sum(pad_forces[indices], axis=0)
+
+    # return forces of contributing atoms
+    return contrib_forces
 
 
 

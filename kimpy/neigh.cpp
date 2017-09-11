@@ -27,7 +27,7 @@ int nbl_initialize(void* kimmdl) {
     return status;
   }
 
-  // free neighbor list content, and the neighbor list itself
+  // free neighbor object content, and the neighbor object itself
   nbl_clean(kimmdl);
 
   // setup a blank neighborlist
@@ -53,19 +53,19 @@ int nbl_initialize(void* kimmdl) {
 
 
 // set up the neighbor list
-int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need_neigh)
+int nbl_build_neighborlist(void* kimmdl, double cutoff, const int* is_padding,
+    int padding_need_neigh)
 {
 
   int status;
   int* Natoms;
   double* coords;
-  double* cutoff;
   NeighList *nl;
 
   int i, j, k, ii, jj, kk;
   int num_neigh;
   double dx[DIM];
-  double rcut, cutsq, rsq;
+  double cutsq, rsq;
   int size[DIM];
   int size_total;
   int index[DIM];
@@ -84,19 +84,15 @@ int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need
   }
 
   // get necessary data for constructing neighborlist
-  KIM_API_getm_data(kimmdl,  &status,  3*3,
+  KIM_API_getm_data(kimmdl,  &status,  2*3,
       "numberOfParticles",   &Natoms,  1,
-      "coordinates",         &coords,  1,
-      "cutoff",              &cutoff,  1);
+      "coordinates",         &coords,  1);
   if (KIM_STATUS_OK != status) {
     KIM_API_report_error(__LINE__, __FILE__, "KIM_API_getm_data", status);
     return status;
   }
 
-  rcut = *cutoff;
-  cutsq = rcut*rcut;
-
-// init max and min of coords to that of the first atom
+  // init max and min of coords to that of the first atom
   for (k=0; k<DIM; k++){
     min[k] = coords[k];
     max[k] = coords[k] + 1; // +1 to prevent max==min for 1D and 2D case
@@ -112,7 +108,7 @@ int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need
   /* make the cell box */
   size_total = 1;
   for (i=0; i<DIM; i++){
-    size[i] = (int)((max[i]-min[i])/rcut);
+    size[i] = (int)((max[i]-min[i])/cutoff);
     size[i] = size[i] <= 0 ? 1 : size[i];
     size_total *= size[i];
   }
@@ -143,6 +139,7 @@ int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need
   // temporary neigh container
   std::vector<int> tmp_neigh;
 
+  cutsq = cutoff*cutoff;
   total = 0;
   for (i=0; i<*Natoms; i++){
     num_neigh = 0;
@@ -253,23 +250,23 @@ void coords_to_index(double *x, int *size, int *index, double *max, double *min)
 
 //  free both the content in the neighbor list and the neighbor list itself
 int nbl_clean(void* kimmdl) {
+
+  // free neighbor object content
   int status = nbl_free_neigh_content(kimmdl);
 
-  // free neighbor list content
+  // free neighbor object itself
   NeighList *nl = (NeighList*) KIM_API_get_data(kimmdl, "neighObject", &status);
   if (KIM_STATUS_OK != status) {
     KIM_API_report_error(__LINE__, __FILE__,"KIM_API_get_data", status);
     return status;
   }
-
-  // free neighbor list itself
   safefree(nl);
 
   return KIM_STATUS_OK;
 }
 
 
-// only free the content in the neighbor list, not the neighbor list itself
+// only free the content in the neighbor object, not the neighbor object itself
 int nbl_free_neigh_content(void* kimmdl)
 {
   int status;

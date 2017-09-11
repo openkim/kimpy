@@ -16,7 +16,8 @@ typedef struct
 int nbl_initialize(void* kimmdl);
 
 // free previous Neighlist contents, and create new
-int nbl_build_neighborlist(void* kimmdl, const int* is_padding, int padding_need_neigh);
+int nbl_build_neighborlist(void* kimmdl, double cutoff, const int* is_padding,
+    int padding_need_neigh);
 
 // free Neighlist and its contents
 int nbl_clean(void* kimmdl);
