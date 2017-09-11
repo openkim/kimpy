@@ -29,8 +29,6 @@ int nbl_get_neigh(void* kimmdl, int* mode, int* request, int *atom, int* numnei,
 // helper function
 int nbl_free_neigh_content(void* kimmdl);
 
-void safefree(void *ptr);
-
 void coords_to_index(double *x, int *size, int *index, double *max, double *min);
 
 
