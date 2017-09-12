@@ -45,7 +45,8 @@ class KIMModelCalculator(Calculator):
     self.padding_need_neigh = padding_need_neigh
     self.skin = None
     self.cutoff = None
-    self.last_update_positions = None
+    self.last_update_positions = None  # atoms positions of last neigh update
+    self.last_positions = None  # atoms positions of last step
 
     # padding related
     self.is_padding = None
@@ -116,7 +117,7 @@ class KIMModelCalculator(Calculator):
       km.report_error('nl.initialize', status)
 
 
-  def update_kim(self, atoms):
+  def update_kim_and_neigh(self, atoms):
     """ Register KIM input and output data pointers, and build neighbor list.
 
     Each time called, new KIM input data arrays will be created according to the
@@ -161,7 +162,6 @@ class KIMModelCalculator(Calculator):
       species_map[s] = code
     particle_code = [species_map[s] for s in particle_species]
 
-
     # create padding atoms if necessary
     if any(pbc):
 
@@ -182,11 +182,9 @@ class KIMModelCalculator(Calculator):
       self.km_coords = np.array(coords, dtype=np.double)
       self.is_padding = np.zeros(nparticles, dtype=np.intc)
 
-
     if self.debug:
       # write configuratons with paddings
       write_extxyz(cell, self.km_particle_code, self.km_coords, fname='config.xyz')
-
 
     # register KIM API object input pointers
     km.set_data_int(self.pkim, "numberOfParticles", self.km_nparticles)
@@ -194,16 +192,13 @@ class KIMModelCalculator(Calculator):
     km.set_data_int(self.pkim, "particleSpecies", self.km_particle_code)
     km.set_data_double(self.pkim, "coordinates", self.km_coords)
 
-
     # initialize and register KIM API object output pointers
     self.km_energy = np.array([0.], dtype=np.double)
     self.km_forces = np.zeros(3*self.km_nparticles[0], dtype=np.double)
     km.set_data_double(self.pkim, "energy", self.km_energy)
     km.set_data_double(self.pkim, "forces", self.km_forces)
 
-
-  def update_neigh(self):
-    """ (Re-)create the neighbor list"""
+    # (Re-)create the neighbor list
     status = nl.build_neighborlist(self.pkim, self.cutoff, self.is_padding,
                                    self.padding_need_neigh)
     if status != km.STATUS_OK:
@@ -216,6 +211,25 @@ class KIMModelCalculator(Calculator):
     km.model_destroy(self.pkim)
     km.free(self.pkim)
     self.pkim = None
+
+
+  def update_km_coords(self, atoms):
+    """Update the atom positions in KIM object.
+
+    Parameter
+    ---------
+
+    atoms: ASE Atoms instance
+    """
+
+    # displacement of contributing atoms
+    disp_contrib = atoms.positions - self.last_positions
+    # displacement of padding atoms
+    disp_pad = disp_contrib[self.pad_image]
+    # displacement of all atoms
+    disp = np.concatenate((disp_contrib, disp_pad)).ravel().astype(np.double)
+    # update coords in KIM
+    self.km_coords += disp
 
 
   def calculate(self, atoms=None,
@@ -242,7 +256,7 @@ class KIMModelCalculator(Calculator):
     Calculator.calculate(self, atoms, properties, system_changes)
 
     need_update_neigh = True
-    if len(system_changes) == 1 and 'positions' in system_changes:
+    if len(system_changes) == 1 and 'positions' in system_changes: # only pos changes
       if self.last_update_positions is not None:
         a = self.last_update_positions
         b = atoms.positions
@@ -252,18 +266,17 @@ class KIMModelCalculator(Calculator):
           if sum(delta[ind]) <= self.skin:
             need_update_neigh = False
 
-
-#TODO update KIM needs to be moved before need_update_neigh check.
-#TODO and the following is not good since neigh is updated every time
     # update KIM API input data and neighbor list if necessary
     if system_changes:
-      self.update_kim(atoms)
-      self.update_neigh()
-      #if need_update_neigh:
-      #  if self.debug:
-      #    print ('neighbor list updated')
-      #  self.update_neigh()
-      #  self.last_update_positions = atoms.get_positions()
+      if need_update_neigh:
+        self.update_kim_and_neigh(atoms)
+        self.last_update_positions = atoms.get_positions()
+        self.last_positions = self.last_update_positions
+        if self.debug:
+          print ('neighbor list updated')
+      else:
+        self.update_km_coords(atoms)
+        self.last_positions = atoms.get_positions()
       status = km.model_compute(self.pkim)
       if status != km.STATUS_OK:
         km.report_error('km.model_compute', status)

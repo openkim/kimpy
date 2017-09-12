@@ -179,13 +179,6 @@ void set_padding(double* cell, int* PBC, double cutoff,
       z = frac_coords[DIM*at+2];
 
 
-      if (i==-size0) {
-        printf("x=%f, xmin=%f, size0=%f, ratio=%f\n", x,xmin,(double)size0, ratio0);
-        if (i == -size0 && x - xmin < (double)size0 - ratio0)
-          printf("    < satisfied\n");
-      }
-
-
       /* select the necessary atoms to repeate for the most outside bins */
       /* the follwing few lines can be easily understood when assuming size=1 */
       if (i == -size0 && x - xmin < (double)size0 - ratio0) continue;
