@@ -16,14 +16,15 @@ def test_forces():
   # create calculator
   modelname = 'ex_model_Ar_P_MLJ_C'
   calc = KIMModelCalculator(modelname)
+
   # create an FCC crystal
   argon = FaceCenteredCubic(directions=[[1,0,0], [0,1,0], [0,0,1]], size=(1,1,1),
-                             symbol='Ar', pbc=(1,0,0), latticeconstant=3.0)
+                            symbol='Ar', pbc=(1,0,0), latticeconstant=3.0)
 
-  # perturb the x coords of the first atoms
+  # perturb the x coord of the first atom
   argon.positions[0,0] += 0.01
 
-  # attach the SAME calculator to the new atoms object
+  # attach calculator to the atoms
   argon.set_calculator(calc)
 
   # get energy and forces

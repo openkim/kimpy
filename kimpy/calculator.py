@@ -129,17 +129,6 @@ class KIMModelCalculator(Calculator):
 
     atoms: ASE Atoms instance
     """
-#NOTE ask Prof. Elliott, about garbage collection. New pointers will be registered
-# in the KIM object, Will the previous registerd one be freed automatically?
-# Provided that KIM object is the only one that has reference to the data?
-# 1. python is passed by reference.
-# 2. Maintain reference count. when referneced, counts++, when deferenced, counts--,
-# when counts == 0. Free.
-#
-# What I did, pass numpy array, and obtained the pointer to the numpy array data, and
-# then register in KIM.
-# Q: does this counts are reference, and when pointer deattached, does it count as
-# dereference.
 
     # get info from Atoms object
     nparticles = atoms.get_number_of_atoms()
@@ -171,7 +160,7 @@ class KIMModelCalculator(Calculator):
         raise ValueError('Supercell\n{}\nis not invertible.'.format(cell))
       pad_coords, pad_code, self.pad_image = nl.set_padding(
           cell.ravel(), pbc, self.cutoff, coords, particle_code)
-      npad = len(pad_code)
+      npad = pad_code.size
 
       self.km_nparticles = np.array([nparticles + npad], dtype=np.intc)
       self.km_particle_code = np.concatenate((particle_code, pad_code)).astype(np.intc)
@@ -180,7 +169,7 @@ class KIMModelCalculator(Calculator):
       self.is_padding[nparticles:] = np.ones(npad, dtype=np.intc)
 
     else:
-      self.pad_image = None
+      self.pad_image = np.array([])
       self.km_nparticles = np.array([nparticles], dtype=np.intc)
       self.km_particle_code = np.array(particle_code, dtype=np.intc)
       self.km_coords = np.array(coords, dtype=np.double)
@@ -238,10 +227,13 @@ class KIMModelCalculator(Calculator):
 
     # displacement of contributing atoms
     disp_contrib = atoms.positions - self.last_positions
-    # displacement of padding atoms
-    disp_pad = disp_contrib[self.pad_image]
-    # displacement of all atoms
-    disp = np.concatenate((disp_contrib, disp_pad)).ravel().astype(np.double)
+    if self.pad_image.size != 0:
+      # displacement of padding atoms
+      disp_pad = disp_contrib[self.pad_image]
+      # displacement of all atoms
+      disp = np.concatenate((disp_contrib, disp_pad)).ravel().astype(np.double)
+    else:
+      disp = disp_contrib.ravel().astype(np.double)
     # update coords in KIM
     self.km_coords += disp
 
@@ -296,7 +288,7 @@ class KIMModelCalculator(Calculator):
         km.report_error('km.model_compute', status)
 
     energy = self.km_energy[0]
-    forces = self.km_forces
+    forces = self.km_forces.copy().reshape(-1, 3)
     forces = assemble_padding_forces(forces, self.ncontrib, self.pad_image)
 
     # return values
@@ -418,20 +410,20 @@ def get_model_species_list(modelname):
   return species_list
 
 
-def assemble_padding_forces(forces, Ncontrib, pad_image=None):
+def assemble_padding_forces(forces, Ncontrib, pad_image):
   """
   Assemble forces on padding atoms back to contributing atoms.
 
   Parameters
   ----------
 
-  forces: 1D array
+  forces: 2D array
     forces on both contributing and padding atoms
 
   Ncontrib: int
     number of contributing atoms
 
-  pad_iamge, list of int
+  pad_image, 1D int array
     atom number, of which the padding atom is an image
 
 
@@ -440,17 +432,13 @@ def assemble_padding_forces(forces, Ncontrib, pad_image=None):
     forces on contributing atoms with padding forces added.
   """
 
-  DIM = 3
-
-  forces = np.array(forces).reshape(-1, DIM)
   contrib_forces = forces[:Ncontrib]
 
-  if pad_image is None:
+  if pad_image.size == 0:
     return contrib_forces
 
   else:
     pad_forces = forces[Ncontrib:]
-    pad_image = np.array(pad_image)
 
     for i in xrange(Ncontrib):
       # idx: the indices of padding atoms that are images of contributing atom i
@@ -469,16 +457,16 @@ def set_padding(cell, PBC, rcut, coords, species):
   Parameters
   ----------
 
-  cell: 2D array
+  cell: 2D 3x3 array or 1D array with 9 elements
     supercell lattice vector
 
-  PBC: list
+  PBC: list of bool
     flag to indicate whether periodic or not in x,y,z diretion
 
   rcut: float
     cutoff
 
-  coords: list
+  coords: 2D Nx3 array or 1D 3N array
     atom coordiantes
 
   species: list of int
@@ -487,17 +475,18 @@ def set_padding(cell, PBC, rcut, coords, species):
   Returns
   -------
 
-  abs_coords: list
+  abs_coords: 1D array of size 3M
     absolute (not fractional) coords of padding atoms
 
-  pad_spec: list of int
+  pad_spec: 1D int array
     species code of padding atoms
 
-  pad_image: list of int
+  pad_image: 1D int array
     atom number, of which the padding atom is an image
   """
 
   # transform coords into fractional coords
+  cell = cell.reshape(3,3)
   coords = np.reshape(coords, (-1, 3))
   tcell = np.transpose(cell)
   fcell = np.linalg.inv(tcell)
@@ -559,11 +548,11 @@ def set_padding(cell, PBC, rcut, coords, species):
 
   # transform fractional coords to abs coords
   if not pad_coords:  # no padding atoms (could be due to non-periodic)
-      abs_coords = []
+      abs_coords = np.array([])
   else:
       abs_coords = np.dot(pad_coords, tcell.T).ravel()
 
-  return abs_coords, pad_spec, pad_image
+  return abs_coords, np.array(pad_spec), np.array(pad_image)
 
 
 
