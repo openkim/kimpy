@@ -143,7 +143,7 @@ class KIMModelCalculator(Calculator):
     # get info from Atoms object
     nparticles = atoms.get_number_of_atoms()
     self.ncontrib = nparticles
-    coords = np.ravel(atoms.get_positions())
+    coords = atoms.get_positions().ravel()
     cell = atoms.get_cell()
     pbc = atoms.get_pbc()
     particle_species = atoms.get_chemical_symbols()
@@ -162,11 +162,14 @@ class KIMModelCalculator(Calculator):
       species_map[s] = code
     particle_code = [species_map[s] for s in particle_species]
 
-    # create padding atoms if necessary
+    # number of particles, particle species code and coordinates
     if any(pbc):
-
+      try:  # ensure cell is invertible (we'll use it in nl.set_padding)
+        np.linalg.inv(cell)
+      except:
+        raise Exception('Supercell\n{}\nis not invertible.'.format(cell))
       pad_coords, pad_code, self.pad_image = nl.set_padding(
-          cell, pbc, self.cutoff, coords, particle_code)
+          cell.ravel(), pbc, self.cutoff, coords, particle_code)
       npad = len(pad_code)
 
       self.km_nparticles = np.array([nparticles + npad], dtype=np.intc)

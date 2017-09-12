@@ -1,47 +1,60 @@
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
 #include <vector>
+#include "padding.h"
 
 #define DIM 3
 
-/*
-  creating padding atoms according to PBC and cutoff.
-*/
+// creating padding atoms according to PBC and cutoff.
 
-/* norm of a 3-element vector */
-double norm(double* a) {
-  return sqrt(a[0]*a[0]+ a[1]*a[1]+ a[2]*a[2]);
+//******************************************************************************
+// help functions
+//******************************************************************************
+
+// norm of a 3-element vector
+inline double norm(double* a) {
+  return std::sqrt(a[0]*a[0]+ a[1]*a[1]+ a[2]*a[2]);
 }
 
-/* dot product of two 3-element vectors */
-double dot(double *a, double *b)
+// dot product of two 3-element vectors
+inline double dot(double *a, double *b)
 {
   return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
 }
 
-/* cross product of two 3-element vectors */
-void cross(double *a, double *b, double* axb)
+// cross product of two 3-element vectors
+inline void cross(double *a, double *b, double* axb)
 {
   axb[0] = a[1]*b[2] - a[2]*b[1];
   axb[1] = a[2]*b[0] - a[0]*b[2];
   axb[2] = a[0]*b[1] - a[1]*b[0];
 }
 
-/* determinant of a 3 by 3 matrix */
-double det(double *mat)
+// determinant of a 3 by 3 matrix
+inline double det(double *mat)
 {
   return (mat[0]*mat[4]*mat[8] - mat[0]*mat[5]*mat[7]
-      - mat[1]*mat[3]*mat[8] + mat[1]*mat[5]*mat[6]
-      + mat[2]*mat[3]*mat[7] - mat[2]*mat[4]*mat[6]);
+        - mat[1]*mat[3]*mat[8] + mat[1]*mat[5]*mat[6]
+        + mat[2]*mat[3]*mat[7] - mat[2]*mat[4]*mat[6]);
 }
 
-
-double det2(double a11, double a12, double a21, double a22)
+// determinant of a 2 by 2 matrix
+inline double det2(double a11, double a12, double a21, double a22)
 {
   return (a11*a22) - (a12*a21);
 }
 
-/*inverse of a 3 by 3 matrix */
+// transpose of a DIM by DIM matrix
+inline void transpose(double *mat, double* trans)
+{
+  int i,j;
+  for (i=0; i<DIM; i++) {
+    for (j=0; j<DIM; j++) {
+      trans[DIM*i+j] = mat[DIM*j+i];
+    }
+  }
+}
+
+//inverse of a 3 by 3 matrix
 void inverse(double *mat, double *inv)
 {
   int i;
@@ -63,19 +76,11 @@ void inverse(double *mat, double *inv)
   }
 }
 
-/* transpose of a DIM by DIM matrix */
-void transpose(double *mat, double* trans)
-{
-  int i,j;
-  for (i=0; i<DIM; i++) {
-    for (j=0; j<DIM; j++) {
-      trans[DIM*i+j] = mat[DIM*j+i];
-    }
-  }
-}
 
+//******************************************************************************
+// create padding atoms
+//******************************************************************************
 
-/* create padding atoms */
 void set_padding(double* cell, int* PBC, double cutoff,
     int Natoms, const double* coords, const int* species,
     std::vector<double>& pad_coords, std::vector<int>& pad_species,
@@ -88,33 +93,21 @@ void set_padding(double* cell, int* PBC, double cutoff,
   double atom_coords[DIM];
   double frac_coords[DIM*Natoms];
 
-  double xprod[3];
+  double xprod[DIM];
   double volume;
-  double dist0;  /* distance of cell surfaces that are 'perpendicular' to x-axis */
-  double dist1;
-  double dist2;
-  double ratio0;
-  double ratio1;
-  double ratio2;
-  int size0; /* number of bins in x direction */
-  int size1;
-  int size2;
+  double dist[DIM];  // distance of cell surfaces perpendicular to x-, y-, and z-axis
+  double ratio[DIM];
+  double size[DIM];  // number of cells in each direction
 
   int at;
   double x,y,z;
-  double xmin, ymin, zmin;
-  double xmax, ymax, zmax;
+  double min[DIM] = {1e10, 1e10, 1e10};
+  double max[DIM] = {-1e10, -1e10, -1e10};
 
 
-  /* transform coords into fractional coords */
+  // transform coords into fractional coords
   transpose(cell, tcell);
   inverse(tcell, fcell);
-  xmin=1e10;
-  ymin=1e10;
-  zmin=1e10;
-  xmax=-1e10;
-  ymax=-1e10;
-  zmax=-1e10;
   for (i=0; i<Natoms; i++) {
     atom_coords[0] = coords[DIM*i+0];
     atom_coords[1] = coords[DIM*i+1];
@@ -125,50 +118,46 @@ void set_padding(double* cell, int* PBC, double cutoff,
     frac_coords[DIM*i+0] = x;
     frac_coords[DIM*i+1] = y;
     frac_coords[DIM*i+2] = z;
-    if (x < xmin) xmin = x;
-    if (y < ymin) ymin = y;
-    if (z < zmin) zmin = z;
-    if (x > xmax) xmax = x;
-    if (y > ymax) ymax = y;
-    if (z > zmax) zmax = z;
+    if (x < min[0]) min[0] = x;
+    if (y < min[1]) min[1] = y;
+    if (z < min[2]) min[2] = z;
+    if (x > max[0]) max[0] = x;
+    if (y > max[1]) max[1] = y;
+    if (z > max[2]) max[2] = z;
   }
+
   // add some extra value to deal with edge case
-  xmin -= 1e-6;
-  ymin -= 1e-6;
-  zmin -= 1e-6;
-  xmax += 1e-6;
-  ymax += 1e-6;
-  zmax += 1e-6;
+  for (i=0; i<DIM; i++) {
+    min[i] -= 1e-10;
+    max[i] += 1e-10;
+  }
 
-
-  /* volume of cell */
+  // volume of cell
   cross(cell+3, cell+6, xprod);
   volume = dot(cell, xprod);
 
-  /* distance between parallelpiped faces */
+  // distance between parallelpiped faces
   cross(cell+3, cell+6, xprod);
-  dist0 = volume/norm(xprod);
+  dist[0] = volume/norm(xprod);
   cross(cell+6, cell+0, xprod);
-  dist1 = volume/norm(xprod);
+  dist[1] = volume/norm(xprod);
   cross(cell, cell+3, xprod);
-  dist2 = volume/norm(xprod);
+  dist[2] = volume/norm(xprod);
 
-  ratio0 = cutoff/dist0;
-  ratio1 = cutoff/dist1;
-  ratio2 = cutoff/dist2;
-  size0 = (int)ceil(ratio0);
-  size1 = (int)ceil(ratio1);
-  size2 = (int)ceil(ratio2);
+  for (i=0; i<DIM; i++) {
+    ratio[i] = cutoff/dist[i];
+    size[i] = static_cast<int> (std::ceil(ratio[i]));
+  }
 
-  /* creating padding atoms */
-  for (i=-size0; i<=size0; i++)
-  for (j=-size1; j<=size1; j++)
-  for (k=-size2; k<=size2; k++) {
+  // creating padding atoms
+  for (i=-size[0]; i<=size[0]; i++)
+  for (j=-size[1]; j<=size[1]; j++)
+  for (k=-size[2]; k<=size[2]; k++) {
 
-    /* skip contributing atoms that we already have */
+    // skip contributing atoms
     if (i==0 && j==0 && k==0) continue;
 
-    /* apply BC */
+    // apply BC
     if (PBC[0]==0 && i != 0) continue;
     if (PBC[1]==0 && j != 0) continue;
     if (PBC[2]==0 && k != 0) continue;
@@ -178,18 +167,22 @@ void set_padding(double* cell, int* PBC, double cutoff,
       y = frac_coords[DIM*at+1];
       z = frac_coords[DIM*at+2];
 
+      // select the necessary atoms to repeate for the most outside bins
+      // the follwing few lines can be easily understood when assuming size=1
+      if (i == -size[0] && x - min[0] < static_cast<double>(size[0]) - ratio[0])
+        continue;
+      if (i ==  size[0] && max[0] - x < static_cast<double>(size[0]) - ratio[0])
+        continue;
+      if (j == -size[1] && y - min[1] < static_cast<double>(size[1]) - ratio[1])
+        continue;
+      if (j ==  size[1] && max[1] - y < static_cast<double>(size[1]) - ratio[1])
+        continue;
+      if (k == -size[2] && z - min[2] < static_cast<double>(size[2]) - ratio[2])
+        continue;
+      if (k ==  size[2] && max[2] - z < static_cast<double>(size[2]) - ratio[2])
+        continue;
 
-      /* select the necessary atoms to repeate for the most outside bins */
-      /* the follwing few lines can be easily understood when assuming size=1 */
-      if (i == -size0 && x - xmin < (double)size0 - ratio0) continue;
-      if (i == size0  && xmax - x < (double)size0 - ratio0) continue;
-      if (j == -size1 && y - ymin < (double)size1 - ratio1) continue;
-      if (j == size1  && ymax - y < (double)size1 - ratio1) continue;
-      if (k == -size2 && z - zmin < (double)size2 - ratio2) continue;
-      if (k == size2 &&  zmax - z < (double)size2 - ratio2) continue;
-
-
-      /* fractional coords of padding atom at */
+      // fractional coords of padding atom at
       atom_coords[0] = i+x;
       atom_coords[1] = j+y;
       atom_coords[2] = k+z;
