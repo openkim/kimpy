@@ -95,6 +95,7 @@ class KIMModelCalculator(Calculator):
     self.pkim, status = km.string_init(test_kimstr, self.modelname)
     if status != km.STATUS_OK:
       km.report_error('km.string_init', status)
+      raise InitializationError(self.modelname)
 
     # init model
     # memory for `cutoff' must be allocated and registered before calling model_init
@@ -167,7 +168,7 @@ class KIMModelCalculator(Calculator):
       try:  # ensure cell is invertible (we'll use it in nl.set_padding)
         np.linalg.inv(cell)
       except:
-        raise Exception('Supercell\n{}\nis not invertible.'.format(cell))
+        raise ValueError('Supercell\n{}\nis not invertible.'.format(cell))
       pad_coords, pad_code, self.pad_image = nl.set_padding(
           cell.ravel(), pbc, self.cutoff, coords, particle_code)
       npad = len(pad_code)
@@ -190,16 +191,20 @@ class KIMModelCalculator(Calculator):
       write_extxyz(cell, self.km_particle_code, self.km_coords, fname='config.xyz')
 
     # register KIM API object input pointers
-    km.set_data_int(self.pkim, "numberOfParticles", self.km_nparticles)
-    km.set_data_int(self.pkim, "numberOfSpecies", self.km_nspecies)
-    km.set_data_int(self.pkim, "particleSpecies", self.km_particle_code)
-    km.set_data_double(self.pkim, "coordinates", self.km_coords)
+    status = (km.set_data_int(self.pkim, "numberOfParticles", self.km_nparticles)
+          and km.set_data_int(self.pkim, "numberOfSpecies", self.km_nspecies)
+          and km.set_data_int(self.pkim, "particleSpecies", self.km_particle_code)
+          and km.set_data_double(self.pkim, "coordinates", self.km_coords) )
+    if status != km.STATUS_OK:
+      km.report_error("km.set_data", status)
 
     # initialize and register KIM API object output pointers
     self.km_energy = np.array([0.], dtype=np.double)
     self.km_forces = np.zeros(3*self.km_nparticles[0], dtype=np.double)
-    km.set_data_double(self.pkim, "energy", self.km_energy)
-    km.set_data_double(self.pkim, "forces", self.km_forces)
+    status = (km.set_data_double(self.pkim, "energy", self.km_energy)
+          and km.set_data_double(self.pkim, "forces", self.km_forces) )
+    if status != km.STATUS_OK:
+      km.report_error("km.set_data", status)
 
     # (Re-)create the neighbor list
     status = nl.build_neighborlist(self.pkim, self.cutoff, self.is_padding,
@@ -211,8 +216,14 @@ class KIMModelCalculator(Calculator):
   def free_neigh_and_kim(self):
     """Free KIM neigh object, KIM Model and KIM object. """
     nl.clean(self.pkim)
-    km.model_destroy(self.pkim)
-    km.free(self.pkim)
+
+    status = km.model_destroy(self.pkim)
+    if status != km.STATUS_OK:
+      km.report_error("km.model_destroy", status)
+    status = km.free(self.pkim)
+    if status != km.STATUS_OK:
+      km.report_error("km.free", status)
+
     self.pkim = None
 
 
@@ -400,7 +411,9 @@ def get_model_species_list(modelname):
     species_list.append(spec)
 
   # destroy the temporary model and the KIM object
-  km.free(pkim)
+  status = km.free(pkim)
+  if status != km.STATUS_OK:
+    km.report_error('km.free', status)
 
   return species_list
 
@@ -595,4 +608,13 @@ def write_extxyz(cell, species, coords, fname='config.xyz'):
       fout.write('{:12.5e} '.format(coords[3*i+0]))
       fout.write('{:12.5e} '.format(coords[3*i+1]))
       fout.write('{:12.5e}\n'.format(coords[3*i+2]))
+
+
+class InitializationError(Exception):
+  def __init__(self, modelname):
+    self.modelname = modelname
+  def __str__(self):
+    return ('\nKIM initialization failed. Model "{}" and Test do not match.\n'
+            'See "kim.log" for more information.'.format(self.modelname)
+           )
 
