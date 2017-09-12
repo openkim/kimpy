@@ -2,7 +2,6 @@
 #include <pybind11/numpy.h>
 #include <pybind11/embed.h>
 #include <string>
-#include <iostream>
 
 #include "KIM_API_C.h"
 #include "KIM_API_status.h"

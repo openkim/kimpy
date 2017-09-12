@@ -92,7 +92,7 @@ neigh_module = Extension('kimpy.neighborlist',
 
 
 setup(name = 'kimpy',
-    version = '0.0.1',
+    version = '1.0.0',
     description = 'This is a demo package',
     packages = ['kimpy'],
     ext_modules = [kimapi_module, neigh_module],
