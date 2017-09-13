@@ -499,7 +499,7 @@ def set_padding(cell, PBC, rcut, coords, species):
   zmax = max(frac_coords[:,2])
 
   # compute distance between parallelpiped faces
-  volume = np.dot(cell[0], np.cross(cell[1], cell[2]))
+  volume = np.absolute(np.dot(cell[0], np.cross(cell[1], cell[2])))
   dist0 = volume/np.linalg.norm(np.cross(cell[1], cell[2]))
   dist1 = volume/np.linalg.norm(np.cross(cell[2], cell[0]))
   dist2 = volume/np.linalg.norm(np.cross(cell[0], cell[1]))

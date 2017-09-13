@@ -134,7 +134,7 @@ void set_padding(double* cell, int* PBC, double cutoff,
 
   // volume of cell
   cross(cell+3, cell+6, xprod);
-  volume = dot(cell, xprod);
+  volume = std::abs(dot(cell, xprod));
 
   // distance between parallelpiped faces
   cross(cell+3, cell+6, xprod);
