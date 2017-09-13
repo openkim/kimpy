@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/embed.h>
+#include <pybind11/iostream.h>
 #include <string>
 
 #include "KIM_API_C.h"
@@ -295,6 +296,11 @@ PYBIND11_MODULE(kimapi, m) {
   // a wrapper of the KIM_API_report_error function
   m.def("report_error_wrapper",
     [](int ln, char* fl, char* usermsg, int error) {
+      // the py::scoped... ensures stdout and stderr are correctly mixed with python
+      // see http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html
+      py::scoped_ostream_redirect stream1();
+      py::scoped_estream_redirect stream2();
+
       int status =  KIM_API_report_error(ln, fl, usermsg, error);
       return status;
     },
