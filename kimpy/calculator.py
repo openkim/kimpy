@@ -73,6 +73,9 @@ class KIMModelCalculator(Calculator):
     """
     if self.pkim is not None:
       self.free_neigh_and_kim()
+      # Do not forget to rest the following two
+      self.last_update_positions = None
+      self.last_positions = None
     self.init_kim_and_neigh(atoms)
 
 
