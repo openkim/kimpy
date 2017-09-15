@@ -61,22 +61,24 @@ class KIMModelCalculator(Calculator):
     self.km_coords = None
     self.km_cutoff = None
 
+    # flags
+    self.km_model_initialized = False
+    self.neigh_initialized = False
+
 
   def set_atoms(self, atoms):
     """Initialize KIM object.
-    Called by set_calculator() of Atoms class.
+    Called by set_calculator() of Atoms instance.
+
+    Note that set_calculator() may be called multiple times by different Atoms instance.
 
     Parameter
     ---------
 
     atoms: ASE Atoms instance
     """
-    if self.pkim is not None:
-      self.free_neigh_and_kim()
-      # Do not forget to rest the following two
-      self.last_update_positions = None
-      self.last_positions = None
-    self.init_kim_and_neigh(atoms)
+    if self.pkim is None:
+      self.init_kim_and_neigh(atoms)
 
 
   def init_kim_and_neigh(self, atoms):
@@ -112,6 +114,7 @@ class KIMModelCalculator(Calculator):
     if status != km.STATUS_OK:
       #km.report_error('km.model_init', status)
       raise KIMError('km.model_init')
+    self.km_model_initialized = True
 
     # set cutoff
     self.skin = self.neigh_skin_ratio * self.km_cutoff[0]
@@ -122,6 +125,7 @@ class KIMModelCalculator(Calculator):
     if status != km.STATUS_OK:
       #km.report_error('nl.initialize', status)
       raise KIMError('nl.initialize')
+    self.neigh_initialized = True
 
 
   def update_kim_and_neigh(self, atoms):
@@ -214,21 +218,24 @@ class KIMModelCalculator(Calculator):
 
   def free_neigh_and_kim(self):
     """Free KIM neigh object, KIM Model and KIM object. """
-    status = nl.clean(self.pkim)
-    if status != km.STATUS_OK:
-      #km.report_error("nl.clean", status)
-      raise KIMError('nl.clean')
+    if self.pkim is not None:
 
-    status = km.model_destroy(self.pkim)
-    if status != km.STATUS_OK:
-      #km.report_error("km.model_destroy", status)
-      raise KIMError('km.model_destroy')
-    status = km.free(self.pkim)
-    if status != km.STATUS_OK:
-      #km.report_error("km.free", status)
-      raise KIMError('km.free')
+      if self.neigh_initialized:
+        status = nl.clean(self.pkim)
+        if status != km.STATUS_OK:
+          #km.report_error("nl.clean", status)
+          raise KIMError('nl.clean')
 
-    self.pkim = None
+      if self.km_model_initialized:
+        status = km.model_destroy(self.pkim)
+        if status != km.STATUS_OK:
+          #km.report_error("km.model_destroy", status)
+          raise KIMError('km.model_destroy')
+
+      status = km.free(self.pkim)
+      if status != km.STATUS_OK:
+        #km.report_error("km.free", status)
+        raise KIMError('km.free')
 
 
   def update_km_coords(self, atoms):
@@ -323,8 +330,7 @@ class KIMModelCalculator(Calculator):
 
   def __del__(self):
     """Garbage collects the KIM neigh objects and KIM object."""
-    if self.pkim is not None:
-      self.free_neigh_and_kim()
+    self.free_neigh_and_kim()
 
 
 
