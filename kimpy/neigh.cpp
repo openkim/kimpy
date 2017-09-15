@@ -1,4 +1,5 @@
 #include <cstring>
+#include <cmath>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -74,6 +75,7 @@ int nbl_build_neighborlist(void* kimmdl, double cutoff, const int* is_padding,
   int n;
   double min[DIM];
   double max[DIM];
+  double tol = 1e-20;
 
 
   // get neigh object
@@ -108,15 +110,16 @@ int nbl_build_neighborlist(void* kimmdl, double cutoff, const int* is_padding,
   /* make the cell box */
   size_total = 1;
   for (i=0; i<DIM; i++){
-    size[i] = (int)((max[i]-min[i])/cutoff);
+    size[i] = static_cast<int> ((max[i]-min[i])/cutoff);
     size[i] = size[i] <= 0 ? 1 : size[i];
     size_total *= size[i];
   }
   if (size_total > 1000000000) {
-    std::cerr << "kimpy: Cell size" << size[0]<<" x " <<size[1]<<" x "<<size[2]<<
+    std::cerr << "kimpy Error:"<< std::endl;
+    std::cerr << "  Cell size" << size[0]<<" x " <<size[1]<<" x "<<size[2]<<
         "? You thinks me a bit ambitious." <<std::endl;
-    std::cerr << "kimpy: Check if you have particles at 1e10." << std::endl;
-    std::cerr << "kimpy: Attempting to proceed..." << std::endl;
+    std::cerr << "  Check if you have particles at 1e10." << std::endl;
+    std::cerr << "  Attempting to proceed..." << std::endl;
   }
 
 
@@ -155,14 +158,21 @@ int nbl_build_neighborlist(void* kimmdl, double cutoff, const int* is_padding,
 
         idx = ii + jj*size[0] + kk*size[0]*size[1];
 
-        for (j=0; j<(int)cells[idx].size(); j++) {
-          n = cells[idx][j];
+        for (size_t m=0; m<cells[idx].size(); m++) {
+          n = cells[idx][m];
           if (n != i) {
             rsq = 0.0;
             for (k=0; k<DIM; k++) {
               dx[k] = coords[DIM*n+k] - coords[DIM*i+k];
               rsq += dx[k]*dx[k];
             }
+            if (rsq <tol) {
+              std::cerr << "kimpy Error:"<< std::endl;
+              std::cerr <<"  Collision of atoms "<<i+1<<" and "<<n+1<<". ";
+              std::cerr <<"Their distance is "<<std::sqrt(rsq)<<"!"<<std::endl;
+              return KIM_STATUS_FAIL;
+            }
+
             if (rsq < cutsq) {
               tmp_neigh.push_back(n);
               num_neigh++;
@@ -203,7 +213,7 @@ int nbl_get_neigh(void* pkim, int* mode, int* request, int *atom, int* numnei,
     return status;
   }
 
-  Natoms = (int*) KIM_API_get_data(kimmdl, "numberOfParticles", &status);
+  Natoms = static_cast<int*> (KIM_API_get_data(kimmdl, "numberOfParticles", &status));
   if (KIM_STATUS_OK != status) {
     KIM_API_report_error(__LINE__, __FILE__,"KIM_API_get_data", status);
     return status;
@@ -243,7 +253,7 @@ int nbl_get_neigh(void* pkim, int* mode, int* request, int *atom, int* numnei,
 void coords_to_index(double *x, int *size, int *index, double *max, double *min){
   int i;
   for (i=0; i<DIM; i++) {
-    index[i] = (int)(((x[i]-min[i])/(max[i]-min[i]) - 1e-14) * size[i]);
+    index[i] = static_cast<int> (((x[i]-min[i])/(max[i]-min[i]) - 1e-14) * size[i]);
   }
 }
 

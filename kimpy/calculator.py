@@ -97,7 +97,7 @@ class KIMModelCalculator(Calculator):
     test_kimstr = generate_kimstr(self.modelname, unique_species)
     self.pkim, status = km.string_init(test_kimstr, self.modelname)
     if status != km.STATUS_OK:
-      km.report_error('km.string_init', status)
+      #km.report_error('km.string_init', status)
       raise InitializationError(self.modelname)
 
     # init model
@@ -105,11 +105,13 @@ class KIMModelCalculator(Calculator):
     self.km_cutoff = np.array([0.], dtype=np.double)
     status = km.set_data_double(self.pkim, "cutoff", self.km_cutoff)
     if status != km.STATUS_OK:
-      km.report_error('km.set_data_double', status)
+      #km.report_error('km.set_data_double', status)
+      raise KIMError('km.set_data_double')
 
     status = km.model_init(self.pkim)
     if status != km.STATUS_OK:
-      km.report_error('km.model_init', status)
+      #km.report_error('km.model_init', status)
+      raise KIMError('km.model_init')
 
     # set cutoff
     self.skin = self.neigh_skin_ratio * self.km_cutoff[0]
@@ -118,7 +120,8 @@ class KIMModelCalculator(Calculator):
     # initialize neighbor list
     status = nl.initialize(self.pkim)
     if status != km.STATUS_OK:
-      km.report_error('nl.initialize', status)
+      #km.report_error('nl.initialize', status)
+      raise KIMError('nl.initialize')
 
 
   def update_kim_and_neigh(self, atoms):
@@ -151,7 +154,8 @@ class KIMModelCalculator(Calculator):
     for s in unique_species:
       code, status = km.get_species_code(self.pkim, s)
       if status != km.STATUS_OK:
-        km.report_error('km.get_species_code', status)
+        #km.report_error('km.get_species_code', status)
+        raise KIMError('km.get_species_code')
       species_map[s] = code
     particle_code = [species_map[s] for s in particle_species]
 
@@ -188,7 +192,8 @@ class KIMModelCalculator(Calculator):
           and km.set_data_int(self.pkim, "particleSpecies", self.km_particle_code)
           and km.set_data_double(self.pkim, "coordinates", self.km_coords) )
     if status != km.STATUS_OK:
-      km.report_error("km.set_data", status)
+      #km.report_error("km.set_data", status)
+      raise KIMError('km.set_data')
 
     # initialize and register KIM API object output pointers
     self.km_energy = np.array([0.], dtype=np.double)
@@ -196,25 +201,32 @@ class KIMModelCalculator(Calculator):
     status = (km.set_data_double(self.pkim, "energy", self.km_energy)
           and km.set_data_double(self.pkim, "forces", self.km_forces) )
     if status != km.STATUS_OK:
-      km.report_error("km.set_data", status)
+      #km.report_error("km.set_data", status)
+      raise KIMError('km.set_data')
 
     # (Re-)create the neighbor list
     status = nl.build_neighborlist(self.pkim, self.cutoff, self.is_padding,
                                    self.padding_need_neigh)
     if status != km.STATUS_OK:
-      km.report_error('nl.build_neighborlist', status)
+      #km.report_error('nl.build_neighborlist', status)
+      raise KIMError('nl.build_neighborlist')
 
 
   def free_neigh_and_kim(self):
     """Free KIM neigh object, KIM Model and KIM object. """
-    nl.clean(self.pkim)
+    status = nl.clean(self.pkim)
+    if status != km.STATUS_OK:
+      #km.report_error("nl.clean", status)
+      raise KIMError('nl.clean')
 
     status = km.model_destroy(self.pkim)
     if status != km.STATUS_OK:
-      km.report_error("km.model_destroy", status)
+      #km.report_error("km.model_destroy", status)
+      raise KIMError('km.model_destroy')
     status = km.free(self.pkim)
     if status != km.STATUS_OK:
-      km.report_error("km.free", status)
+      #km.report_error("km.free", status)
+      raise KIMError('km.free')
 
     self.pkim = None
 
@@ -288,7 +300,8 @@ class KIMModelCalculator(Calculator):
         self.last_positions = atoms.get_positions()
       status = km.model_compute(self.pkim)
       if status != km.STATUS_OK:
-        km.report_error('km.model_compute', status)
+        #km.report_error('km.model_compute', status)
+        raise KIMError('km.model_compute')
 
     energy = self.km_energy[0]
     forces = self.km_forces.copy().reshape(-1, 3)
@@ -390,25 +403,29 @@ def get_model_species_list(modelname):
 
   pkim, status = km.model_info(modelname)
   if status != km.STATUS_OK:
-    km.report_error('km.model_info', status)
+    #km.report_error('km.model_info', status)
+    raise KIMError('km.model_info')
 
   # number of model species
   numberSpecies, maxStrLen, status = km.get_num_model_species(pkim)
   if status != km.STATUS_OK:
-    km.report_error('km.get_num_model_species', status)
+    #km.report_error('km.get_num_model_species', status)
+    raise KIMError('km.get_num_model_species')
 
   # get species list
   species_list = []
   for i in xrange(numberSpecies):
     spec, status = km.get_model_species(pkim, i)
     if status != km.STATUS_OK:
-      km.report_error('km.get_model_species', status)
+      #km.report_error('km.get_model_species', status)
+      raise KIMError('km.get_model_species')
     species_list.append(spec)
 
   # destroy the temporary model and the KIM object
   status = km.free(pkim)
   if status != km.STATUS_OK:
-    km.report_error('km.free', status)
+    #km.report_error('km.free', status)
+    raise KIMError('km.free')
 
   return species_list
 
@@ -606,7 +623,13 @@ class InitializationError(Exception):
   def __init__(self, modelname):
     self.modelname = modelname
   def __str__(self):
-    return ('\nKIM initialization failed. Model "{}" and Test do not match.\n'
-            'See "kim.log" for more information.'.format(self.modelname)
-           )
+    return ('\n  KIM initialization failed. Model "{}" and Test do not match.\n'
+            'See "kim.log" for more information.'.format(self.modelname) )
+
+class KIMError(Exception):
+  def __init__(self, msg):
+    self.msg = msg
+  def __str__(self):
+    return '\n  Calling kimpy KIM API function failed: {}'.format(self.msg)
+
 
