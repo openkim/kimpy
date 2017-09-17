@@ -43,7 +43,7 @@ def get_kim_extra_link_args():
   return inquire_kim_api('--ldflags', '-L', 1)
 
 def get_extra_compile_args():
-  return ['-std=c++14']
+  return ['-std=c++11']
 
 
 class get_pybind11_includes(object):
@@ -96,7 +96,8 @@ setup(name = 'kimpy',
     description = 'This is a demo package',
     packages = ['kimpy'],
     ext_modules = [kimapi_module, neigh_module],
-    install_requires=['pybind11>=2.2', 'numpy', 'ase'],
+    install_requires=['numpy', 'ase'],
+    #install_requires=['pybind11>=2.2', 'numpy', 'ase'],
     setup_requires=['pybind11>=2.2'],  # ensures it be downloaded first
     zip_safe = False,
     )
