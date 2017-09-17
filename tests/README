@@ -1,0 +1,5 @@
+To check possible memory leak (for test_forces.py), do the following
+
+$ valgrind --leak-check=yes --suppressions=valgrind-python.supp python -E -tt ./test_forces.py
+
+For more, see https://stackoverflow.com/questions/3982036/how-can-i-use-valgrind-with-python-c-extensions

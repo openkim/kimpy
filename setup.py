@@ -43,7 +43,7 @@ def get_kim_extra_link_args():
   return inquire_kim_api('--ldflags', '-L', 1)
 
 def get_extra_compile_args():
-  return ['-std=c++11']
+  return ['-std=c++14']
 
 
 class get_pybind11_includes(object):
