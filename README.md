@@ -8,13 +8,13 @@ of Interatomic Models.
 0. Virtual environment (Optional)
 
 Create a virtual environment using `conda` (see [here](https://conda.io/miniconda.html)
-for more information about `conda` and `Miniconda`.)
+for more information about `conda` and `Miniconda`)
 
-    $ conda create -n kimcalculator
+    $ conda create -n kimpy
 
 and then activate the environment
 
-    $ source activate kimcalulator
+    $ source activate kimpy
 
 1. install from source
 
