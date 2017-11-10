@@ -96,9 +96,7 @@ setup(name = 'kimpy',
     description = 'This is a demo package',
     packages = ['kimpy'],
     ext_modules = [kimapi_module, neigh_module],
-    install_requires=['numpy', 'ase'],
-    #install_requires=['pybind11>=2.2', 'numpy', 'ase'],
-    setup_requires=['pybind11>=2.2'],  # ensures it be downloaded first
+    install_requires=['pybind11>=2.2', 'numpy', 'ase'],
     zip_safe = False,
     )
 
