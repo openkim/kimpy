@@ -3,4 +3,6 @@ dist/
 ase_kim_calculator.egg-info/
 *.so
 *.pyc
+.eggs
+kimpy.egg-info
 kim.log

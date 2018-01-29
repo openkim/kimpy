@@ -99,11 +99,13 @@ PYBIND11_MODULE(kimapi, m) {
   );
 
   m.def("model_compute",
-    [](void* kimmdl) {
+    [](void* kimmdl, bool release_GIL) {
+      if (release_GIL) py::gil_scoped_release release;
       int status = KIM_API_model_compute(kimmdl);
       return status;
     },
-    py::arg("kimmdl")
+    py::arg("kimmdl"),
+    py::arg("release_GIL") = false
   );
 
   m.def("model_init",

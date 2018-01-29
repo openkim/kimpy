@@ -305,7 +305,12 @@ class KIMModelCalculator(Calculator):
       else:
         self.update_km_coords(atoms)
         self.last_positions = atoms.get_positions()
-      status = km.model_compute(self.pkim)
+
+      release_GIL = False
+      if 'GIL' in atoms.info:
+        if atoms.info['GIL'] == 'off':
+          release_GIL = True
+      status = km.model_compute(self.pkim, release_GIL)
       if status != km.STATUS_OK:
         #km.report_error('km.model_compute', status)
         raise KIMError('km.model_compute')
