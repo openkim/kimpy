@@ -270,7 +270,10 @@ int nbl_clean(void* kimmdl) {
     KIM_API_report_error(__LINE__, __FILE__,"KIM_API_get_data", status);
     return status;
   }
-  if (nl != nullptr) delete[] nl;
+  if (nl != nullptr) {
+    delete[] nl;
+    nl = nullptr;
+  }
 
   return KIM_STATUS_OK;
 }
@@ -288,9 +291,18 @@ int nbl_free_neigh_content(void* kimmdl)
   }
 
   if (nl != nullptr) {
-    if (nl->Nneighbors != nullptr) delete[] nl->Nneighbors;
-    if (nl->neighborList != nullptr) delete[] nl->neighborList;
-    if (nl->beginIndex != nullptr) delete[] nl->beginIndex;
+    if (nl->Nneighbors != nullptr) {
+      delete[] nl->Nneighbors;
+      nl->Nneighbors = nullptr;
+    }
+    if (nl->neighborList != nullptr) {
+      delete[] nl->neighborList;
+      nl->neighborList = nullptr;
+    }
+    if (nl->beginIndex != nullptr) {
+      delete[] nl->beginIndex;
+      nl->beginIndex = nullptr;
+    }
   }
 
   return KIM_STATUS_OK;
