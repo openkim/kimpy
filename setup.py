@@ -69,6 +69,21 @@ def get_includes():
   return kim_inc + pybind11_inc
 
 
+def get_version(fname='kimpy/__init__.py'):
+  with open(fname) as fin:
+    for line in fin:
+      line = line.strip()
+      if '__version__' in line:
+        v = line.split('=')[1]
+        # stripe white space, and ' or " in string
+        if "'" in v:
+          version = v.strip("' ")
+        elif '"' in v:
+          version = v.strip('" ')
+        break
+  return version
+
+
 kimapi_module = Extension('kimpy.kimapi',
     sources = ['kimpy/kim_api_bind.cpp'],
     include_dirs = get_includes(),
@@ -92,11 +107,17 @@ neigh_module = Extension('kimpy.neighborlist',
 
 
 setup(name = 'kimpy',
-    version = '1.0.0',
-    description = 'This is a demo package',
+    version = get_version(),
     packages = ['kimpy'],
     ext_modules = [kimapi_module, neigh_module],
-    install_requires=['pybind11>=2.2', 'numpy', 'ase'],
+    install_requires = ['pybind11>=2.2', 'numpy', 'ase'],
+
+    # metadata
+    author = 'Mingjian Wen',
+    author_email = 'wenxx151[at]umn.edu',
+    url = 'https://github.com/mjwen/kimpy',
+    description = 'Python binding of the KIM API to work with ASE',
+
     zip_safe = False,
     )
 

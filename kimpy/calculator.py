@@ -5,9 +5,6 @@ from kimpy import kimapi as km
 from kimpy import neighborlist as nl
 
 
-__anthor__ = 'Mingjian Wen'
-
-
 class KIMModelCalculator(Calculator):
   """ An ASE calculator based on Knowledge base of Interatomic Models.
 
