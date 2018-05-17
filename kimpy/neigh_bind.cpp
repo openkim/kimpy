@@ -95,11 +95,11 @@ PYBIND11_MODULE(neighborlist, m) {
 
       return t;
     },
-    py::arg("cell"),
-    py::arg("PBC"),
+    py::arg("cell").noconvert(),
+    py::arg("PBC").noconvert(),
     py::arg("cutoff"),
-    py::arg("coords"),
-    py::arg("species_code"),
+    py::arg("coords").noconvert(),
+    py::arg("species_code").noconvert(),
     "Return (pad_coords, pad_species_code, pad_image)"
   );
 
