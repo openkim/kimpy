@@ -12,10 +12,10 @@ for key, value in cfg_vars.items():
 
 def inquire_kim_api(option, key, mode):
   try:
-    config = subprocess.check_output(['kim-api-v1-build-config', option])
+    config = subprocess.check_output(['kim-api-v2-build-config', option])
   except:
-    raise Exception('"kim-api-v1-build-config" not found on PATH; make sure '
-                    'kim-api ss installed and "kim-api-v1-build-config" is on PATH.')
+    raise Exception('"kim-api-v2-build-config" not found on PATH; make sure '
+                    'kim-api ss installed and "kim-api-v2-build-config" is on PATH.')
 
   # remove `\n' at end and then split at white space
   split_config = [s for s in config.strip().split(' ')]

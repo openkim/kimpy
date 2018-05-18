@@ -1,19 +1,20 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include <pybind11/embed.h>
-#include <pybind11/iostream.h>
-#include <string>
-
-#include "KIM_API_C.h"
-#include "KIM_API_status.h"
+//#include <pybind11/embed.h>
+//#include <pybind11/iostream.h>
+#include "KIM_SimulatorHeaders.hpp"
 
 namespace py = pybind11;
-using namespace py::literals;
+//using namespace py::literals;
 
 
 PYBIND11_MODULE(kimpy, m) {
-  m.doc() = "A python interface to KIM API";
+  m.doc() = "Python Interface to KIM API V2";
 
+
+
+
+/*
   m.attr("STATUS_OK") = KIM_STATUS_OK;
 
   m.def("get_version",
@@ -481,7 +482,7 @@ PYBIND11_MODULE(kimpy, m) {
     py::arg("kimmdl"),
     py::arg("name")
   );
-
+*/
 
 }
 
