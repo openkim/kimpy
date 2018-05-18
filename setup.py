@@ -14,8 +14,8 @@ def inquire_kim_api(option, key, mode):
   try:
     config = subprocess.check_output(['kim-api-v1-build-config', option])
   except:
-    raise Exception('"kim-api-v1-build-config" not found on PATH; make sure kim-api '
-                    'is installed and "kim-api-v1-build-config" is on PATH.')
+    raise Exception('"kim-api-v1-build-config" not found on PATH; make sure '
+                    'kim-api ss installed and "kim-api-v1-build-config" is on PATH.')
 
   # remove `\n' at end and then split at white space
   split_config = [s for s in config.strip().split(' ')]
@@ -84,7 +84,7 @@ def get_version(fname='kimpy/__init__.py'):
   return version
 
 
-kimapi_module = Extension('kimpy.kimapi',
+kimapi_module = Extension('kimpy',
     sources = ['kimpy/kim_api_bind.cpp'],
     include_dirs = get_includes(),
     library_dirs = get_kim_libdirs(),
@@ -94,22 +94,10 @@ kimapi_module = Extension('kimpy.kimapi',
     language = 'c++',
     )
 
-
-neigh_module = Extension('kimpy.neighborlist',
-    sources = ['kimpy/neigh.cpp', 'kimpy/padding.cpp', 'kimpy/neigh_bind.cpp'],
-    include_dirs = get_includes(),
-    library_dirs = get_kim_libdirs(),
-    libraries = get_kim_ldlibs(),
-    extra_compile_args = get_extra_compile_args(),
-    extra_link_args = get_kim_extra_link_args(),
-    language = 'c++',
-    )
-
-
 setup(name = 'kimpy',
     version = get_version(),
     packages = ['kimpy'],
-    ext_modules = [kimapi_module, neigh_module],
+    ext_modules = [kimapi_module],
     install_requires = ['pybind11>=2.2', 'numpy', 'ase'],
 
     # metadata

@@ -11,7 +11,7 @@ namespace py = pybind11;
 using namespace py::literals;
 
 
-PYBIND11_MODULE(kimapi, m) {
+PYBIND11_MODULE(kimpy, m) {
   m.doc() = "A python interface to KIM API";
 
   m.attr("STATUS_OK") = KIM_STATUS_OK;
