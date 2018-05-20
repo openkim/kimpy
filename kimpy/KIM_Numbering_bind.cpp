@@ -2,14 +2,104 @@
 #include <pybind11/numpy.h>
 //#include <pybind11/embed.h>
 //#include <pybind11/iostream.h>
-#include "KIM_SimulatorHeaders.hpp"
+#include "KIM_Model.hpp"
 
 namespace py = pybind11;
 //using namespace py::literals;
 
+using namespace KIM;
 
-PYBIND11_MODULE(kimpy, m) {
-  m.doc() = "Python Interface to KIM API V2";
+
+PYBIND11_MODULE(kim_model, m) {
+  m.doc() = "Python binding to ... ";
+
+
+//=============================================================================
+// Model class
+//=============================================================================
+
+  py::class_<Model> mo (m, "Model");
+
+  mo.def(py::init<>())
+
+  .def("create",
+    [](Numbering const numbering,
+      LengthUnit const requestedLengthUnit,
+      EnergyUnit const requestedEnergyUnit,
+      ChargeUnit const requestedChargeUnit,
+      TemperatureUnit const requestedTemperatureUnit,
+      TimeUnit const requestedTimeUnit,
+      std::string const & modelName)
+    {
+      int requestedUnitsAccepted;
+      Model * model;
+
+      //@ CHECK name conflicting
+      //int error = KIM::Model::Create(numbering, requestedLengthUnit,
+      int error = Model::Create(numbering, requestedLengthUnit,
+          requestedEnergyUnit, requestedChargeUnit, requestedTemperatureUnit,
+          requestedTimeUnit, modelName, &requestedUnitsAccepted, &model);
+
+      py::tuple re(3);
+      re[0] = requestedUnitsAccepted;
+      re[1] = model;
+      re[2] = error;
+      return err;
+    }
+    // py arg could go here
+    //py::arg("coords").noconvert(),
+    "Return (requestedUnitsAccepted, model, error)"
+  )
+
+
+//=============================================================================
+// Numbering class
+//=============================================================================
+
+  py::class_<Numbering> nu (m, "Number");
+
+  nu.def(py::init<>())
+
+  .def(" ",
+    []()
+    {
+
+      int error =
+
+      py::tuple re(2);
+      re[0] = ;
+      re[1] = ;
+      return err;
+    }
+    "Return ()"
+  )
+
+
+
+
+
+//=============================================================================
+//  class
+//=============================================================================
+
+  py::class_<Numbering> nu (m, "Number");
+
+  nu.def(py::init<>())
+
+  .def(" ",
+    []()
+    {
+
+      int error =
+
+      py::tuple re(2);
+      re[0] = ;
+      re[1] = ;
+      return err;
+    }
+    "Return ()"
+  )
+
 
 
 

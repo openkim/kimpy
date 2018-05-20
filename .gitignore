@@ -6,3 +6,4 @@ ase_kim_calculator.egg-info/
 .eggs
 kimpy.egg-info
 kim.log
+.cache

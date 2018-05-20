@@ -84,20 +84,43 @@ def get_version(fname='kimpy/__init__.py'):
   return version
 
 
-kimapi_module = Extension('kimpy',
-    sources = ['kimpy/kim_api_bind.cpp'],
-    include_dirs = get_includes(),
-    library_dirs = get_kim_libdirs(),
-    libraries = get_kim_ldlibs(),
-    extra_compile_args = get_extra_compile_args(),
-    extra_link_args = get_kim_extra_link_args(),
-    language = 'c++',
-    )
+def get_extension(module_name, sources):
+  return Extension(module_name,
+  sources = sources,
+  include_dirs = get_includes(),
+  library_dirs = get_kim_libdirs(),
+  libraries = get_kim_ldlibs(),
+  extra_compile_args = get_extra_compile_args(),
+  extra_link_args = get_kim_extra_link_args(),
+  language = 'c++',
+  )
+
+
+model = get_extension(
+  'kimpy.model',
+  ['kimpy/KIM_Model_bind.cpp']
+)
+numbering = get_extension(
+  'kimpy.numbering',
+  ['kimpy/KIM_Numbering_bind.cpp']
+)
+compute_arguments = get_extension(
+  'kimpy.compute_arguments',
+  ['kimpy/KIM_ComputeArguments_bind.cpp']
+)
+compute_argument_name = get_extension(
+  'kimpy.compute_argument_name',
+  ['kimpy/KIM_ComputeArgumentName_bind.cpp']
+)
+
 
 setup(name = 'kimpy',
     version = get_version(),
     packages = ['kimpy'],
-    ext_modules = [kimapi_module],
+    #ext_modules = [model],
+    #ext_modules = [compute_arguments],
+    ext_modules = [model, compute_argument_name],
+    #ext_modules = [numbering],
     install_requires = ['pybind11>=2.2', 'numpy', 'ase'],
 
     # metadata
