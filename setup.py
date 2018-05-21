@@ -132,6 +132,7 @@ module_names = [
   'numbering',
   'species_name',
   'support_status',
+  'language_name',
   'length_unit',
   'energy_unit',
   'charge_unit',

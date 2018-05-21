@@ -7,6 +7,7 @@ import data_type
 import numbering
 import species_name
 import support_status
+import language_name
 import length_unit
 import energy_unit
 import charge_unit
@@ -21,6 +22,7 @@ __all__ = [
   'numbering',
   'species_name',
   'support_status',
+  'language_name',
   'length_unit',
   'energy_unit',
   'charge_unit',

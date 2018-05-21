@@ -1,4 +1,5 @@
 import os
+from generate_bind_test_commons import generate_bind, generate_test
 
 species = [
   'electron',
@@ -142,27 +143,15 @@ species = [
   'user20'
 ]
 
-
-# write bind attributes
-dir_path = os.path.dirname(os.path.realpath(__file__))
-parent_path = os.path.dirname(dir_path)
-fname = os.path.join(parent_path, 'kimpy', 'SpeciesName_attributes.cpp')
-with open (fname, 'write') as fout:
-  for s in species:
-    fout.write('module.attr("{0}") = SPECIES_NAME::{0};\n'.format(s))
+fields = {
+  'FIELD_NAME': 'SPECIES_NAME',
+  'FieldName': 'SpeciesName',
+  'fieldName': 'speciesName',
+  'field_name': 'species_name',
+}
 
 
-# write test attributes
-fname = os.path.join(parent_path, 'tests', 'species_name_attributes.py')
-with open (fname, 'write') as fout:
-  fout.write('import kimpy\n\n')
-  fout.write('attributes = [\n')
-  for s in species:
-    fout.write('  kimpy.species_name.{},\n'.format(s))
-  fout.write(']\n')
+generate_bind(fields, species)
+generate_test(fields, species)
 
-  fout.write('\n\nstr_names = [\n')
-  for s in species:
-    fout.write('  "{}",\n'.format(s))
-  fout.write(']\n')
 

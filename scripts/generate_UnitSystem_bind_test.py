@@ -1,5 +1,5 @@
 import os
-
+from generate_bind_test_commons import generate_bind, generate_test
 
 length_unit = {
   'FIELD_NAME': 'LENGTH_UNIT',
@@ -89,69 +89,8 @@ all_attributes = [
 ]
 
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-parent_path = os.path.dirname(dir_path)
-
-# write binding
-template_name = os.path.join(dir_path, 'KIM_FieldName_bind.cpp-template')
-with open(template_name, 'r') as fin:
-  template = fin.read()
-
-for units, attributes in zip(all_units, all_attributes):
-
-  temp = template
-  fname = os.path.join(parent_path, 'kimpy', os.path.basename(template_name).split('-')[0])
-
-  # add attributes
-  attr_str = ''
-  for attr in attributes:
-    attr_str += '  module.attr("{0}") = FIELD_NAME::{0};\n'.format(attr)
-  temp = temp.replace('rpls_attributes', attr_str)
-
-  # replace field names
-  for key, value in units.iteritems():
-    temp = temp.replace(key, value)
-    fname = fname.replace(key, value)
-
-  # write to file
-  with open(fname, 'w') as fout:
-    fout.write(temp)
-
-
-# write tests
-template_name = os.path.join(dir_path, 'test_field_name.py-template')
-with open(template_name, 'r') as fin:
-  template = fin.read()
-
-for units, attributes in zip(all_units, all_attributes):
-
-  temp = template
-  fname = os.path.join(parent_path, 'tests', os.path.basename(template_name).split('-')[0])
-
-  # add attributes
-  attr_str = 'attributes = [\n'
-  for attr in attributes:
-    attr_str += '  kimpy.field_name.{},\n'.format(attr)
-  attr_str += ']\n'
-  temp = temp.replace('rpls_attributes', attr_str)
-
-  # add str names
-  attr_str = 'str_names = [\n'
-  for attr in attributes:
-    attr_str += '  "{}",\n'.format(attr)
-  attr_str += ']\n'
-  temp = temp.replace('rpls_str_names', attr_str)
-
-  # replace field names
-  for key, value in units.iteritems():
-    temp = temp.replace(key, value)
-    fname = fname.replace(key, value)
-
-  # replace number of attributes
-  temp = temp.replace('rpls_num_attributes', str(len(attributes)))
-
-  # write to file
-  with open(fname, 'w') as fout:
-    fout.write(temp)
+for fields, attributes in zip(all_units, all_attributes):
+  generate_bind(fields, attributes)
+  generate_test(fields, attributes)
 
 

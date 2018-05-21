@@ -52,7 +52,7 @@ def test_main():
     assert dtype_error == False
     assert inst == attributes[i]
     assert str(inst) == str_names[i]
-    #assert dtype == data_types[i]   #TODO enable this after fixing KIM API bug
+    assert dtype == data_types[i]   #TODO enable this after fixing KIM API bug
 
   # test operator overloading
   for i in range(N):
