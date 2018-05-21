@@ -116,11 +116,20 @@ data_type = get_extension(
   'kimpy.data_type',
   ['kimpy/KIM_DataType_bind.cpp']
 )
+data_type = get_extension(
+  'kimpy.numbering',
+  ['kimpy/KIM_Numbering_bind.cpp']
+)
+
+
 
 setup(name = 'kimpy',
     version = get_version(),
     packages = ['kimpy'],
-    ext_modules = [compute_argument_name, data_type],
+    ext_modules = [compute_argument_name,
+                   data_type,
+                   numbering,
+                  ],
     install_requires = ['pybind11>=2.2', 'numpy', 'ase'],
 
     # metadata
