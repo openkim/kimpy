@@ -2,7 +2,6 @@
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
 #include <pybind11/embed.h>
-//#include <pybind11/iostream.h>
 
 #include "KIM_SimulatorHeaders.hpp"
 //@ TODO replace the header with the following. (need to solve forward declaration)

@@ -112,15 +112,15 @@ compute_argument_name = get_extension(
   'kimpy.compute_argument_name',
   ['kimpy/KIM_ComputeArgumentName_bind.cpp']
 )
-
+data_type = get_extension(
+  'kimpy.data_type',
+  ['kimpy/KIM_DataType_bind.cpp']
+)
 
 setup(name = 'kimpy',
     version = get_version(),
     packages = ['kimpy'],
-    #ext_modules = [model],
-    #ext_modules = [compute_arguments],
-    ext_modules = [model, compute_argument_name],
-    #ext_modules = [numbering],
+    ext_modules = [compute_argument_name, data_type],
     install_requires = ['pybind11>=2.2', 'numpy', 'ase'],
 
     # metadata
