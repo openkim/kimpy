@@ -7,5 +7,9 @@ ase_kim_calculator.egg-info/
 kimpy.egg-info
 kim.log
 .cache
+
 kimpy/SpeciesName_attributes.cpp
+kimpy/*Unit_bind.cpp
+
 tests/species_name_attributes.py
+tests/*_unit.py

@@ -143,9 +143,26 @@ species = [
 ]
 
 
+# write bind attributes
 dir_path = os.path.dirname(os.path.realpath(__file__))
-fname = os.path.join(dir_path, 'SpeciesName_attributes.cpp')
+parent_path = os.path.dirname(dir_path)
+fname = os.path.join(parent_path, 'kimpy', 'SpeciesName_attributes.cpp')
 with open (fname, 'write') as fout:
   for s in species:
     fout.write('module.attr("{0}") = SPECIES_NAME::{0};\n'.format(s))
+
+
+# write test attributes
+fname = os.path.join(parent_path, 'tests', 'species_name_attributes.py')
+with open (fname, 'write') as fout:
+  fout.write('import kimpy\n\n')
+  fout.write('attributes = [\n')
+  for s in species:
+    fout.write('  kimpy.species_name.{},\n'.format(s))
+  fout.write(']\n')
+
+  fout.write('\n\nstr_names = [\n')
+  for s in species:
+    fout.write('  "{}",\n'.format(s))
+  fout.write(']\n')
 

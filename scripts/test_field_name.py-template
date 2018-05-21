@@ -1,16 +1,18 @@
-from __future__ import absolute_import, division, print_function
+#from __future__ import absolute_import, division, print_function
 import kimpy
-from species_name_attributes import attributes, str_names
 
+rpls_attributes
+
+rpls_str_names
 
 def test_main():
 
-  N = kimpy.species_name.get_number_of_species_names()
-  assert N == 139
+  N = kimpy.field_name.get_number_of_field_names()
+  assert N == rpls_num_attributes
 
   all_instances = []
   for i in range(N):
-    inst,error = kimpy.species_name.get_species_name(i)
+    inst,error = kimpy.field_name.get_field_name(i)
     all_instances.append(inst)
 
     assert error == False
@@ -24,11 +26,11 @@ def test_main():
       assert all_instances[i] != all_instances[j]
 
   # test out of bound
-  inst,error = kimpy.species_name.get_species_name(N)
+  inst,error = kimpy.field_name.get_field_name(N)
   assert error == True
 
-  #help(kimpy.species_name.get_number_of_species_names)
-  #help(kimpy.species_name.get_species_name)
+  #help(kimpy.field_name.get_number_of_field_names)
+  #help(kimpy.field_name.get_field_name)
 
 
 if __name__ == '__main__':

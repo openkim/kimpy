@@ -11,9 +11,9 @@ for key, value in cfg_vars.items():
   if type(value) == str and '-Wstrict-prototypes' in value:
     cfg_vars[key] = value.replace('-Wstrict-prototypes', '')
 
-# run script to generate files
-cwd = os.getcwd()
-fname = os.path.join(cwd, 'kimpy', 'generate_SpeciesName_attributes.py')
+## run scripts to generate files
+dir_path = os.path.dirname(os.path.realpath(__file__))
+fname = os.path.join(dir_path, 'scripts', 'generate_all.py')
 subprocess.call(['python', fname])
 
 
@@ -103,55 +103,47 @@ def get_extension(module_name, sources):
   )
 
 
-model = get_extension(
-  'kimpy.model',
-  ['kimpy/KIM_Model_bind.cpp']
-)
-numbering = get_extension(
-  'kimpy.numbering',
-  ['kimpy/KIM_Numbering_bind.cpp']
-)
-compute_arguments = get_extension(
-  'kimpy.compute_arguments',
-  ['kimpy/KIM_ComputeArguments_bind.cpp']
-)
-compute_argument_name = get_extension(
-  'kimpy.compute_argument_name',
-  ['kimpy/KIM_ComputeArgumentName_bind.cpp']
-)
-compute_callback_name = get_extension(
-  'kimpy.compute_callback_name',
-  ['kimpy/KIM_ComputeCallbackName_bind.cpp']
-)
-data_type = get_extension(
-  'kimpy.data_type',
-  ['kimpy/KIM_DataType_bind.cpp']
-)
-numbering = get_extension(
-  'kimpy.numbering',
-  ['kimpy/KIM_Numbering_bind.cpp']
-)
-species_name = get_extension(
-  'kimpy.species_name',
-  ['kimpy/KIM_SpeciesName_bind.cpp']
-)
-support_status = get_extension(
-  'kimpy.support_status',
-  ['kimpy/KIM_SupportStatus_bind.cpp']
-)
+def get_extension_2(name):
 
+  module_name = 'kimpy.{}'.format(name)
+  name = name.split('_')
+  name = [i.title() for i in name]
+  name = ''.join(name)
+  sources = ['kimpy/KIM_{}_bind.cpp'.format(name)]
+  print('Module name: {}, sources: {}'.format(module_name, sources))
+  return Extension(
+    module_name,
+    sources = sources,
+    include_dirs = get_includes(),
+    library_dirs = get_kim_libdirs(),
+    libraries = get_kim_ldlibs(),
+    extra_compile_args = get_extra_compile_args(),
+    extra_link_args = get_kim_extra_link_args(),
+    language = 'c++',
+  )
 
+module_names = [
+  'model',
+  'numbering',
+  'compute_arguments',
+  'compute_argument_name',
+  'compute_callback_name',
+  'data_type',
+  'numbering',
+  'species_name',
+  'support_status',
+  'length_unit',
+  'energy_unit',
+  'charge_unit',
+  'temperature_unit',
+  'time_unit',
+]
+all_modules = [get_extension_2(name) for name in module_names]
 
 setup(name = 'kimpy',
     version = get_version(),
     packages = ['kimpy'],
-    ext_modules = [compute_argument_name,
-                   compute_callback_name,
-                   data_type,
-                   numbering,
-                   species_name,
-                   support_status,
-                  ],
+    ext_modules = all_modules,
     install_requires = ['pybind11>=2.2', 'numpy', 'ase'],
 
     # metadata

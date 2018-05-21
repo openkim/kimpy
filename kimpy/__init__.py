@@ -7,6 +7,11 @@ import data_type
 import numbering
 import species_name
 import support_status
+import length_unit
+import energy_unit
+import charge_unit
+import temperature_unit
+import time_unit
 
 # needed by `from kimpy import *`
 __all__ = [
@@ -16,4 +21,10 @@ __all__ = [
   'numbering',
   'species_name',
   'support_status',
+  'length_unit',
+  'energy_unit',
+  'charge_unit',
+  'temperature_unit',
+  'time_unit',
 ]
+
