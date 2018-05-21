@@ -15,7 +15,7 @@ PYBIND11_MODULE(species_name, module) {
 
   // classes
 
-  py::class_<SpeciesName> cl (module, "get_species_name_original");
+  py::class_<SpeciesName> cl (module, "SpeciesName");
   cl.def(py::init(
     [](int const index, py::array_t<int> error) {
       SpeciesName speciesName;
@@ -31,7 +31,7 @@ PYBIND11_MODULE(species_name, module) {
 
   // functions
 
-  // wrapper to call get_species_name_original to deal with `error`
+  // wrapper to call SpeciesName to deal with `error`
   module.def("get_species_name",
     [](int const index) {
       auto locals = py::dict("index"_a=index);
@@ -42,7 +42,7 @@ PYBIND11_MODULE(species_name, module) {
         import numpy as np
         index = locals()['index']
         e = np.array([0], dtype='intc')
-        species_name = species_name.get_species_name_original(index, e)
+        species_name = species_name.SpeciesName(index, e)
         error = e[0]
       )", py::globals(), locals);
 

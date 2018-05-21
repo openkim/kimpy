@@ -9,4 +9,6 @@ inplace:
 clean:
 	python setup.py clean
 clean_all:
-	rm -rf build/ dist/ kimpy.egg-info/ *.so kimpy/*.so kimpy/*pyc
+	rm -rf build/ dist/ kimpy.egg-info/ *.so kimpy/*.so kimpy/*.pyc \
+  kimpy/SpeciesName_attributes.cpp tests/*.pyc tests/species_name_attributes.py \
+  tests/__pycache__

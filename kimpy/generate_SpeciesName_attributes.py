@@ -1,3 +1,5 @@
+import os
+
 species = [
   'electron',
   'H',
@@ -141,7 +143,8 @@ species = [
 ]
 
 
-fname = 'SpeciesName_attributes.cpp'
+dir_path = os.path.dirname(os.path.realpath(__file__))
+fname = os.path.join(dir_path, 'SpeciesName_attributes.cpp')
 with open (fname, 'write') as fout:
   for s in species:
     fout.write('module.attr("{0}") = SPECIES_NAME::{0};\n'.format(s))

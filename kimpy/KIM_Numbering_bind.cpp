@@ -15,7 +15,7 @@ PYBIND11_MODULE(numbering, module) {
 
   // classes
 
-  py::class_<Numbering> cl (module, "get_numbering_original");
+  py::class_<Numbering> cl (module, "Numbering");
   cl.def(py::init(
     [](int const index, py::array_t<int> error) {
       Numbering numbering_;
@@ -31,7 +31,7 @@ PYBIND11_MODULE(numbering, module) {
 
   // functions
 
-  // wrapper to call get_numbering_original to deal with `error`
+  // wrapper to call Numbering to deal with `error`
   module.def("get_numbering",
     [](int const index) {
       auto locals = py::dict("index"_a=index);
@@ -42,7 +42,7 @@ PYBIND11_MODULE(numbering, module) {
         import numpy as np
         index = locals()['index']
         e = np.array([0], dtype='intc')
-        numbering_ = numbering.get_numbering_original(index, e)
+        numbering_ = numbering.Numbering(index, e)
         error = e[0]
       )", py::globals(), locals);
 

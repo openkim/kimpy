@@ -15,7 +15,7 @@ PYBIND11_MODULE(data_type, module) {
 
   // classes
 
-  py::class_<DataType> cl (module, "get_data_type_original");
+  py::class_<DataType> cl (module, "DataType");
   cl.def(py::init(
     [](int const index, py::array_t<int> error) {
       DataType dataType;
@@ -31,7 +31,7 @@ PYBIND11_MODULE(data_type, module) {
 
   // functions
 
-  // wrapper to call get_data_type_original to deal with `error`
+  // wrapper to call DataType to deal with `error`
   module.def("get_data_type",
     [](int const index) {
       auto locals = py::dict("index"_a=index);
@@ -42,7 +42,7 @@ PYBIND11_MODULE(data_type, module) {
         import numpy as np
         index = locals()['index']
         e = np.array([0], dtype='intc')
-        data_type = data_type.get_data_type_original(index, e)
+        data_type = data_type.DataType(index, e)
         error = e[0]
       )", py::globals(), locals);
 

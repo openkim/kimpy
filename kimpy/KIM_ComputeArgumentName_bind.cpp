@@ -16,7 +16,7 @@ PYBIND11_MODULE(compute_argument_name, module) {
 
   // classes
 
-  py::class_<ComputeArgumentName> cl (module, "get_compute_argument_name_original");
+  py::class_<ComputeArgumentName> cl (module, "ComputeArgumentName");
   cl.def(py::init(
     [](int const index, py::array_t<int> error) {
       ComputeArgumentName computeArgumentName;
@@ -32,7 +32,7 @@ PYBIND11_MODULE(compute_argument_name, module) {
 
   // functions
 
-  // wrapper to call get_compute_argument_name_original to deal with `error`
+  // wrapper to call ComputeArgumentName to deal with `error`
   module.def("get_compute_argument_name",
     [](int const index) {
       auto locals = py::dict("index"_a=index);
@@ -43,7 +43,7 @@ PYBIND11_MODULE(compute_argument_name, module) {
         import numpy as np
         index = locals()['index']
         e = np.array([0], dtype='intc')
-        name = compute_argument_name.get_compute_argument_name_original(index, e)
+        name = compute_argument_name.ComputeArgumentName(index, e)
         error = e[0]
       )", py::globals(), locals);
 

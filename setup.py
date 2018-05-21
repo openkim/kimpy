@@ -1,6 +1,8 @@
 from setuptools import setup, Extension
 from distutils.sysconfig import get_config_vars
-import sys, subprocess
+import sys
+import os
+import subprocess
 
 
 # remove `-Wstrict-prototypes' that is for C not C++
@@ -8,6 +10,11 @@ cfg_vars = get_config_vars()
 for key, value in cfg_vars.items():
   if type(value) == str and '-Wstrict-prototypes' in value:
     cfg_vars[key] = value.replace('-Wstrict-prototypes', '')
+
+# run script to generate files
+cwd = os.getcwd()
+fname = os.path.join(cwd, 'kimpy', 'generate_SpeciesName_attributes.py')
+subprocess.call(['python', fname])
 
 
 def inquire_kim_api(option, key, mode):

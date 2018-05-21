@@ -1,6 +1,13 @@
-#from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function
 import kimpy
-from species_name_attributes import attributes, str_names
+try:
+  from species_name_attributes import attributes, str_names
+except ImportError:
+  print('Generated `species_name_attributes.py`')
+  import subprocess
+  subprocess.call(['python', 'generate_species_name_attributes.py'])
+  from species_name_attributes import attributes, str_names
+
 
 def test_main():
 
