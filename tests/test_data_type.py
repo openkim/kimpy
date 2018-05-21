@@ -1,29 +1,39 @@
 #from __future__ import absolute_import, division, print_function
 import kimpy
 
+attributes = [
+  kimpy.data_type.Integer,
+  kimpy.data_type.Double
+]
+
+str_names = [
+  'Integer',
+  'Double'
+]
+
 def test_main():
 
   N = kimpy.data_type.get_number_of_data_types()
   assert N == 2
 
-  arg0,error0 = kimpy.data_type.get_data_type(0)
-  arg00,_ = kimpy.data_type.get_data_type(0)
-  arg1,_ = kimpy.data_type.get_data_type(1)
-  argN,errorN = kimpy.data_type.get_data_type(N)
+  all_instances = []
+  for i in range(N):
+    inst,error = kimpy.data_type.get_data_type(i)
+    all_instances.append(inst)
 
-  # class instances
-  assert arg0 == arg00
-  assert arg0 != arg1
-  assert str(arg0) == 'Integer'
-  assert str(arg1) == 'Double'
+    assert error == False
+    assert inst == attributes[i]
+    assert str(inst) == str_names[i]
 
-  # error handling
-  assert error0 == False
-  assert errorN == True
+  # test operator overloading
+  for i in range(N):
+    assert all_instances[i] == all_instances[i]
+    for j in range(i+1, N):
+      assert all_instances[i] != all_instances[j]
 
-  # module attributes
-  assert arg0 == kimpy.data_type.Integer
-  assert str(kimpy.data_type.Integer) == 'Integer'
+  # test out of bound
+  inst,error = kimpy.data_type.get_data_type(N)
+  assert error == True
 
   #help(kimpy.data_type.get_number_of_data_types)
   #help(kimpy.data_type.get_data_type)
