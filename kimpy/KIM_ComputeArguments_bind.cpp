@@ -27,19 +27,15 @@ PYBIND11_MODULE(compute_arguments, module) {
 
   // python constructor needs to return a pointer to the C++ instance
   cl.def(py::init(
-    [](py::array_t<int> error, Model* mo) {
+    [](Model& mo, py::array_t<int> error) {
       ComputeArguments * ca;
       auto e = error.mutable_data(0);
-      e[0] = mo->ComputeArgumentsCreate(&ca);
+      e[0] = mo.ComputeArgumentsCreate(&ca);
       return ca;
     }
   ))
-  .def("__repr__", &ComputeArguments::String);
 
-
-  // functions
-
-  module.def("get_argument_support_status",
+  .def("get_argument_support_status",
     [](ComputeArguments& inst, ComputeArgumentName const computeArgumentName) {
       SupportStatus supportStatus;
       int error = inst.GetArgumentSupportStatus(computeArgumentName, &supportStatus);
@@ -49,12 +45,11 @@ PYBIND11_MODULE(compute_arguments, module) {
       re[1] = error;
       return re;
     },
-    py::arg("instance (do not pass)"),
     py::arg("ComputeArgumentName"),
     "Return(SupportStatus, error)"
-  );
+  )
 
-  module.def("get_callback_support_status",
+  .def("get_callback_support_status",
     [](ComputeArguments& inst, ComputeCallbackName const computeCallbackName) {
       SupportStatus supportStatus;
       int error = inst.GetCallbackSupportStatus(computeCallbackName, &supportStatus);
@@ -64,12 +59,11 @@ PYBIND11_MODULE(compute_arguments, module) {
       re[1] = error;
       return re;
     },
-    py::arg("instance (do not pass)"),
     py::arg("ComputeCallbackName"),
     "Return(SupportStatus, error)"
-  );
+  )
 
-  module.def("set_argument_pointer",
+  .def("set_argument_pointer",
     [](ComputeArguments& inst,
        ComputeArgumentName const computeArgumentName,
        py::array_t<int> ptr
@@ -78,12 +72,11 @@ PYBIND11_MODULE(compute_arguments, module) {
       int error = inst.SetArgumentPointer(computeArgumentName, data);
       return error;
     },
-    py::arg("instance (do not pass)"),
     py::arg("ComputeArgumentName"),
     py::arg("ptr").noconvert()
-  );
+  )
 
-  module.def("set_argument_pointer",
+  .def("set_argument_pointer",
     [](ComputeArguments& inst,
       ComputeArgumentName const computeArgumentName,
       py::array_t<double> ptr
@@ -92,10 +85,11 @@ PYBIND11_MODULE(compute_arguments, module) {
       int error = inst.SetArgumentPointer(computeArgumentName, data);
       return error;
     },
-    py::arg("instance (do not pass)"),
     py::arg("ComputeArgumentName"),
     py::arg("ptr").noconvert()
-  );
+  )
+
+  .def("__repr__", &ComputeArguments::String);
 
 }
 
