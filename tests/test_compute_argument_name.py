@@ -3,6 +3,9 @@ import kimpy
 
 def test_main():
 
+  N = kimpy.compute_argument_name.get_number_of_compute_arguments()
+  assert N == 9
+
   arg0,error0 = kimpy.compute_argument_name.get_compute_argument_name(0)
   arg00,_ = kimpy.compute_argument_name.get_compute_argument_name(0)
   arg1,_ = kimpy.compute_argument_name.get_compute_argument_name(1)
@@ -18,11 +21,14 @@ def test_main():
   assert error0 == False
   assert error10 == True
 
-  # class instance and attributes
+  # module attributes
   assert arg0 == kimpy.compute_argument_name.numberOfParticles
   assert str(kimpy.compute_argument_name.numberOfParticles) == 'numberOfParticles'
 
-  help(kimpy.compute_argument_name.get_compute_argument_name)
+  #help(kimpy.compute_argument_name.get_number_of_compute_arguments)
+  #help(kimpy.compute_argument_name.get_compute_argument_name)
+  #help(kimpy.compute_argument_name.get_compute_argument_data_type)
+
 
 if __name__ == '__main__':
   test_main()

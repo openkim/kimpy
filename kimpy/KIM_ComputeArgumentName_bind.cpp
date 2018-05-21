@@ -18,11 +18,9 @@ PYBIND11_MODULE(compute_argument_name, module) {
   module.doc() = "Python binding to ... ";
 
 
-
+  // classes
 
   py::class_<ComputeArgumentName> cl (module, "get_compute_argument_name_original");
-
-  //@TODO we may want to implement the other two initializer as well
   cl.def(py::init(
     [](int const index, py::array_t<int> error) {
       ComputeArgumentName computeArgumentName;
@@ -36,7 +34,9 @@ PYBIND11_MODULE(compute_argument_name, module) {
   .def("__repr__", &ComputeArgumentName::String);
 
 
-  // wrapper function to deal with error
+  // functions
+
+  // wrapper to call get_compute_argument_name_original to deal with `error`
   module.def("get_compute_argument_name",
     [](int const index) {
       auto locals = py::dict("index"_a=index);
@@ -60,11 +60,8 @@ PYBIND11_MODULE(compute_argument_name, module) {
       return re;
     },
     py::arg("index"),
-    "Return(computeArgumentName, error)"
+    "Return(ComputeArgumentName, error)"
   );
-
-
-
 
   module.def("get_number_of_compute_arguments",
     []() {
@@ -74,6 +71,32 @@ PYBIND11_MODULE(compute_argument_name, module) {
     }
   );
 
+  module.def("get_compute_argument_data_type",
+    [](ComputeArgumentName const computeArgumentName) {
+      DataType dataType;
+      bool error = COMPUTE_ARGUMENT_NAME::GetComputeArgumentDataType(
+          computeArgumentName, &dataType);
+
+      py::tuple re(2);
+      re[0] = dataType;
+      re[1] = error;
+      return re;
+    },
+    py::arg("ComputeArgumentName"),
+    "Return(DataType, error)"
+  );
+
+
+  // attrributes
   module.attr("numberOfParticles") = COMPUTE_ARGUMENT_NAME::numberOfParticles;
+  module.attr("particleSpeciesCodes") = COMPUTE_ARGUMENT_NAME::particleSpeciesCodes;
+  module.attr("particleContributing") = COMPUTE_ARGUMENT_NAME::particleContributing;
+  module.attr("coordinates") = COMPUTE_ARGUMENT_NAME::coordinates;
+  module.attr("partialEnergy") = COMPUTE_ARGUMENT_NAME::partialEnergy;
+  module.attr("partialForces") = COMPUTE_ARGUMENT_NAME::partialForces;
+  module.attr("partialParticleEnergy") = COMPUTE_ARGUMENT_NAME::partialParticleEnergy;
+  module.attr("partialVirial") = COMPUTE_ARGUMENT_NAME::partialVirial;
+  module.attr("partialParticleVirial") = COMPUTE_ARGUMENT_NAME::partialParticleVirial;
+
 }
 
