@@ -42,11 +42,11 @@ PYBIND11_MODULE(data_type, module) {
         import numpy as np
         index = locals()['index']
         e = np.array([0], dtype='intc')
-        data_type = data_type.DataType(index, e)
+        instance = data_type.DataType(index, e)
         error = e[0]
       )", py::globals(), locals);
 
-      auto dataType = locals["data_type"].cast<DataType>();
+      auto dataType = locals["instance"].cast<DataType>();
       bool error = locals["error"].cast<bool>();
 
       py::tuple re(2);

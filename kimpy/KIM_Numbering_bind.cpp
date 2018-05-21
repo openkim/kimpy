@@ -42,11 +42,11 @@ PYBIND11_MODULE(numbering, module) {
         import numpy as np
         index = locals()['index']
         e = np.array([0], dtype='intc')
-        numbering_ = numbering.Numbering(index, e)
+        instance = numbering.Numbering(index, e)
         error = e[0]
       )", py::globals(), locals);
 
-      auto numbering_ = locals["numbering_"].cast<Numbering>();
+      auto numbering_ = locals["instance"].cast<Numbering>();
       bool error = locals["error"].cast<bool>();
 
       py::tuple re(2);

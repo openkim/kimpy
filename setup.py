@@ -119,6 +119,10 @@ compute_argument_name = get_extension(
   'kimpy.compute_argument_name',
   ['kimpy/KIM_ComputeArgumentName_bind.cpp']
 )
+compute_callback_name = get_extension(
+  'kimpy.compute_callback_name',
+  ['kimpy/KIM_ComputeCallbackName_bind.cpp']
+)
 data_type = get_extension(
   'kimpy.data_type',
   ['kimpy/KIM_DataType_bind.cpp']
@@ -137,6 +141,7 @@ setup(name = 'kimpy',
     version = get_version(),
     packages = ['kimpy'],
     ext_modules = [compute_argument_name,
+                   compute_callback_name,
                    data_type,
                    numbering,
                    species_name,

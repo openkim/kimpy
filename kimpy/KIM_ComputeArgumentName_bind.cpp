@@ -43,11 +43,11 @@ PYBIND11_MODULE(compute_argument_name, module) {
         import numpy as np
         index = locals()['index']
         e = np.array([0], dtype='intc')
-        name = compute_argument_name.ComputeArgumentName(index, e)
+        instance = compute_argument_name.ComputeArgumentName(index, e)
         error = e[0]
       )", py::globals(), locals);
 
-      auto computeArgumentName = locals["name"].cast<ComputeArgumentName>();
+      auto computeArgumentName = locals["instance"].cast<ComputeArgumentName>();
       bool error = locals["error"].cast<bool>();
 
       py::tuple re(2);

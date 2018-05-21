@@ -42,11 +42,11 @@ PYBIND11_MODULE(species_name, module) {
         import numpy as np
         index = locals()['index']
         e = np.array([0], dtype='intc')
-        species_name = species_name.SpeciesName(index, e)
+        instance = species_name.SpeciesName(index, e)
         error = e[0]
       )", py::globals(), locals);
 
-      auto speciesName = locals["species_name"].cast<SpeciesName>();
+      auto speciesName = locals["instance"].cast<SpeciesName>();
       bool error = locals["error"].cast<bool>();
 
       py::tuple re(2);
