@@ -135,6 +135,11 @@ species_name = get_extension(
   'kimpy.species_name',
   ['kimpy/KIM_SpeciesName_bind.cpp']
 )
+support_status = get_extension(
+  'kimpy.support_status',
+  ['kimpy/KIM_SupportStatus_bind.cpp']
+)
+
 
 
 setup(name = 'kimpy',
@@ -145,6 +150,7 @@ setup(name = 'kimpy',
                    data_type,
                    numbering,
                    species_name,
+                   support_status,
                   ],
     install_requires = ['pybind11>=2.2', 'numpy', 'ase'],
 

@@ -6,6 +6,7 @@ import compute_callback_name
 import data_type
 import numbering
 import species_name
+import support_status
 
 # needed by `from kimpy import *`
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
   'data_type',
   'numbering',
   'species_name',
+  'support_status',
 ]
