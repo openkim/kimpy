@@ -2,14 +2,11 @@
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
 #include <pybind11/embed.h>
-
-#include "KIM_SimulatorHeaders.hpp"
-//@ TODO replace the header with the following. (need to solve forward declaration)
-//#include "KIM_Model.hpp"
+#include "KIM_ComputeArgumentName.hpp"
+#include "KIM_DataType.hpp"  // Forward declaration in KIM_ComputeArgumentName.hpp
 
 namespace py = pybind11;
 using namespace py::literals;
-
 using namespace KIM;
 
 

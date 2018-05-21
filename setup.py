@@ -116,7 +116,7 @@ data_type = get_extension(
   'kimpy.data_type',
   ['kimpy/KIM_DataType_bind.cpp']
 )
-data_type = get_extension(
+numbering = get_extension(
   'kimpy.numbering',
   ['kimpy/KIM_Numbering_bind.cpp']
 )
