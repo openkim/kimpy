@@ -120,7 +120,10 @@ numbering = get_extension(
   'kimpy.numbering',
   ['kimpy/KIM_Numbering_bind.cpp']
 )
-
+species_name = get_extension(
+  'kimpy.species_name',
+  ['kimpy/KIM_SpeciesName_bind.cpp']
+)
 
 
 setup(name = 'kimpy',
@@ -129,6 +132,7 @@ setup(name = 'kimpy',
     ext_modules = [compute_argument_name,
                    data_type,
                    numbering,
+                   species_name,
                   ],
     install_requires = ['pybind11>=2.2', 'numpy', 'ase'],
 

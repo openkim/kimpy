@@ -4,6 +4,12 @@ __version__ = '2.0.0'
 import compute_argument_name
 import data_type
 import numbering
+import species_name
 
 # needed by `from kimpy import *`
-__all__ = ['compute_argument_name', 'data_type', 'numbering']
+__all__ = [
+  'compute_argument_name',
+  'data_type',
+  'numbering',
+  'species_name',
+]
