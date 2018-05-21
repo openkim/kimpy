@@ -12,9 +12,9 @@ for key, value in cfg_vars.items():
     cfg_vars[key] = value.replace('-Wstrict-prototypes', '')
 
 ## run scripts to generate files
-dir_path = os.path.dirname(os.path.realpath(__file__))
-fname = os.path.join(dir_path, 'scripts', 'generate_all.py')
-subprocess.call(['python', fname])
+#dir_path = os.path.dirname(os.path.realpath(__file__))
+#fname = os.path.join(dir_path, 'scripts', 'generate_all.py')
+#subprocess.call(['python', fname])
 
 
 def inquire_kim_api(option, key, mode):

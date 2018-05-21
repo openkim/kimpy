@@ -1,0 +1,4 @@
+1. 05/21/2018
+  Remove py::nodelete in binding to class where it is unnecessory, such as
+  KIM_DataType.hpp.                                                             Not yet
+

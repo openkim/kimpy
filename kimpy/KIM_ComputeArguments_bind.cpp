@@ -9,7 +9,6 @@
 
 namespace py = pybind11;
 //using namespace py::literals;
-
 using namespace KIM;
 
 
@@ -33,12 +32,70 @@ PYBIND11_MODULE(compute_arguments, module) {
       auto e = error.mutable_data(0);
       e[0] = mo->ComputeArgumentsCreate(&ca);
       return ca;
-    }//,
-//    py::arg("error").noconvert(),
-//    py::arg("Model")
-  ));
+    }
+  ))
+  .def("__repr__", &ComputeArguments::String);
 
 
+  // functions
+
+  module.def("get_argument_support_status",
+    [](ComputeArguments& inst, ComputeArgumentName const computeArgumentName) {
+      SupportStatus supportStatus;
+      int error = inst.GetArgumentSupportStatus(computeArgumentName, &supportStatus);
+
+      py::tuple re(2);
+      re[0] = supportStatus;
+      re[1] = error;
+      return re;
+    },
+    py::arg("instance (do not pass)"),
+    py::arg("ComputeArgumentName"),
+    "Return(SupportStatus, error)"
+  );
+
+  module.def("get_callback_support_status",
+    [](ComputeArguments& inst, ComputeCallbackName const computeCallbackName) {
+      SupportStatus supportStatus;
+      int error = inst.GetCallbackSupportStatus(computeCallbackName, &supportStatus);
+
+      py::tuple re(2);
+      re[0] = supportStatus;
+      re[1] = error;
+      return re;
+    },
+    py::arg("instance (do not pass)"),
+    py::arg("ComputeCallbackName"),
+    "Return(SupportStatus, error)"
+  );
+
+  module.def("set_argument_pointer",
+    [](ComputeArguments& inst,
+       ComputeArgumentName const computeArgumentName,
+       py::array_t<int> ptr
+    ) {
+      int* data = ptr.mutable_data(0);
+      int error = inst.SetArgumentPointer(computeArgumentName, data);
+      return error;
+    },
+    py::arg("instance (do not pass)"),
+    py::arg("ComputeArgumentName"),
+    py::arg("ptr").noconvert()
+  );
+
+  module.def("set_argument_pointer",
+    [](ComputeArguments& inst,
+      ComputeArgumentName const computeArgumentName,
+      py::array_t<double> ptr
+    ) {
+      double* data = ptr.mutable_data(0);
+      int error = inst.SetArgumentPointer(computeArgumentName, data);
+      return error;
+    },
+    py::arg("instance (do not pass)"),
+    py::arg("ComputeArgumentName"),
+    py::arg("ptr").noconvert()
+  );
 
 }
 
