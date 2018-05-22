@@ -124,15 +124,14 @@ def get_extension_2(name):
 
 module_names = [
   'model',
-  'numbering',
   'compute_arguments',
   'compute_argument_name',
   'compute_callback_name',
   'data_type',
-  'numbering',
   'species_name',
-  'support_status',
   'language_name',
+  'numbering',
+  'support_status',
   'length_unit',
   'energy_unit',
   'charge_unit',

@@ -2,3 +2,6 @@
   Remove py::nodelete in binding to class where it is unnecessory, such as
   KIM_DataType.hpp.                                                             Not yet
 
+2. 05/21/2018
+  Add py::scoped_interpreter guard{}; to embed functions.                       Not yet
+
