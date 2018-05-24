@@ -6,16 +6,21 @@ from error import check_error, report_error
 from ase.lattice.cubic import FaceCenteredCubic
 
 
-def create_fcc_argon():
+def create_fcc_argon(alat=5.26):
   argon = FaceCenteredCubic(
     directions=[[1,0,0], [0,1,0], [0,0,1]], size=(2,2,2), symbol='Ar',
-    pbc=(0,0,0), latticeconstant=5.26)
+    pbc=(0,0,0), latticeconstant=alat)
   return argon
 
 
 def test_main():
 
   modelname = 'ex_model_Ar_P_Morse_07C'
+  print()
+  print('='*80)
+  print('Matching results for KIM model:', modelname)
+  print()
+
 
   # create model
   requestedUnitsAccepted, kim_model, error = kimpy.model.create(
@@ -29,7 +34,6 @@ def test_main():
   )
   check_error(error, 'kimpy.model.create')
 
-
   # units
   l_unit,e_unit,c_unit,te_unit,ti_unit = kim_model.get_units()
   check_error(error, 'kim_model.get_units')
@@ -39,7 +43,6 @@ def test_main():
   print('Temperature unit is:', str(te_unit))
   print('Time unit is:', str(ti_unit))
   print()
-
 
 
   # create compute arguments
@@ -62,8 +65,11 @@ def test_main():
     support_status, error = compute_arguments.get_argument_support_status(name)
     check_error(error, 'compute_argument.get_argument_support_status')
 
-    print('Compute Argument name "{}" of type: "{}" and has support status '
-        '"{}".'.format(name, dtype, support_status))
+    n_space_1 = 21 - len(str(name))
+    n_space_2 = 7 - len(str(dtype))
+    print('Compute Argument name "{}" '.format(name) + ' '*n_space_1 +
+          'is of type "{}" '.format(dtype) + ' '*n_space_2 +
+          'and has support status "{}".'.format(support_status) )
 
     # can only handle energy and force as a required arg
     if support_status == kimpy.support_status.required:
@@ -92,8 +98,9 @@ def test_main():
     support_status, error = compute_arguments.get_callback_support_status(name)
     check_error(error, 'compute_argument.get_callback_support_status')
 
-    print('Compute callback "{}" of has support status "{}".'.format(
-        name, support_status))
+    n_space = 18 - len(str(name))
+    print('Compute callback "{}"'.format(name) + ' '*n_space +
+          'has support status "{}".'.format(support_status))
 
     # cannot handle any "required" callbacks
     if support_status == kimpy.support_status.required:
@@ -120,6 +127,7 @@ def test_main():
 
   coords = np.asarray(argon.get_positions(), dtype='double')
   N = coords.shape[0]
+  print('Number of particles:', N)
   forces = np.zeros((N, 3), dtype='double')
   energy = np.array([0.], dtype='double')
   num_particles = np.array([N], dtype='intc')
@@ -158,10 +166,10 @@ def test_main():
 
   error = compute_arguments.set_callback_pointer(
       kimpy.compute_callback_name.GetNeighborList,
-      kimpy.language_name.cpp,
+      kimpy.language_name.cpp, #TODO ask Ryan to add python
       nl.get_neigh_kim(),
       neigh
-    )   #TODO ask Ryan to add python
+    )
   check_error(error, 'kimpy.compute_argument.set_callback_pointer')
 
 
@@ -171,7 +179,7 @@ def test_main():
   if(model_cutoffs.size != 1):
     report_error('too many cutoffs')
   print('Model influence distance:', model_influence_dist)
-  print('Model cutoff:', model_cutoffs)
+  print('Model cutoffs:', model_cutoffs)
   print()
 
    # species support and code
@@ -190,14 +198,28 @@ def test_main():
 
   # setup neighbor list
   need_neigh = np.ones(N, dtype='intc')
-  error = nl.build(neigh, model_influence_dist, coords, need_neigh)
-  check_error(error, 'nl.build')
 
 
-  error = kim_model.compute(compute_arguments)
-  check_error(error, 'kim_mode.compute')
-  print('energy:', energy)
-  print('force norm:', np.linalg.norm(forces))
+  # compute energy and force for different structures
+  alat = 5.26
+  min_alat = 0.8*5.26
+  max_alat = 1.2*5.26
+  inc_alat = 0.025*alat
+  all_alat = np.arange(min_alat, max_alat, inc_alat)
+
+  print('='*80)
+  print('Result for KIM model:', modelname)
+  print()
+  print('       energy          force norm        lattice spacing')
+  print()
+
+  for a in all_alat:
+    argon = create_fcc_argon(a)
+    np.copyto(coords, argon.get_positions())   # NOTE cannot change coords address
+    error = nl.build(neigh, model_influence_dist, coords, need_neigh)
+    check_error(error, 'nl.build')
+    error = kim_model.compute(compute_arguments)
+    print('{:18.10e} {:18.10e} {:18.10e}'.format(energy[0], np.linalg.norm(forces), a))
 
 
   # destory compute arguments
@@ -210,3 +232,4 @@ def test_main():
 
 if __name__ == '__main__':
   test_main()
+
