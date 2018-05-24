@@ -5,3 +5,8 @@
 2. 05/21/2018
   Add py::scoped_interpreter guard{}; to embed functions.                       Not yet
 
+3. 05/22/2018
+  Check whether polymophism works for functions like `set_argument_pointer`
+  in KIM_ComputeArguments.hpp.                                                  Not yet
+
+

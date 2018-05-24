@@ -123,7 +123,8 @@ PYBIND11_MODULE(model, module) {
 
   .def("compute_arguments_destroy",
     [](Model& mo, ComputeArguments * computeArguments) {
-      mo.ComputeArgumentsDestroy(&computeArguments);
+      int error = mo.ComputeArgumentsDestroy(&computeArguments);
+      return error;
     }
   )
 
@@ -154,6 +155,25 @@ PYBIND11_MODULE(model, module) {
       mo.GetNumberOfParameters(&numberOfParameters);
       return numberOfParameters;
     }
+  )
+
+  .def("get_parameter_data_type_extend_and_description",
+    [](Model& mo, int const index) {
+      DataType dataType;
+      int extent;
+      std::string const * description;
+
+      int error = mo.GetParameterDataTypeExtentAndDescription(
+        index, &dataType, &extent, &description);
+      py::tuple re(4);
+      re[0] = dataType;
+      re[1] = extent;
+      re[2] = *description;
+      re[3] = error;
+      return re;
+    },
+    py::arg("index"),
+    "Return(DataType, extent, description, error)"
   )
 
   .def("__repr__", &Model::String);
@@ -233,6 +253,12 @@ PYBIND11_MODULE(model, module) {
     py::arg("TimeUnit"),
     py::arg("modelName"),
     "Return(requestedUnitsAccepted, Model, error)"
+  );
+
+  module.def("destroy",
+    [](Model * mo) {
+      Model::Destroy(&mo);
+    }
   );
 
 }

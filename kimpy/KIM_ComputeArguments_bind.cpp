@@ -3,6 +3,7 @@
 //#include <pybind11/embed.h>
 //#include <pybind11/iostream.h>
 
+
 #include "KIM_SimulatorHeaders.hpp"
 //@ TODO replace the header with the following. (need to solve forward declaration)
 //#include "KIM_ComputeArguments.hpp"
@@ -88,6 +89,35 @@ PYBIND11_MODULE(compute_arguments, module) {
     py::arg("ComputeArgumentName"),
     py::arg("ptr").noconvert()
   )
+
+  .def("set_callback_pointer",
+    [](ComputeArguments& inst,
+      ComputeCallbackName const computeCallbackName,
+      LanguageName const languageName,
+      void const * const fptr,  // cannpt use: KIM::func * const fptr
+                                // the argument passed in is of type: void const *
+                                // we cast type explicitly in the funciton body
+      void const * const dataObject
+    ) {
+      KIM::func * new_fptr = (KIM::func*) fptr;
+      int error = inst.SetCallbackPointer(computeCallbackName,
+        languageName, new_fptr, dataObject);
+      return error;
+    },
+    py::arg("ComputeCallbackName"),
+    py::arg("LanguageName"),
+    py::arg("ptr"),
+    py::arg("dataObject")
+  )
+
+  .def("are_all_required_arguments_and_callbacks_present",
+    [](ComputeArguments& inst) {
+      int result;
+      inst.AreAllRequiredArgumentsAndCallbacksPresent(&result);
+      return result;
+    }
+  )
+
 
   .def("__repr__", &ComputeArguments::String);
 
