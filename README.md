@@ -24,14 +24,9 @@ Clone this repo
 ```
 $ git clone https://github.com/mjwen/kimpy.git
 ```
-and then checkout the `kim-api-v2` branch
+and then install by
 ```
-$ cd kimpy
-$ git checkout kim-api-v2
-```
-and finally install by
-```
-$ pip install -e .
+$ pip install -e ./kimpy
 ```
 
 2. pip (to come)
@@ -40,7 +35,7 @@ $ pip install -e .
 
 To check that `kimpy` is sussessfully installed, you can do
 ```
-$ cd tests
+$ cd kimpy/tests
 $ pytest
 ```
 and you will get something like
