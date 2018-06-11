@@ -1,8 +1,8 @@
 # kimpy
 
-This is the Python interface to the KIM API V2.x.x. 
+This is the Python interface to the KIM API V2.x.x.
 
-- TODO add a short description of KIM. 
+- TODO add a short description of KIM.
 
 For more information about the KIM API, please see: https://openkim.org/kim-api/
 
@@ -52,7 +52,7 @@ test_time_unit.py .
 ==================== 13 passed in 0.18 seconds ====================
 ```
 
-##Example
+## Example
 
 For an example of using the python interface, take a look at `tests\test_model.py`.
 
@@ -65,12 +65,12 @@ For exampe:
 1. To list all the modules in the package, do
 
 ```
-$ python 
+$ python
 >>> import kimpy
 >>> help(kimpy)
 ```
 
-and then you can find all the available modules under `PACKAGE CONTENTS` as 
+and then you can find all the available modules under `PACKAGE CONTENTS` as
 
 ```
 PACKAGE CONTENTS
@@ -80,15 +80,15 @@ PACKAGE CONTENTS
 	time_unit
 ```
 
-2. To inspect the `compute_argument_name` module, do 
+2. To inspect the `compute_argument_name` module, do
 
 ```
-$ python 
+$ python
 >>> import kimpy
 >>> help(kimpy.compute_argument_name)
 ```
 
-All the functions are listed under `FUNCTIONS`. For example, 
+All the functions are listed under `FUNCTIONS`. For example,
 
 ``` get_compute_argument_name(...)
 FUNCTIONS
@@ -98,17 +98,17 @@ FUNCTIONS
 		Return(ComputeArgumentName, error)
 ```
 
-shows that the function `get_compute_argument_name` takes an integer `index` as input, and returns a tuple of two outputs: `ComputeArgumentName` and `error`. You can refer to`KIM API` docs for the meaning of the input and outputs. 
+shows that the function `get_compute_argument_name` takes an integer `index` as input, and returns a tuple of two outputs: `ComputeArgumentName` and `error`. You can refer to`KIM API` docs for the meaning of the input and outputs.
 
-All the attributes of the module are listed under `DATA`. For example, 
+All the attributes of the module are listed under `DATA`. For example,
 
     DATA
     	coordinates = coordinates
-    	numberOfParticles = numberOfParticles 
+    	numberOfParticles = numberOfParticles
     	...
     	particleSpeciesCodes = particleSpeciesCodes
 
-## API 
+## API
 
 The python interface is designed to closely mimic the C++ API with only a few exceptions. These are mainly related to functions that return pointers, and in the python interface we convert these functions to return data. Explicitly, these includes:
 
@@ -119,13 +119,13 @@ void GetNeighborListCutoffsPointer(int * const numberOfCutoffs,                 
 ```
 
 
-In the python interface it is converted to 
+In the python interface it is converted to
 
 ```python
 cutoffs = Model.get_neighbor_list_cutoffs()
 ```
 
-where `cutoffs` is a numpy 1D array contains `numberOfCutoffs = len(cutoffs)` values. 
+where `cutoffs` is a numpy 1D array contains `numberOfCutoffs = len(cutoffs)` values.
 
 ## Contact
 
