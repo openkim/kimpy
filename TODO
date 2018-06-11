@@ -1,12 +1,14 @@
 1. 05/21/2018
   Remove py::nodelete in binding to class where it is unnecessory, such as
-  KIM_DataType.hpp.                                                             Not yet
+  KIM_DataType.hpp.                                                             Done
 
 2. 05/21/2018
-  Add py::scoped_interpreter guard{}; to embed functions.                       Not yet
+  Add py::scoped_interpreter guard{}; to embed functions.                       Done
+  Answer: cannot use it. Runtime error will occur.
 
 3. 05/22/2018
   Check whether polymophism works for functions like `set_argument_pointer`
-  in KIM_ComputeArguments.hpp.                                                  Not yet
+  in KIM_ComputeArguments.hpp.                                                  Done
+  Answer: yes, it works.
 
 

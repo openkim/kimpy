@@ -17,7 +17,7 @@ PYBIND11_MODULE(model, module) {
 
   // C++ class constructor and destructor are private, and as a result, simple ways
   // to construct py::init() does not exist.
-
+  // We use factory function to initialize instance.
   // std::unique_ptr<Model, py::nodelete> avoids calling the destructor
   // of the C++ class. In this case, it is crucial that instances are deallocated
   // on the C++ side to avoid memory leaks. Model_Destroy should do the work.
@@ -93,7 +93,6 @@ PYBIND11_MODULE(model, module) {
   // wrapper to call constructor of ComputeArguments to deal with `error`
   .def("compute_arguments_create",
     [](Model& mo) {
-
       auto locals = py::dict( "mo"_a = mo);
 
       // embed python code

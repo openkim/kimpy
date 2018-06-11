@@ -1,15 +1,11 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-//#include <pybind11/embed.h>
-//#include <pybind11/iostream.h>
-
 
 #include "KIM_SimulatorHeaders.hpp"
 //@ TODO replace the header with the following. (need to solve forward declaration)
 //#include "KIM_ComputeArguments.hpp"
 
 namespace py = pybind11;
-//using namespace py::literals;
 using namespace KIM;
 
 
@@ -18,7 +14,7 @@ PYBIND11_MODULE(compute_arguments, module) {
 
   // C++ class constructor and destructor are private, and as a result, simple ways
   // to construct py::init() does not exist.
-
+  // We use factory function to create the instance.
   // std::unique_ptr<ComputeArguments, py::nodelete> avoids calling the destructor
   // of the C++ class. In this case, it is crucial that instances are deallocated
   // on the C++ side to avoid memory leaks. ComputeArguments_Destroy should do the
@@ -117,7 +113,6 @@ PYBIND11_MODULE(compute_arguments, module) {
       return result;
     }
   )
-
 
   .def("__repr__", &ComputeArguments::String);
 

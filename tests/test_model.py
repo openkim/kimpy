@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import numpy as np
 import kimpy
-from neighlist import neighlist as nl
+import neighlist as nl
 from error import check_error, report_error
 from ase.lattice.cubic import FaceCenteredCubic
 
@@ -33,6 +33,8 @@ def test_main():
      modelname
   )
   check_error(error, 'kimpy.model.create')
+  if not requestedUnitsAccepted:
+    report_error('requested units not accepted in kimpy.model.create')
 
   # units
   l_unit,e_unit,c_unit,te_unit,ti_unit = kim_model.get_units()
@@ -125,14 +127,14 @@ def test_main():
   # register argument
   argon = create_fcc_argon()
 
-  coords = np.asarray(argon.get_positions(), dtype='double')
+  coords = np.asarray(argon.get_positions(), dtype=np.double)
   N = coords.shape[0]
   print('Number of particles:', N)
-  forces = np.zeros((N, 3), dtype='double')
-  energy = np.array([0.], dtype='double')
-  num_particles = np.array([N], dtype='intc')
-  species_code = np.zeros(num_particles, dtype='intc')
-  particle_contributing = np.zeros(num_particles, dtype='intc')
+  forces = np.zeros((N, 3), dtype=np.double)
+  energy = np.array([0.], dtype=np.double)
+  num_particles = np.array([N], dtype=np.intc)
+  species_code = np.zeros(num_particles, dtype=np.intc)
+  particle_contributing = np.zeros(num_particles, dtype=np.intc)
 
   error = compute_arguments.set_argument_pointer(
       kimpy.compute_argument_name.numberOfParticles, num_particles)
@@ -221,6 +223,9 @@ def test_main():
     error = kim_model.compute(compute_arguments)
     print('{:18.10e} {:18.10e} {:18.10e}'.format(energy[0], np.linalg.norm(forces), a))
 
+
+  # destory neighbor list
+  nl.clean(neigh)
 
   # destory compute arguments
   error = kim_model.compute_arguments_destroy(compute_arguments)
