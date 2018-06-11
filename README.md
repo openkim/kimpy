@@ -1,4 +1,4 @@
-# kimpy v2
+# kimpy
 
 This is the Python interface to the KIM API V2.x.x. 
 
@@ -57,6 +57,9 @@ test_time_unit.py .
 ==================== 13 passed in 0.18 seconds ====================
 ```
 
+##Example
+
+For an example of using the python interface, take a look at `tests\test_model.py`.
 
 ## Help
 
