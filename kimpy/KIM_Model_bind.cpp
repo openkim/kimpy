@@ -124,10 +124,25 @@ PYBIND11_MODULE(model, module) {
     [](Model& mo, ComputeArguments * computeArguments) {
       int error = mo.ComputeArgumentsDestroy(&computeArguments);
       return error;
-    }
+    },
+    py::arg("ComputeArguments")
   )
 
-  .def("compute", &Model::Compute)
+  .def("compute",
+    [](Model& mo, ComputeArguments const * const computeArguments, bool release_GIL) {
+      if (release_GIL) {
+        py::gil_scoped_release release;
+        int error = mo.Compute(computeArguments);
+        return error;
+      }
+      else {
+        int error = mo.Compute(computeArguments);
+        return error;
+      }
+    },
+      py::arg("ComputeArguments"),
+      py::arg("release_GIL") = false
+    )
 
   .def("clean_influence_distance_and_cutoffs_then_refresh_model",
       &Model::ClearInfluenceDistanceAndCutoffsThenRefreshModel)
