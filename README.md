@@ -54,7 +54,7 @@ test_time_unit.py .
 
 ## Example
 
-For an example of using the python interface, take a look at `tests\test_model.py`.
+For an example of using the python interface, take a look at `kimpy/tests/test_model.py`.
 
 ## Help
 
