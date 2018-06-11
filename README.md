@@ -1,95 +1,134 @@
-# OpenKIM ASE calculator
+# kimpy v2
 
-An Atomic Simulation Environemnt (ASE) calculator based on the Knowledgebase
-of Interatomic Models.
+This is the Python interface to the KIM API V2.x.x. 
+
+- TODO add a short description of KIM. 
+
+For more information about the KIM API, please see: https://openkim.org/kim-api/
 
 ## Installation
 
-0. Virtual environment (Optional)
+0. Virtual environment (optional)
 
-Create a virtual environment using `conda` (see [here](https://conda.io/miniconda.html)
-for more information about `conda` and `Miniconda`)
-
-    $ conda create -n kimpy
-
+Create a virtual environment using `conda` (see [here](https://conda.io/miniconda.html) for more information about `conda` and `Miniconda`)
+```
+$ conda create -n kimpy
+```
 and then activate the environment
-
-    $ source activate kimpy
-
+```
+$ source activate kimpy
+```
 1. install from source
 
 Clone this repo
-
-    $ git clone https://github.com/mjwen/kimpy.git
-
-and then install by
-
-    $ pip install ./kimpy
+```
+$ git clone https://github.com/mjwen/kimpy.git
+```
+and then checkout the `kim-api-v2` branch
+```
+$ cd kimpy
+$ git checkout kim-api-v2
+```
+and finally install by
+```
+$ pip install -e .
+```
 
 2. pip (to come)
 
 3. conda (to come)
 
-TO check that `kimpy` is sussessfully installed, you can do
-
-    $ cd kimpy/tests
-    $ pytest
-
+To check that `kimpy` is sussessfully installed, you can do
+```
+$ cd tests
+$ pytest
+```
 and you will get something like
 ```
 ...
-collected 2 items
+collected 13 items
 
-test_calculator.py .
-test_report_error.py .
+test_charge_unit.py .
+.
+.
+.
+test_time_unit.py .
 
-==================== 2 passed in 0.18 seconds ====================
+==================== 13 passed in 0.18 seconds ====================
 ```
 
-## Example
 
-After successfully intalling the `simpy` package, the ASE calculator can be
-imported from the `calculator` module as
+## Help
 
-    from kimpy.calculator import KIMModelCalculator
+Use `help(object)` to get help for any objects in the package (including the `kimpy` package itself and any module, class, and function in the package.)
 
-The floowing code snippet (`test_argon.py`) shows how to compute the potential
-energy and forces of a FCC crystal using the KIM ASE calculator with the KIM
-potentail `ex_model_Ar_P_MLJ_C` (get more KIM potenital Models
-[here](https://openkim.org/intro-models/)).
+For exampe:
+
+1. To list all the modules in the package, do
+
+```
+$ python 
+>>> import kimpy
+>>> help(kimpy)
+```
+
+and then you can find all the available modules under `PACKAGE CONTENTS` as 
+
+```
+PACKAGE CONTENTS
+	charge_unit
+	compute_argument_name
+	...
+	time_unit
+```
+
+2. To inspect the `compute_argument_name` module, do 
+
+```
+$ python 
+>>> import kimpy
+>>> help(kimpy.compute_argument_name)
+```
+
+All the functions are listed under `FUNCTIONS`. For example, 
+
+``` get_compute_argument_name(...)
+FUNCTIONS
+	get_compute_argument_name(...)
+		get_compute_argument_name(index: int) -> tuple
+
+		Return(ComputeArgumentName, error)
+```
+
+shows that the function `get_compute_argument_name` takes an integer `index` as input, and returns a tuple of two outputs: `ComputeArgumentName` and `error`. You can refer to`KIM API` docs for the meaning of the input and outputs. 
+
+All the attributes of the module are listed under `DATA`. For example, 
+
+    DATA
+    	coordinates = coordinates
+    	numberOfParticles = numberOfParticles 
+    	...
+    	particleSpeciesCodes = particleSpeciesCodes
+
+## API 
+
+The python interface is designed to closely mimic the C++ API with only a few exceptions. These are mainly related to functions that return pointers, and in the python interface we convert these functions to return data. Explicitly, these includes:
+
+- `GetNeighborListCutoffsPointer`, a member funciton of class `Model`,  defined in C++ API as
+
+```cpp
+void GetNeighborListCutoffsPointer(int * const numberOfCutoffs,                                              double const ** const cutoffs) const;
+```
+
+
+In the python interface it is converted to 
 
 ```python
-from __future__ import print_function
-import numpy as np
-from kimpy.calculator import KIMModelCalculator
-from ase.lattice.cubic import SimpleCubic
-
-def test_calculator():
-
-  # create atoms object
-  argon = SimpleCubic(directions=[[1,0,0], [0,1,0], [0,0,1]], size=(2,2,2),
-                      symbol='Ar', pbc=(1,1,0), latticeconstant=3.0)
-
-  # create calculator
-  modelname = 'ex_model_Ar_P_MLJ_C'
-  calc = KIMModelCalculator(modelname)
-
-  # attach calculator to atoms
-  argon.set_calculator(calc)
-
-  pos = argon.get_positions()
-  energy = argon.get_potential_energy()
-  forces = argon.get_forces()
-
-  print('KIM model:', modelname)
-  print('\ncoords:\n', pos)
-  print('\nenergy:\n', energy)
-  print('\nforces:\n', np.reshape(forces, (-1, 3)))
-
-if __name__ == '__main__':
-  test_calculator()
+cutoffs = Model.get_neighbor_list_cutoffs()
 ```
 
-Run this code snippet by
+where `cutoffs` is a numpy 1D array contains `numberOfCutoffs = len(cutoffs)` values. 
 
-    $ python test_argon.py
+## Contact
+
+Mingjian Wen (wenxx151@umn.edu)
