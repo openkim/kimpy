@@ -59,10 +59,10 @@ PYBIND11_MODULE(compute_argument_name, module) {
     "Return(ComputeArgumentName, error)"
   );
 
-  module.def("get_number_of_compute_arguments",
+  module.def("get_number_of_compute_argument_names",
     []() {
       int numberOfComputeArguments;
-      COMPUTE_ARGUMENT_NAME::GetNumberOfComputeArguments(&numberOfComputeArguments);
+      COMPUTE_ARGUMENT_NAME::GetNumberOfComputeArgumentNames(&numberOfComputeArguments);
       return numberOfComputeArguments;
     }
   );

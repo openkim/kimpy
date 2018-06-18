@@ -39,7 +39,7 @@ data_types = [
 
 def test_main():
 
-  N = kimpy.compute_argument_name.get_number_of_compute_arguments()
+  N = kimpy.compute_argument_name.get_number_of_compute_argument_names()
   assert N == 9
 
   all_instances = []

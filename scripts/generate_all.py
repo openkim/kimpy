@@ -7,6 +7,7 @@ all_fnames = [
   'generate_DataType_bind_test.py',
   'generate_Numbering_bind_test.py',
   'generate_LanguageName_bind_test.py',
+  'generate_ComputeCallbackName_bind_test.py',
 ]
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

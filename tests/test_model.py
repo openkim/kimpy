@@ -53,7 +53,7 @@ def test_main():
 
 
   # check compute arguments
-  num_compute_arguments = kimpy.compute_argument_name.get_number_of_compute_arguments()
+  num_compute_arguments = kimpy.compute_argument_name.get_number_of_compute_argument_names()
   print('Number of compute_arguments:', num_compute_arguments)
 
   for i in range(num_compute_arguments):
@@ -89,7 +89,7 @@ def test_main():
 
 
   # check compute callbacks
-  num_callbacks = kimpy.compute_callback_name.get_number_of_compute_callbacks()
+  num_callbacks = kimpy.compute_callback_name.get_number_of_compute_callback_names()
   print('Number of callbacks:', num_callbacks)
 
   for i in range(num_callbacks):
