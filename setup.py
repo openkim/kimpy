@@ -19,19 +19,20 @@ subprocess.call(['python', fname])
 
 
 def inquire_kim_api(option, key, mode):
+  """ Get compile and link flags of kim-api."""
   try:
     config = subprocess.check_output(['kim-api-v2-build-config', option])
   except:
     raise Exception('"kim-api-v2-build-config" not found on PATH; make sure '
-                    'kim-api ss installed and "kim-api-v2-build-config" is on PATH.')
+                    'kim-api is installed and "kim-api-v2-build-config" is on PATH.')
 
   # remove `\n' at end and then split at white space
   split_config = [s for s in config.strip().split(' ')]
   if mode == 0:
-    # only collect item starting with key, and remove key in the string
+    # collect item starting with key, and remove key in the string
     split_config= [s.replace(key, '') for s in split_config if s.startswith(key)]
   elif mode == 1:
-    # only collect item not starting with key
+    # collect item not starting with key
     split_config= [s for s in split_config if not s.startswith(key)]
 
   return split_config
@@ -46,12 +47,8 @@ def get_kim_libdirs():
 def get_kim_ldlibs():
   return inquire_kim_api('--ldlibs', '-l', 0)
 
-#TODO not sure whether we need to add this
 def get_kim_extra_link_args():
   return inquire_kim_api('--ldflags', '-L', 1)
-
-def get_extra_compile_args():
-  return ['-std=c++11']
 
 
 class get_pybind11_includes(object):
@@ -75,6 +72,10 @@ def get_includes():
   kim_inc = get_kim_includes()
   pybind11_inc =[get_pybind11_includes(), get_pybind11_includes(user=True)]
   return kim_inc + pybind11_inc
+
+
+def get_extra_compile_args():
+  return ['-std=c++11']
 
 
 def get_version(fname='kimpy/__init__.py'):
@@ -142,17 +143,16 @@ module_names = [
 all_modules = [get_extension_2(name) for name in module_names]
 
 setup(name = 'kimpy',
-    version = get_version(),
-    packages = ['kimpy'],
-    ext_modules = all_modules,
-    install_requires = ['pybind11>=2.2', 'numpy', 'ase'],
+  version = get_version(),
+  packages = ['kimpy'],
+  ext_modules = all_modules,
+  install_requires = ['pybind11>=2.2', 'numpy'],
 
-    # metadata
-    author = 'Mingjian Wen',
-    author_email = 'wenxx151[at]umn.edu',
-    url = 'https://github.com/mjwen/kimpy',
-    description = 'Python binding of the KIM API to work with ASE',
-
-    zip_safe = False,
-    )
+  # metadata
+  author = 'Mingjian Wen',
+  author_email = 'wenxx151[at]umn.edu',
+  url = 'https://github.com/mjwen/kimpy',
+  description = 'Python interface to the KIM API',
+  zip_safe = False,
+)
 

@@ -115,7 +115,7 @@ The python interface is designed to closely mimic the C++ API with only a few ex
 - `GetNeighborListCutoffsPointer`, a member funciton of class `Model`,  defined in C++ API as
 
 ```cpp
-void GetNeighborListCutoffsPointer(int * const numberOfCutoffs,                                              double const ** const cutoffs) const;
+void GetNeighborListCutoffsPointer(int * const numberOfCutoffs, double const ** const cutoffs) const;
 ```
 
 
