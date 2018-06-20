@@ -16,14 +16,9 @@ PYBIND11_MODULE(field_name, module) {
   // classes
 
   py::class_<FieldName> cl (module, "FieldName");
-  cl.def(py::init(
-    [](int const index, py::array_t<int> error) {
-      FieldName fieldName;
-      auto e = error.mutable_data(0);
-      e[0] = FIELD_NAME::GetFieldName(index, &fieldName);
-      return fieldName;
-    }
-  ))
+  cl.def(py::init<>())
+  .def(py::init<int const>())
+  .def(py::init<std::string const>())
   .def(py::self == py::self)
   .def(py::self != py::self)
   .def("__repr__", &FieldName::String);
@@ -31,23 +26,10 @@ PYBIND11_MODULE(field_name, module) {
 
   // functions
 
-  // wrapper to call FieldName to deal with `error`
   module.def("get_field_name",
     [](int const index) {
-      auto locals = py::dict("index"_a=index);
-
-      // embed python code
-      py::exec(R"(
-        from kimpy import field_name
-        import numpy as np
-        index = locals()['index']
-        e = np.array([0], dtype='intc')
-        instance = field_name.FieldName(index, e)
-        error = e[0]
-      )", py::globals(), locals);
-
-      auto fieldName = locals["instance"].cast<FieldName>();
-      bool error = locals["error"].cast<bool>();
+      FieldName fieldName;
+      int error = FIELD_NAME::GetFieldName(index, &fieldName);
 
       py::tuple re(2);
       re[0] = fieldName;
