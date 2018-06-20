@@ -1,4 +1,4 @@
-#from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function
 import kimpy
 
 attributes = [
@@ -52,7 +52,7 @@ def test_main():
     assert dtype_error == False
     assert inst == attributes[i]
     assert str(inst) == str_names[i]
-    assert dtype == data_types[i]   #TODO enable this after fixing KIM API bug
+    assert dtype == data_types[i]
 
   # test operator overloading
   for i in range(N):
@@ -63,10 +63,6 @@ def test_main():
   # test out of bound
   inst,error = kimpy.compute_argument_name.get_compute_argument_name(N)
   assert error == True
-
-  #help(kimpy.compute_argument_name.get_number_of_compute_arguments)
-  #help(kimpy.compute_argument_name.get_compute_argument_name)
-  #help(kimpy.compute_argument_name.get_compute_argument_data_type)
 
 
 if __name__ == '__main__':

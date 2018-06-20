@@ -13,8 +13,8 @@ clean_all:
   kimpy/*.pyc kimpy/*.so kimpy/*Unit_bind.cpp \
   kimpy/KIM_DataType_bind.cpp kimpy/KIM_Numbering_bind.cpp \
   kimpy/KIM_SpeciesName_bind.cpp kimpy/KIM_LanguageName_bind.cpp \
+  kimpy/KIM_ComputeCallbackName_bind.cpp \
   scripts/*.pyc \
   tests/__pycache__  tests/*_unit.py \
   tests/test_data_type.py tests/test_numbering.py tests/test_species_name.py \
-  tests/test_language_name.py \
-
+  tests/test_language_name.py tests/test_compute_callback_name.py

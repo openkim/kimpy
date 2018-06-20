@@ -11,20 +11,15 @@ using namespace KIM;
 
 
 PYBIND11_MODULE(compute_argument_name, module) {
-  module.doc() = "Python binding to ... ";
+  module.doc() = "Python binding to KIM_ComputeCallbackName.hpp";
 
 
   // classes
 
   py::class_<ComputeArgumentName> cl (module, "ComputeArgumentName");
-  cl.def(py::init(
-    [](int const index, py::array_t<int> error) {
-      ComputeArgumentName computeArgumentName;
-      auto e = error.mutable_data(0);
-      e[0] = COMPUTE_ARGUMENT_NAME::GetComputeArgumentName(index, &computeArgumentName);
-      return computeArgumentName;
-    }
-  ))
+  cl.def(py::init<>())
+  .def(py::init<int const>())
+  .def(py::init<std::string const>())
   .def(py::self == py::self)
   .def(py::self != py::self)
   .def("__repr__", &ComputeArgumentName::String);
@@ -32,23 +27,10 @@ PYBIND11_MODULE(compute_argument_name, module) {
 
   // functions
 
-  // wrapper to call ComputeArgumentName to deal with `error`
   module.def("get_compute_argument_name",
     [](int const index) {
-      auto locals = py::dict("index"_a=index);
-
-      // embed python code
-      py::exec(R"(
-        from kimpy import compute_argument_name
-        import numpy as np
-        index = locals()['index']
-        e = np.array([0], dtype='intc')
-        instance = compute_argument_name.ComputeArgumentName(index, e)
-        error = e[0]
-      )", py::globals(), locals);
-
-      auto computeArgumentName = locals["instance"].cast<ComputeArgumentName>();
-      bool error = locals["error"].cast<bool>();
+      ComputeArgumentName computeArgumentName;
+      int error = COMPUTE_ARGUMENT_NAME::GetComputeArgumentName(index, &computeArgumentName);
 
       py::tuple re(2);
       re[0] = computeArgumentName;

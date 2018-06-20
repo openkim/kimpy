@@ -1,4 +1,4 @@
-#from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function
 import kimpy
 
 rpls_attributes
@@ -28,9 +28,6 @@ def test_main():
   # test out of bound
   inst,error = kimpy.field_name.get_field_name(N)
   assert error == True
-
-  #help(kimpy.field_name.get_number_of_field_names)
-  #help(kimpy.field_name.get_field_name)
 
 
 if __name__ == '__main__':
