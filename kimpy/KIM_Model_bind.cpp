@@ -90,28 +90,10 @@ PYBIND11_MODULE(model, module) {
     "Return(LengthUnit, EnergyUnit, ChargeUnit, TemperatureUnit, TimeUnit)"
   )
 
-  // wrapper to call constructor of ComputeArguments to deal with `error`
   .def("compute_arguments_create",
     [](Model& mo) {
-      auto locals = py::dict( "mo"_a = mo);
-
-      // embed python code
-      py::exec(R"(
-        from kimpy import compute_arguments
-        import numpy as np
-
-        mo = locals()['mo']
-        e = np.array([0], dtype='intc')
-
-        instance = compute_arguments.ComputeArguments(mo, e)
-        error = e[0]
-      )", py::globals(), locals);
-
-      // cannot cast, because ~ComputeArguments() is private
-      //ComputeArguments computeArguments = locals["instance"].cast<ComputeArguments>();
-      auto computeArguments = locals["instance"];
-      int error = locals["error"].cast<int>();
-
+      ComputeArguments * computeArguments;
+      int error = mo.ComputeArgumentsCreate(&computeArguments);
       py::tuple re(2);
       re[0] = computeArguments;
       re[1] = error;
