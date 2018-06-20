@@ -51,6 +51,7 @@ def generate_bind(fields, attributes):
   parent_path = os.path.dirname(dir_path)
   fname = os.path.join(parent_path, 'kimpy', fname.split('-')[0])
   with open(fname, 'w') as fout:
+    fout.write('// This file is generated automatically by scripts\n')
     fout.write(template)
 
 
@@ -117,5 +118,6 @@ def generate_test(fields, attributes):
   parent_path = os.path.dirname(dir_path)
   fname = os.path.join(parent_path, 'tests', fname.split('-')[0])
   with open(fname, 'w') as fout:
+    fout.write('# This file is generated automatically by scripts\n')
     fout.write(template)
 

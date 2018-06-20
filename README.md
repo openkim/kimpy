@@ -1,9 +1,6 @@
 # kimpy
 
-This is the Python interface to the KIM API V2.x.x.
-
-- TODO add a short description of KIM.
-
+This is the Python interface to the KIM API V2.
 For more information about the KIM API, please see: https://openkim.org/kim-api/
 
 ## Installation
