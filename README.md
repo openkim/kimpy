@@ -38,7 +38,7 @@ $ pytest
 and you will get something like
 ```
 ...
-collected 13 items
+collected 14 items
 
 test_charge_unit.py .
 .
@@ -46,12 +46,14 @@ test_charge_unit.py .
 .
 test_time_unit.py .
 
-==================== 13 passed in 0.18 seconds ====================
+==================== 14 passed in 0.18 seconds ====================
 ```
 
 ## Example
 
-For an example of using the python interface, take a look at `kimpy/tests/test_model.py`.
+For an example of using `kimpy`, take a look at `kimpy/tests/test_model.py`.
+
+In the above example, the neighbor list is built within python. We provide a [neighbor list building library](https://github.com/mjwen/neighlist) that accelerates the creation of neighbor list and works seamlessly with `kimpy`. See `kimpy/tests/test_model_neigh_library.py`for an example of using this library.
 
 ## Help
 
@@ -95,7 +97,7 @@ FUNCTIONS
 		Return(ComputeArgumentName, error)
 ```
 
-shows that the function `get_compute_argument_name` takes an integer `index` as input, and returns a tuple of two outputs: `ComputeArgumentName` and `error`. You can refer to`KIM API` docs for the meaning of the input and outputs.
+shows that the function `get_compute_argument_name` takes an integer `index` as input, and returns a tuple of two outputs: `ComputeArgumentName` and `error`. You can refer to `KIM API` docs for the meaning of the input and outputs.
 
 All the attributes of the module are listed under `DATA`. For example,
 

@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import numpy as np
 import kimpy
+import neighlist as nl
 from error import check_error, report_error
 from ase.lattice.cubic import FaceCenteredCubic
 
@@ -10,52 +11,6 @@ def create_fcc_argon(alat=5.26):
     directions=[[1,0,0], [0,1,0], [0,0,1]], size=(2,2,2), symbol='Ar',
     pbc=(0,0,0), latticeconstant=alat)
   return argon
-
-
-# neighbor list
-neigh = dict()
-
-# get neigh function
-def get_neigh(data, cutoffs, neighbor_list_index, particle_number):
-  error = 0
-
-  # we only support one neighbor list
-  rcut = data['cutoff']
-  if len(cutoffs) != 1 or cutoffs[0] > rcut:
-    error = 1
-  if neighbor_list_index != 0:
-    error = 1
-
-  # invalid id
-  number_of_particles = data['num_particles']
-  if particle_number >= number_of_particles or particle_number < 0:
-    error = 1
-  check_error(error, 'get_neigh')
-
-  neighbors = data['neighbors'][particle_number]
-  return (neighbors, error)
-
-
-def create_neigh(coords, cutoff, neigh):
-  """naively create a full neighbor list"""
-
-  n = coords.shape[0]
-  neighbors = []
-  for i in range(n):
-    neigh_i = []
-    for j in range(n):
-      if j == i:
-        continue
-      dist = np.linalg.norm(coords[i] - coords[j])
-      if dist < cutoff:
-        neigh_i.append(j)
-    neigh_i = np.array(neigh_i, dtype=np.intc)
-    neighbors.append(neigh_i)
-
-  neigh['cutoff'] = cutoff
-  neigh['num_particles'] = n
-  neigh['neighbors'] = neighbors
-
 
 
 def test_main():
@@ -69,13 +24,13 @@ def test_main():
 
   # create model
   requestedUnitsAccepted, kim_model, error = kimpy.model.create(
-    kimpy.numbering.zeroBased,
-    kimpy.length_unit.A,
-    kimpy.energy_unit.eV,
-    kimpy.charge_unit.e,
-    kimpy.temperature_unit.K,
-    kimpy.time_unit.ps,
-    modelname
+     kimpy.numbering.zeroBased,
+     kimpy.length_unit.A,
+     kimpy.energy_unit.eV,
+     kimpy.charge_unit.e,
+     kimpy.temperature_unit.K,
+     kimpy.time_unit.ps,
+     modelname
   )
   check_error(error, 'kimpy.model.create')
   if not requestedUnitsAccepted:
@@ -206,10 +161,14 @@ def test_main():
   check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
 
+  # create neighbor list
+  neigh = nl.initialize()
+
   # register get neigh callback
-  error = compute_arguments.set_callback(
+
+  error = compute_arguments.set_callback_pointer(
       kimpy.compute_callback_name.GetNeighborList,
-      get_neigh,
+      nl.get_neigh_kim(),
       neigh
     )
   check_error(error, 'kimpy.compute_argument.set_callback_pointer')
@@ -238,6 +197,10 @@ def test_main():
   # setup particleContributing
   particle_contributing[:] = 1
 
+  # setup neighbor list
+  need_neigh = np.ones(N, dtype='intc')
+
+
   # compute energy and force for different structures
   alat = 5.26
   min_alat = 0.8*5.26
@@ -253,11 +216,15 @@ def test_main():
 
   for a in all_alat:
     argon = create_fcc_argon(a)
-    np.copyto(coords, argon.get_positions())   # NOTE should change coords aneighress
-    create_neigh(coords, model_influence_dist, neigh)  # NOTE safe to change content of neigh
+    np.copyto(coords, argon.get_positions())   # NOTE cannot change coords address
+    error = nl.build(neigh, model_influence_dist, coords, need_neigh)
+    check_error(error, 'nl.build')
     error = kim_model.compute(compute_arguments)
     print('{:18.10e} {:18.10e} {:18.10e}'.format(energy[0], np.linalg.norm(forces), a))
 
+
+  # destory neighbor list
+  nl.clean(neigh)
 
   # destory compute arguments
   error = kim_model.compute_arguments_destroy(compute_arguments)
