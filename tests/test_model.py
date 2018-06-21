@@ -61,6 +61,7 @@ def create_neigh(coords, cutoff, neigh):
 def test_main():
 
   modelname = 'ex_model_Ar_P_Morse_07C'
+  #modelname = 'LennardJones612_Universal__MO_826355984548_002'
   print()
   print('='*80)
   print('Matching results for KIM model:', modelname)
@@ -165,8 +166,8 @@ def test_main():
     dtype, extent, description, error = out
     check_error(error, 'kim_model.get_parameter_data_type_extend_and_description')
 
-    print('Parameter No. {} has data type "{}" with extent and description: '
-      '"{}".'.format(dtype, extent, description))
+    print('Parameter No. {} has data type "{}" with extent {} and description: '
+      '"{}".'.format(i, dtype, extent, description))
 
 
   # register argument
@@ -212,7 +213,7 @@ def test_main():
       get_neigh,
       neigh
     )
-  check_error(error, 'kimpy.compute_argument.set_callback_pointer')
+  check_error(error, 'kimpy.compute_argument.set_callback')
 
 
   # influence distance and cutoff of model

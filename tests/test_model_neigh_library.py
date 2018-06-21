@@ -120,8 +120,8 @@ def test_main():
     dtype, extent, description, error = out
     check_error(error, 'kim_model.get_parameter_data_type_extend_and_description')
 
-    print('Parameter No. {} has data type "{}" with extent and description: '
-      '"{}".'.format(dtype, extent, description))
+    print('Parameter No. {} has data type "{}" with extent {} and description: '
+      '"{}".'.format(i, dtype, extent, description))
 
 
   # register argument
