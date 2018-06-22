@@ -1,4 +1,3 @@
-import os
 from collections import OrderedDict
 from generate_bind_test_commons import generate_bind, generate_test
 
@@ -14,7 +13,6 @@ fields['fieldName'] = 'supportStatus'
 fields['field_name'] = 'support_status'
 
 
-
 attributes = [
   'requiredByAPI',
   'notSupported',
@@ -25,5 +23,4 @@ attributes = [
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)
-
 

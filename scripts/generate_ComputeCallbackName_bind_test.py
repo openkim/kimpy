@@ -1,5 +1,5 @@
-import os
 from generate_bind_test_commons import generate_bind, generate_test
+
 
 fields = {
   'FIELD_NAME': 'COMPUTE_CALLBACK_NAME',
@@ -7,6 +7,7 @@ fields = {
   'fieldName': 'computeCallbackName',
   'field_name': 'compute_callback_name',
 }
+
 
 attributes = [
   'GetNeighborList',
@@ -17,5 +18,4 @@ attributes = [
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)
-
 

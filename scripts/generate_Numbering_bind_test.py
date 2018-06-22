@@ -1,5 +1,5 @@
-import os
 from generate_bind_test_commons import generate_bind, generate_test
+
 
 fields = {
   'FIELD_NAME': 'NUMBERING',
@@ -7,6 +7,7 @@ fields = {
   'fieldName': 'numbering',
   'field_name': 'numbering',
 }
+
 
 attributes = [
   'zeroBased',
@@ -16,5 +17,4 @@ attributes = [
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)
-
 

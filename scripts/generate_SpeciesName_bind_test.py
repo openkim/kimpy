@@ -1,4 +1,3 @@
-import os
 from generate_bind_test_commons import generate_bind, generate_test
 
 species = [
@@ -143,6 +142,7 @@ species = [
   'user20'
 ]
 
+
 fields = {
   'FIELD_NAME': 'SPECIES_NAME',
   'FieldName': 'SpeciesName',
@@ -153,5 +153,4 @@ fields = {
 
 generate_bind(fields, species)
 generate_test(fields, species)
-
 

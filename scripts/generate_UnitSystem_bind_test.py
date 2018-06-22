@@ -1,5 +1,5 @@
-import os
 from generate_bind_test_commons import generate_bind, generate_test
+
 
 length_unit = {
   'FIELD_NAME': 'LENGTH_UNIT',
@@ -92,5 +92,4 @@ all_attributes = [
 for fields, attributes in zip(all_units, all_attributes):
   generate_bind(fields, attributes)
   generate_test(fields, attributes)
-
 
