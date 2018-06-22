@@ -12,12 +12,11 @@
   Answer: yes, it works.
 
 4. 06/21/2018
-  The followting two member functions in KIM_ComputeArguments.hpp not wrapper.
+  The followting two member functions in KIM_ComputeArguments.hpp and
+  KIM_Model.hpp are not wrapper.
     void SetSimulatorBufferPointer(void * const ptr);
     void GetSimulatorBufferPointer(void ** const ptr) const;
   To do it, we can require `ptr` to be a dictionary, and use the same method
-  for callbacks to wrap it.
-  But check with Ryan to see whether this is really needed.                     Not yet
-
-
+  for callbacks to wrap it.  But check with Ryan to see whether this is
+  really needed.                                                                Not yet
 

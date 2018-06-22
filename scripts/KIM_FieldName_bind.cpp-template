@@ -3,7 +3,6 @@
 #include "KIM_FieldName.hpp"
 
 namespace py = pybind11;
-using namespace py::literals;
 using namespace KIM;
 
 

@@ -1,12 +1,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include <pybind11/embed.h>
-#include <pybind11/iostream.h>
 
 #include "KIM_SimulatorHeaders.hpp"
 
 namespace py = pybind11;
-using namespace py::literals;
 using namespace KIM;
 
 
@@ -172,7 +169,49 @@ PYBIND11_MODULE(model, module) {
     "Return(DataType, extent, description, error)"
   )
 
-  .def("__repr__", &Model::String);
+  .def("get_parameter_int",
+    [](Model& self, int const parameterIndex, int const arrayIndex) {
+      int parameterValue;
+      int error = self.GetParameter(parameterIndex, arrayIndex, &parameterValue);
+
+      py::tuple re(2);
+      re[0] = parameterValue;
+      re[1] = error;
+      return re;
+    },
+    py::arg("parameterIndex"),
+    py::arg("arrayIndex"),
+    "Return(parameterValue, error)"
+  )
+
+  .def("get_parameter_double",
+    [](Model& self, int const parameterIndex, int const arrayIndex) {
+      double parameterValue;
+      int error = self.GetParameter(parameterIndex, arrayIndex, &parameterValue);
+
+      py::tuple re(2);
+      re[0] = parameterValue;
+      re[1] = error;
+      return re;
+    },
+    py::arg("parameterIndex"),
+    py::arg("arrayIndex"),
+    "Return(parameterValue, error)"
+  )
+
+  .def("set_parameter",
+      (int (Model::*)(int const, int const, int const)) &Model::SetParameter)
+
+  .def("set_parameter",
+      (int (Model::*)(int const, int const, double const)) &Model::SetParameter)
+
+  .def("__repr__", &Model::String)
+
+  .def("set_log_id", &Model::SetLogID)
+
+  .def("push_log_verbosity", &Model::PushLogVerbosity)
+
+  .def("pop_log_verbosity", &Model::PopLogVerbosity);
 
 
   // module functions
@@ -216,4 +255,5 @@ PYBIND11_MODULE(model, module) {
   );
 
 }
+
 
