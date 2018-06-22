@@ -1,7 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/embed.h>
-#include <iostream>
 
 #include "KIM_SimulatorHeaders.hpp"
 
@@ -62,7 +61,6 @@ int get_neigh(void const * const dataObject, int const numberOfCutoffs,
 }
 
 
-// TODO test this
 // process_dEdr wrapper
 // The corresponding python process_dEdr function should be defined as:
 //
@@ -108,7 +106,6 @@ int process_dEdr(void const * const dataObject, double const de, double const r,
 }
 
 
-// TODO test this
 // process_dEdr wrapper
 // The corresponding python process_dEdr function should be defined as:
 //
@@ -166,18 +163,17 @@ int process_d2Edr2(void const * const dataObject, double const de,
 
 
 
-
-
 PYBIND11_MODULE(compute_arguments, module) {
   module.doc() = "Python binding to ... ";
 
-  // C++ class constructor and destructor are private, and as a result, simple ways
-  // to construct py::init() does not exist.
-  // We use factory function to create the instance.
-  // std::unique_ptr<ComputeArguments, py::nodelete> avoids calling the destructor
-  // of the C++ class. In this case, it is crucial that instances are deallocated
-  // on the C++ side to avoid memory leaks. ComputeArguments_Destroy should do the
-  // work.
+  // C++ class constructor and destructor are private, which can not be wrapped
+  // directly.
+  // So we need to call the C++ class factory function in py::init, and use
+  // `py::nodelete` to avoid calling the destructor when python instance is destroyed.
+  // It is crucial that the instance is deallocated by calling the destroy function
+  // from the C++ side to avoid memory leaks.
+  // For more info, see http://pybind11.readthedocs.io/en/stable/advanced/classes.html
+
   py::class_<ComputeArguments, std::unique_ptr<ComputeArguments, py::nodelete>>
       cl (module, "ComputeArguments", py::dynamic_attr());
 
@@ -192,9 +188,9 @@ PYBIND11_MODULE(compute_arguments, module) {
   ))
 
   .def("get_argument_support_status",
-    [](ComputeArguments& inst, ComputeArgumentName const computeArgumentName) {
+    [](ComputeArguments& self, ComputeArgumentName const computeArgumentName) {
       SupportStatus supportStatus;
-      int error = inst.GetArgumentSupportStatus(computeArgumentName, &supportStatus);
+      int error = self.GetArgumentSupportStatus(computeArgumentName, &supportStatus);
 
       py::tuple re(2);
       re[0] = supportStatus;
@@ -206,9 +202,9 @@ PYBIND11_MODULE(compute_arguments, module) {
   )
 
   .def("get_callback_support_status",
-    [](ComputeArguments& inst, ComputeCallbackName const computeCallbackName) {
+    [](ComputeArguments& self, ComputeCallbackName const computeCallbackName) {
       SupportStatus supportStatus;
-      int error = inst.GetCallbackSupportStatus(computeCallbackName, &supportStatus);
+      int error = self.GetCallbackSupportStatus(computeCallbackName, &supportStatus);
 
       py::tuple re(2);
       re[0] = supportStatus;
@@ -220,12 +216,12 @@ PYBIND11_MODULE(compute_arguments, module) {
   )
 
   .def("set_argument_pointer",
-    [](ComputeArguments& inst,
+    [](ComputeArguments& self,
        ComputeArgumentName const computeArgumentName,
        py::array_t<int> ptr
     ) {
       int* data = ptr.mutable_data(0);
-      int error = inst.SetArgumentPointer(computeArgumentName, data);
+      int error = self.SetArgumentPointer(computeArgumentName, data);
       return error;
     },
     py::arg("ComputeArgumentName"),
@@ -233,12 +229,12 @@ PYBIND11_MODULE(compute_arguments, module) {
   )
 
   .def("set_argument_pointer",
-    [](ComputeArguments& inst,
+    [](ComputeArguments& self,
       ComputeArgumentName const computeArgumentName,
       py::array_t<double> ptr
     ) {
       double* data = ptr.mutable_data(0);
-      int error = inst.SetArgumentPointer(computeArgumentName, data);
+      int error = self.SetArgumentPointer(computeArgumentName, data);
       return error;
     },
     py::arg("ComputeArgumentName"),
@@ -246,7 +242,7 @@ PYBIND11_MODULE(compute_arguments, module) {
   )
 
   .def("set_callback_pointer",
-    [](ComputeArguments& inst,
+    [](ComputeArguments& self,
       ComputeCallbackName const computeCallbackName,
       void const * const fptr,  // cannpt use: KIM::func * const fptr
                                 // the argument passed in is of type: void const *
@@ -254,7 +250,7 @@ PYBIND11_MODULE(compute_arguments, module) {
       void const * const dataObject
     ) {
       KIM::func * new_fptr = (KIM::func*) fptr;
-      int error = inst.SetCallbackPointer(computeCallbackName,
+      int error = self.SetCallbackPointer(computeCallbackName,
         LANGUAGE_NAME::cpp, new_fptr, dataObject);
       return error;
     },
@@ -265,7 +261,7 @@ PYBIND11_MODULE(compute_arguments, module) {
 
 
   .def("set_callback",
-    [](ComputeArguments& inst,
+    [](ComputeArguments& self,
       ComputeCallbackName const computeCallbackName,
       py::object& pyfunc,
       py::dict& dataObject
@@ -285,7 +281,7 @@ PYBIND11_MODULE(compute_arguments, module) {
       // automatically deallocate the memory of `d`
       // cannot use `d` directly in the below line (valgrind will report memory leak),
       // type matters?
-      auto locals = py::dict( "self"_a = inst, "callback"_a = pd);
+      auto locals = py::dict( "self"_a = self, "callback"_a = pd);
       // embed python code
       py::exec(R"(
         self = locals()['self']
@@ -314,7 +310,7 @@ PYBIND11_MODULE(compute_arguments, module) {
       }
 
      // register callback to kim api
-      error = error || inst.SetCallbackPointer(computeCallbackName,
+      error = error || self.SetCallbackPointer(computeCallbackName,
         LANGUAGE_NAME::cpp, wrap_fptr, pd);
 
       return error;
@@ -326,9 +322,9 @@ PYBIND11_MODULE(compute_arguments, module) {
 
 
   .def("are_all_required_arguments_and_callbacks_present",
-    [](ComputeArguments& inst) {
+    [](ComputeArguments& self) {
       int result;
-      inst.AreAllRequiredArgumentsAndCallbacksPresent(&result);
+      self.AreAllRequiredArgumentsAndCallbacksPresent(&result);
       return result;
     }
   )

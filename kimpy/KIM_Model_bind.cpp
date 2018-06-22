@@ -46,18 +46,18 @@ PYBIND11_MODULE(model, module) {
   ))
 
   .def("get_influence_distance",
-    [](Model& mo) {
+    [](Model& self) {
       double influenceDistance;
-      mo.GetInfluenceDistance(&influenceDistance);
+      self.GetInfluenceDistance(&influenceDistance);
       return influenceDistance;
     }
   )
 
   .def("get_neighbor_list_cutoffs",
-    [](Model& mo) {
+    [](Model& self) {
       int numberOfCutoffs;
       double const * cutoff_ptr;
-      mo.GetNeighborListCutoffsPointer(&numberOfCutoffs, &cutoff_ptr);
+      self.GetNeighborListCutoffsPointer(&numberOfCutoffs, &cutoff_ptr);
 
       py::array_t<double, py::array::c_style> cutoffs (
           {static_cast<size_t> (numberOfCutoffs)});
@@ -71,13 +71,13 @@ PYBIND11_MODULE(model, module) {
   )
 
   .def("get_units",
-    [](Model& mo) {
+    [](Model& self) {
       LengthUnit lengthUnit;
       EnergyUnit energyUnit;
       ChargeUnit chargeUnit;
       TemperatureUnit temperatureUnit;
       TimeUnit timeUnit;
-      mo.GetUnits(&lengthUnit, &energyUnit, &chargeUnit, &temperatureUnit, &timeUnit);
+      self.GetUnits(&lengthUnit, &energyUnit, &chargeUnit, &temperatureUnit, &timeUnit);
 
       py::tuple re(5);
       re[0] = lengthUnit;
@@ -91,9 +91,9 @@ PYBIND11_MODULE(model, module) {
   )
 
   .def("compute_arguments_create",
-    [](Model& mo) {
+    [](Model& self) {
       ComputeArguments * computeArguments;
-      int error = mo.ComputeArgumentsCreate(&computeArguments);
+      int error = self.ComputeArgumentsCreate(&computeArguments);
       py::tuple re(2);
       re[0] = computeArguments;
       re[1] = error;
@@ -103,22 +103,22 @@ PYBIND11_MODULE(model, module) {
   )
 
   .def("compute_arguments_destroy",
-    [](Model& mo, ComputeArguments * computeArguments) {
-      int error = mo.ComputeArgumentsDestroy(&computeArguments);
+    [](Model& self, ComputeArguments * computeArguments) {
+      int error = self.ComputeArgumentsDestroy(&computeArguments);
       return error;
     },
     py::arg("ComputeArguments")
   )
 
   .def("compute",
-    [](Model& mo, ComputeArguments const * const computeArguments, bool release_GIL) {
+    [](Model& self, ComputeArguments const * const computeArguments, bool release_GIL) {
       if (release_GIL) {
         py::gil_scoped_release release;
-        int error = mo.Compute(computeArguments);
+        int error = self.Compute(computeArguments);
         return error;
       }
       else {
-        int error = mo.Compute(computeArguments);
+        int error = self.Compute(computeArguments);
         return error;
       }
     },
@@ -130,10 +130,10 @@ PYBIND11_MODULE(model, module) {
       &Model::ClearInfluenceDistanceAndCutoffsThenRefreshModel)
 
   .def("get_species_support_and_code",
-    [](Model& mo, SpeciesName const speciesName) {
+    [](Model& self, SpeciesName const speciesName) {
       int speciesIsSupported;
       int code;
-      int error = mo.GetSpeciesSupportAndCode(speciesName, &speciesIsSupported, &code);
+      int error = self.GetSpeciesSupportAndCode(speciesName, &speciesIsSupported, &code);
 
       py::tuple re(3);
       re[0] = speciesIsSupported;
@@ -146,20 +146,20 @@ PYBIND11_MODULE(model, module) {
   )
 
   .def("get_number_of_parameters",
-    [](Model& mo) {
+    [](Model& self) {
       int numberOfParameters;
-      mo.GetNumberOfParameters(&numberOfParameters);
+      self.GetNumberOfParameters(&numberOfParameters);
       return numberOfParameters;
     }
   )
 
   .def("get_parameter_data_type_extend_and_description",
-    [](Model& mo, int const index) {
+    [](Model& self, int const index) {
       DataType dataType;
       int extent;
       std::string const * description;
 
-      int error = mo.GetParameterDataTypeExtentAndDescription(
+      int error = self.GetParameterDataTypeExtentAndDescription(
         index, &dataType, &extent, &description);
       py::tuple re(4);
       re[0] = dataType;
@@ -210,8 +210,8 @@ PYBIND11_MODULE(model, module) {
   );
 
   module.def("destroy",
-    [](Model * mo) {
-      Model::Destroy(&mo);
+    [](Model * self) {
+      Model::Destroy(&self);
     }
   );
 
