@@ -10,6 +10,7 @@ import species_name
 import language_name
 import numbering
 import support_status
+import log_verbosity
 import length_unit
 import energy_unit
 import charge_unit
@@ -27,6 +28,7 @@ __all__ = [
   'language_name',
   'numbering',
   'support_status',
+  'log_verbosity',
   'length_unit',
   'energy_unit',
   'charge_unit',

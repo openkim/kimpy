@@ -1,6 +1,5 @@
 import os
 from collections import OrderedDict
-
 from generate_bind_test_commons import generate_bind, generate_test
 
 

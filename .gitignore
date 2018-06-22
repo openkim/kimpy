@@ -16,6 +16,7 @@ kimpy/KIM_SpeciesName_bind.cpp
 kimpy/KIM_LanguageName_bind.cpp
 kimpy/KIM_ComputeCallbackName_bind.cpp
 kimpy/KIM_SupportStatus_bind.cpp
+kimpy/KIM_LogVerbosity_bind.cpp
 
 tests/species_name_attributes.py
 tests/*_unit.py
@@ -25,3 +26,4 @@ tests/test_species_name.py
 tests/test_language_name.py
 tests/test_compute_callback_name.py
 tests/test_support_status.py
+tests/test_log_verbosity.py

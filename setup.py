@@ -134,6 +134,7 @@ module_names = [
   'language_name',
   'numbering',
   'support_status',
+  'log_verbosity',
   'length_unit',
   'energy_unit',
   'charge_unit',
