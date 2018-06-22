@@ -4,8 +4,6 @@
 #include <pybind11/iostream.h>
 
 #include "KIM_SimulatorHeaders.hpp"
-//@ TODO replace the header with the following. (need to solve forward declaration)
-//#include "KIM_Model.hpp"
 
 namespace py = pybind11;
 using namespace py::literals;
@@ -13,14 +11,16 @@ using namespace KIM;
 
 
 PYBIND11_MODULE(model, module) {
-  module.doc() = "Python binding to ... ";
+  module.doc() = "Python binding to KIM_Model.hpp";
 
-  // C++ class constructor and destructor are private, and as a result, simple ways
-  // to construct py::init() does not exist.
-  // We use factory function to initialize instance.
-  // std::unique_ptr<Model, py::nodelete> avoids calling the destructor
-  // of the C++ class. In this case, it is crucial that instances are deallocated
-  // on the C++ side to avoid memory leaks. Model_Destroy should do the work.
+  // C++ class constructor and destructor are private, which can not be wrapped
+  // directly.
+  // So we need to call the C++ class factory function in py::init, and use
+  // `py::nodelete` to avoid calling the destructor when python instance is destroyed.
+  // It is crucial that the instance is deallocated by calling the destroy function
+  // from the C++ side to avoid memory leaks.
+  // For more info, see http://pybind11.readthedocs.io/en/stable/advanced/classes.html
+
   py::class_<Model, std::unique_ptr<Model, py::nodelete>> cl (module, "Model");
 
   // python constructor needs to return a pointer to the C++ instance
@@ -177,8 +177,6 @@ PYBIND11_MODULE(model, module) {
 
   // module functions
 
-  // wrapper to call constructor of Model to deal with `error` and
-  // `requestedUnitsAccepted`
   module.def("create",
     [](Numbering const numbering,
       LengthUnit const requestedLengthUnit,
@@ -189,51 +187,11 @@ PYBIND11_MODULE(model, module) {
       std::string const & modelName
     ) {
 
-      auto locals = py::dict(
-        "numbering"_a = numbering,
-        "requestedLengthUnit"_a = requestedLengthUnit,
-        "requestedEnergyUnit"_a = requestedEnergyUnit,
-        "requestedChargeUnit"_a = requestedChargeUnit,
-        "requestedTemperatureUnit"_a = requestedTemperatureUnit,
-        "requestedTimeUnit"_a = requestedTimeUnit,
-        "modelName"_a = modelName
-      );
-
-      // embed python code
-      py::exec(R"(
-        from kimpy import model
-        import numpy as np
-
-        numbering = locals()['numbering']
-        requestedLengthUnit = locals()['requestedLengthUnit']
-        requestedEnergyUnit = locals()['requestedEnergyUnit']
-        requestedChargeUnit = locals()['requestedChargeUnit']
-        requestedTemperatureUnit = locals()['requestedTemperatureUnit']
-        requestedTimeUnit = locals()['requestedTimeUnit']
-        modelName = locals()['modelName']
-
-        requestedUnitsAccepted = np.array([0], dtype='intc')
-        e = np.array([0], dtype='intc')
-        instance = model.Model(
-          numbering,
-          requestedLengthUnit,
-          requestedEnergyUnit,
-          requestedChargeUnit,
-          requestedTemperatureUnit,
-          requestedTimeUnit,
-          modelName,
-          requestedUnitsAccepted,
-          e
-        )
-        error = e[0]
-        rua = requestedUnitsAccepted[0]
-      )", py::globals(), locals);
-
-      // cannot cast, because ~Model() is private
-      //Model mo = locals["instance"].cast<Model>();
-      auto mo = locals["instance"];
-      int requestedUnitsAccepted = locals["rua"].cast<int>();
-      int error = locals["error"].cast<int>();
+      Model * mo;
+      int requestedUnitsAccepted;
+      int error = Model::Create(numbering, requestedLengthUnit,
+          requestedEnergyUnit, requestedChargeUnit, requestedTemperatureUnit,
+          requestedTimeUnit, modelName, &requestedUnitsAccepted, &mo);
 
       py::tuple re(3);
       re[0] = requestedUnitsAccepted;
