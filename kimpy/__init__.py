@@ -17,6 +17,7 @@ import charge_unit
 import temperature_unit
 import time_unit
 import sem_ver
+import log
 
 
 # needed by `from kimpy import *`
@@ -37,5 +38,6 @@ __all__ = [
   'temperature_unit',
   'time_unit',
   'sem_ver',
+  'log ',
 ]
 
