@@ -11,7 +11,7 @@ using namespace KIM;
 
 
 PYBIND11_MODULE(compute_arguments, module) {
-  module.doc() = "Python binding to ... ";
+  module.doc() = "Python binding to KIM_ComputeArguments.hpp";
 
   // C++ class constructor and destructor are private, which can not be wrapped
   // directly.
@@ -124,9 +124,9 @@ PYBIND11_MODULE(compute_arguments, module) {
       //py::dict* d = new py::dict(dataObject);
       auto pd = reinterpret_cast<void const * const> (d);
 
-      // add 'pd' to as attribute of class ComputeArguments, which helps to
-      // automatically deallocate the memory of `d`
-      // cannot use `d` directly in the below line (valgrind will report memory leak),
+      // add 'pd' as attribute of python class `compute_arguments`, which helps to
+      // automatically deallocate the memory of `d`, when this class is destroyed.
+      // Cannot use `d` directly in the below line (valgrind will report memory leak),
       // type matters?
       auto locals = py::dict( "self"_a = self, "callback"_a = pd);
       // embed python code

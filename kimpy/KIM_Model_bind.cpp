@@ -199,9 +199,9 @@ PYBIND11_MODULE(model, module) {
     "Return(parameterValue, error)"
   )
 
+  // overloaded function
   .def("set_parameter",
       (int (Model::*)(int const, int const, int const)) &Model::SetParameter)
-
   .def("set_parameter",
       (int (Model::*)(int const, int const, double const)) &Model::SetParameter)
 
