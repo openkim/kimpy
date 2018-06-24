@@ -140,6 +140,8 @@ module_names = [
   'charge_unit',
   'temperature_unit',
   'time_unit',
+  'sem_ver',
+  'log',
 ]
 all_modules = [get_extension_2(name) for name in module_names]
 
@@ -147,13 +149,16 @@ setup(name = 'kimpy',
   version = get_version(),
   packages = ['kimpy'],
   ext_modules = all_modules,
-  install_requires = ['pybind11>=2.2', 'numpy'],
-
-  # metadata
+  install_requires = ['pybind11', 'numpy', 'pytest'],
   author = 'Mingjian Wen',
-  author_email = 'wenxx151[at]umn.edu',
+  author_email = 'wenxx151@umn.edu',
   url = 'https://github.com/mjwen/kimpy',
   description = 'Python interface to the KIM API',
+  classifiers = (
+    'Programming Language :: Python :: 2.7',
+    'License :: OSI Approved :: Common Development and Distribution License 1.0 (CDDL-1.0)',
+    'Operating System :: OS Independent',
+  ),
   zip_safe = False,
 )
 
