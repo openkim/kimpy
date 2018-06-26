@@ -22,9 +22,13 @@ Clone this repo
 
     $ git clone https://github.com/mjwen/kimpy.git
 
+checkout out the `kim-api-v1` branch
+    $ cd kimpy
+    $ git checkout kim-api-v1
+
 and then install by
 
-    $ pip install ./kimpy
+    $ pip install ./
 
 2. pip (to come)
 
