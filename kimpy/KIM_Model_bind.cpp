@@ -150,7 +150,7 @@ PYBIND11_MODULE(model, module) {
     }
   )
 
-  .def("get_parameter_data_type_extend_and_description",
+  .def("get_parameter_data_type_extent_and_description",
     [](Model& self, int const index) {
       DataType dataType;
       int extent;
