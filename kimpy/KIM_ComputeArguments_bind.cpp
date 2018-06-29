@@ -88,6 +88,18 @@ PYBIND11_MODULE(compute_arguments, module) {
     py::arg("ptr").noconvert()
   )
 
+
+  .def("set_argument_null_pointer",
+    [](ComputeArguments& self,
+      ComputeArgumentName const computeArgumentName
+    ) {
+      int error = self.SetArgumentPointer(computeArgumentName, reinterpret_cast<double *> (NULL));
+      return error;
+    },
+    py::arg("ComputeArgumentName")
+  )
+
+
   .def("set_callback_pointer",
     [](ComputeArguments& self,
       ComputeCallbackName const computeCallbackName,
