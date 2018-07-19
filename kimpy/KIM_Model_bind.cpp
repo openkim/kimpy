@@ -139,7 +139,7 @@ PYBIND11_MODULE(model, module) {
       py::arg("release_GIL") = false
     )
 
-  .def("clean_then_refresh",
+  .def("clear_then_refresh",
       &Model::ClearThenRefresh)
 
   .def("get_species_support_and_code",
