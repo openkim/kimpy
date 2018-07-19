@@ -50,20 +50,36 @@ PYBIND11_MODULE(model, module) {
     }
   )
 
-  .def("get_neighbor_list_cutoffs",
+  .def("get_neighbor_list_cutoffs_and_hints",
     [](Model& self) {
       int numberOfCutoffs;
       double const * cutoff_ptr;
-      self.GetNeighborListCutoffsPointer(&numberOfCutoffs, &cutoff_ptr);
+      int const * paddingNeighborHints_ptr;
+      int const * halfListHints_ptr;
+      self.GetNeighborListPointers(&numberOfCutoffs, &cutoff_ptr,
+          &paddingNeighborHints_ptr, &halfListHints_ptr);
 
       py::array_t<double, py::array::c_style> cutoffs (
           {static_cast<size_t> (numberOfCutoffs)});
+      py::array_t<int, py::array::c_style> paddingNeighborHints (
+          {static_cast<size_t> (numberOfCutoffs)});
+      py::array_t<int, py::array::c_style> halfListHints (
+          {static_cast<size_t> (numberOfCutoffs)});
       auto cut = cutoffs.mutable_data(0);
+      auto pnh = paddingNeighborHints.mutable_data(0);
+      auto hlh = halfListHints.mutable_data(0);
       for(int i=0; i<numberOfCutoffs; i++) {
         cut[i] = cutoff_ptr[i];
+        pnh[i] = paddingNeighborHints_ptr[i];
+        hlh[i] = halfListHints_ptr[i];
       }
 
-      return cutoffs;
+      py::tuple re(3);
+      re[0] = cutoffs;
+      re[1] = paddingNeighborHints;
+      re[2] = halfListHints;
+
+      return re;
     }
   )
 
@@ -123,8 +139,8 @@ PYBIND11_MODULE(model, module) {
       py::arg("release_GIL") = false
     )
 
-  .def("clean_influence_distance_and_cutoffs_then_refresh_model",
-      &Model::ClearInfluenceDistanceAndCutoffsThenRefreshModel)
+  .def("clean_then_refresh",
+      &Model::ClearThenRefresh)
 
   .def("get_species_support_and_code",
     [](Model& self, SpeciesName const speciesName) {

@@ -1,6 +1,9 @@
 """ Test callbacks can pass data bi-directionally.
+
 Two atoms are in the configuration, and as a results, each time `kim_model.compute`
-is issued, each callback will be called twice.
+is issued, callback `get_neigh` is called twice, but `process_dEdr` and
+`process_d2Edr2` are called only once since the LJ612 model uses half list.
+
 In this test, we call `kim_model.compute` twice. After the first call, we change
 the local data to test that we can modifiy data locally and the modification
 goes to the data object in the KIM API. Similary, we test the data modified in the
@@ -22,6 +25,22 @@ def get_dimer():
   return argon
 
 
+def assert_1d_array(A, B):
+  assert len(A) == len(B)
+  for i,j in zip(A, B):
+    assert i == pytest.approx(j, 1e-6)
+
+
+def assert_2d_array(A, B):
+  A = np.array(A)
+  B = np.array(B)
+  assert A.shape[0] == B.shape[0]
+  assert A.shape[1] == B.shape[1]
+  for i,j in zip(A, B):
+    for m,n in zip(i,j):
+      assert m == pytest.approx(n, 1e-6)
+
+
 # neigh
 neigh_data = dict()
 neigh_data['cutoff'] = 1.
@@ -34,12 +53,12 @@ def get_neigh(data, cutoffs, neighbor_list_index, particle_number):
   if data['num_called'] < 2:  # 1st call of kim_model.compute
     assert data['cutoff'] == pytest.approx(1., 1e-6)
     assert data['num_particles'] == 2
-    assert data['neighbors'] == pytest.approx([[1],[0]])
+    assert_2d_array(data['neighbors'], [[1], [0]])
     assert data['key'] == 1
   else:  # 2nd call of kim_model.compute
     assert data['cutoff'] == pytest.approx(1., 1e-6)
     assert data['num_particles'] == 2
-    assert data['neighbors'] == pytest.approx([[1],[0]])
+    assert_2d_array(data['neighbors'], [[1], [0]])
     assert data['key'] == 2
 
   if data['num_called'] == 3: # last call of this function
@@ -59,12 +78,12 @@ dEdr_data['num_called'] = 0
 n_dEdr_called = 0
 def process_dEdr(data, de, r, dx, i, j):
   assert r == pytest.approx(0.3, 1e-6)
-  assert abs(dx) == pytest.approx([0.1, 0.2, 0.2], 1e-6)
-  if data['num_called'] < 2:  # 1st call of kim_model.compute
+  assert_1d_array(abs(dx), [0.1, 0.2, 0.2])
+  if data['num_called'] < 1:  # 1st call of kim_model.compute
     assert data['key'] == 1
   else:
     assert data['key'] == 2
-  if data['num_called'] == 3: # last call of this function
+  if data['num_called'] == 1: # last call of this function
     data['key'] = 3   # modify original key
     data['new_key'] = 1  # add new key
   data['num_called'] += 1
@@ -78,13 +97,13 @@ d2Edr2_data['key'] = 1
 d2Edr2_data['num_called'] = 0
 
 def process_d2Edr2(data, de, r, dx, i, j):
-  assert r == pytest.approx([0.3,0.3], 1e-6)
-  assert abs(dx) == pytest.approx([0.1, 0.2, 0.2, 0.1, 0.2, 0.2], 1e-6)
-  if data['num_called'] < 2:  # 1st call of kim_model.compute
+  assert_1d_array(r, [0.3, 0.3])
+  assert_1d_array(abs(dx), [0.1, 0.2, 0.2, 0.1, 0.2, 0.2])
+  if data['num_called'] < 1:  # 1st call of kim_model.compute
     assert data['key'] == 1
   else:
     assert data['key'] == 2
-  if data['num_called'] == 3: # last call of this function
+  if data['num_called'] == 1: # last call of this function
     data['key'] = 3   # modify original key
     data['new_key'] = 1  # add new key
   data['num_called'] += 1
@@ -94,7 +113,7 @@ def process_d2Edr2(data, de, r, dx, i, j):
 
 def test_main():
 
-  modelname = 'LennardJones612_Universal__MO_826355984548_002'
+  modelname = 'LennardJones612_UniversalShifted__MO_959249795837_003'
 
   # create model
   requestedUnitsAccepted, kim_model, error = kimpy.model.create(

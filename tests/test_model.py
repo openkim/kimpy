@@ -218,11 +218,13 @@ def test_main():
 
   # influence distance and cutoff of model
   model_influence_dist = kim_model.get_influence_distance()
-  model_cutoffs = kim_model.get_neighbor_list_cutoffs()
+  model_cutoffs,padding_hints,half_hints = kim_model.get_neighbor_list_cutoffs_and_hints()
   if(model_cutoffs.size != 1):
     report_error('too many cutoffs')
   print('Model influence distance:', model_influence_dist)
   print('Model cutoffs:', model_cutoffs)
+  print('Model padding neighbors hints:', padding_hints)
+  print('Model half list hints:', half_hints)
   print()
 
    # species support and code
