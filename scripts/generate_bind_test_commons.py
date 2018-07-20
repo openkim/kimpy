@@ -43,7 +43,7 @@ def generate_bind(fields, attributes):
   template = template.replace('rpls_attributes', attr_str)
 
   # replace field names
-  for key, value in fields.iteritems():
+  for key, value in fields.items():
     template = template.replace(key, value)
     fname = fname.replace(key, value)
 
@@ -107,7 +107,7 @@ def generate_test(fields, attributes):
   template = template.replace('rpls_str_names', attr_str)
 
   # replace field names
-  for key, value in fields.iteritems():
+  for key, value in fields.items():
     template = template.replace(key, value)
     fname = fname.replace(key, value)
 

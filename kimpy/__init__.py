@@ -1,23 +1,23 @@
 __version__ = '2.0.0'
 
 # import all modules
-import model
-import compute_arguments
-import compute_argument_name
-import compute_callback_name
-import data_type
-import species_name
-import language_name
-import numbering
-import support_status
-import log_verbosity
-import length_unit
-import energy_unit
-import charge_unit
-import temperature_unit
-import time_unit
-import sem_ver
-import log
+from . import model
+from . import compute_arguments
+from . import compute_argument_name
+from . import compute_callback_name
+from . import data_type
+from . import species_name
+from . import language_name
+from . import numbering
+from . import support_status
+from . import log_verbosity
+from . import length_unit
+from . import energy_unit
+from . import charge_unit
+from . import temperature_unit
+from . import time_unit
+from . import sem_ver
+from . import log
 
 
 # needed by `from kimpy import *`
@@ -38,6 +38,6 @@ __all__ = [
   'temperature_unit',
   'time_unit',
   'sem_ver',
-  'log ',
+  'log',
 ]
 
