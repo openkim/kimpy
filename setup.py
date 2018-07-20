@@ -21,8 +21,13 @@ subprocess.call(['python', fname])
 def inquire_kim_api(option, key, mode):
   """ Get compile and link flags of kim-api."""
   try:
-    # str since subprocess returns `bytes` in python3
-    config = str(subprocess.check_output(['kim-api-v2-build-config', option]))
+    py_version = sys.version_info[0]
+    if py_version == 2:
+      config = subprocess.check_output(['kim-api-v2-build-config', option])
+    else:
+      config = subprocess.check_output(['kim-api-v2-build-config', option]).decode('utf-8')
+
+    print('@@', config)
   except:
     raise Exception('"kim-api-v2-build-config" not found on PATH; make sure '
                     'kim-api is installed and "kim-api-v2-build-config" is on PATH.')
