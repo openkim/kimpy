@@ -1,0 +1,46 @@
+os: linux
+language: python
+
+python:
+  - "2.7"
+  - "3.5"
+  - "3.6"
+#  - "3.7"
+
+
+before_install:
+  # gcc (gfortran is not there by default, we install all gcc suit just in case)
+  - sudo apt-get install gcc
+  - sudo apt-get install gfortran
+
+  # keep record of kliff directory
+  - export KIMPY_DIR=$PWD
+
+
+install:
+  # kim-api
+  - cd $KIMPY_DIR && cd ..
+  - wget http://s3.openkim.org/kim-api/kim-api-v2.0.0-beta.1.txz
+  - tar xJf kim-api-v2.0.0-beta.1.txz
+  - cd kim-api-v2.0.0-beta.1
+  - ./configure
+  - make
+  - sudo make install
+  - sudo ldconfig
+  - cd examples
+  - make all-user
+
+  # neighlist
+  - cd $KIMPY_DIR && cd ..
+  - git clone https://github.com/mjwen/neighlist.git
+  - cd neighlist/python
+  - pip install -e .
+
+  - pip install ase
+
+
+script:
+  - cd $KIMPY_DIR
+  - pip install -e .
+  - pytest
+

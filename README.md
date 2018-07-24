@@ -1,5 +1,7 @@
 # kimpy
 
+[![Build Status](https://travis-ci.com/mjwen/kimpy.svg?branch=master)](https://travis-ci.com/mjwen/kimpy)
+
 This is the Python interface to the KIM API V2.
 For more information about the KIM API, please see: https://openkim.org/kim-api/
 
