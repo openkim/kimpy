@@ -61,10 +61,17 @@ class get_pybind11_includes(object):
   The purpose of this class is to postpone importing pybind11 until it is actually
   installed, so that the ``get_include()`` method can be invoked.
 
-  Borrowd from: https://github.com/pybind/python_example/blob/master/setup.py
+  see:
+  https://github.com/pybind/python_example/blob/master/setup.py
+  https://github.com/pybind/python_example/issues/32
   """
 
   def __init__(self, user=False):
+    try:
+      import pybind11
+    except ImportError:
+      if subprocess.call([sys.executable, '-m', 'pip', 'install', 'pybind11']):
+        raise RuntimeError('pybind11 install failed.')
     self.user = user
 
   def __str__(self):
