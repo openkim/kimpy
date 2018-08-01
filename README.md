@@ -2,24 +2,20 @@
 
 [![Build Status](https://travis-ci.com/mjwen/kimpy.svg?branch=master)](https://travis-ci.com/mjwen/kimpy)
 
-This is the Python interface to the KIM API V2.
-For more information about the KIM API, please see: https://openkim.org/kim-api/
+Kimpy is the Python interface to the KIM API. For more information about the KIM API, see: https://openkim.org/kim-api/
+
 
 ## Installation
 
-0. Virtual environment (optional)
+### Package managers
 
-Create a virtual environment using `conda` (see [here](https://conda.io/miniconda.html) for more information about `conda` and `Miniconda`)
 ```
-$ conda create -n kimpy
+$ pip install kimpy
 ```
-and then activate the environment
-```
-$ source activate kimpy
-```
-1. install from source
 
-Clone this repo
+### From source
+
+Get the source
 ```
 $ git clone https://github.com/mjwen/kimpy.git
 ```
@@ -28,28 +24,6 @@ and then install by
 $ pip install -e ./kimpy
 ```
 
-2. pip (to come)
-
-3. conda (to come)
-
-To check that `kimpy` is sussessfully installed, you can do
-```
-$ cd kimpy/tests
-$ pytest
-```
-and you will get something like
-```
-...
-collected 14 items
-
-test_charge_unit.py .
-.
-.
-.
-test_time_unit.py .
-
-==================== 14 passed in 0.18 seconds ====================
-```
 
 ## Example
 
@@ -57,9 +31,10 @@ For an example of using `kimpy`, take a look at `kimpy/tests/test_model.py`.
 
 In the above example, the neighbor list is built within python. We provide a [neighbor list building library](https://github.com/mjwen/neighlist) that accelerates the creation of neighbor list and works seamlessly with `kimpy`. See `kimpy/tests/test_model_neigh_library.py`for an example of using this library.
 
+
 ## Help
 
-Use `help(object)` to get help for any objects in the package (including the `kimpy` package itself and any module, class, and function in the package.)
+Kimpy is designed to closely mimic the C++ KIM API with only a few changes of names. In case one wants to know the names and arguments of a class or function, Use `help(object)` to get help for any objects in the package.
 
 For exampe:
 
@@ -109,24 +84,6 @@ All the attributes of the module are listed under `DATA`. For example,
     	...
     	particleSpeciesCodes = particleSpeciesCodes
 
-## API
-
-The python interface is designed to closely mimic the C++ API with only a few exceptions. These are mainly related to functions that return pointers, and in the python interface we convert these functions to return data. Explicitly, these includes:
-
-- `GetNeighborListCutoffsPointer`, a member funciton of class `Model`,  defined in C++ API as
-
-```cpp
-void GetNeighborListCutoffsPointer(int * const numberOfCutoffs, double const ** const cutoffs) const;
-```
-
-
-In the python interface it is converted to
-
-```python
-cutoffs = Model.get_neighbor_list_cutoffs()
-```
-
-where `cutoffs` is a numpy 1D array contains `numberOfCutoffs = len(cutoffs)` values.
 
 ## Contact
 

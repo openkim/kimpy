@@ -1,0 +1,4 @@
+recursive-include kimpy *.hpp
+recursive-include tests *.py
+recursive-include scripts *.py *-template
+include README.md

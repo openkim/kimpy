@@ -26,8 +26,6 @@ def inquire_kim_api(option, key, mode):
       config = subprocess.check_output(['kim-api-v2-build-config', option])
     else:
       config = subprocess.check_output(['kim-api-v2-build-config', option]).decode('utf-8')
-
-    print('@@', config)
   except:
     raise Exception('"kim-api-v2-build-config" not found on PATH; make sure '
                     'kim-api is installed and "kim-api-v2-build-config" is on PATH.')
@@ -84,7 +82,7 @@ def get_extra_compile_args():
   return ['-std=c++11']
 
 
-def get_version(fname='kimpy/__init__.py'):
+def get_version(fname=os.path.join('kimpy', '__init__.py')):
   with open(fname) as fin:
     for line in fin:
       line = line.strip()
@@ -118,7 +116,6 @@ def get_extension_2(name):
   name = [i.title() for i in name]
   name = ''.join(name)
   sources = ['kimpy/KIM_{}_bind.cpp'.format(name)]
-  print('Module name: {}, sources: {}'.format(module_name, sources))
   return Extension(
     module_name,
     sources = sources,
@@ -149,12 +146,14 @@ module_names = [
   'sem_ver',
   'log',
 ]
-all_modules = [get_extension_2(name) for name in module_names]
+
+kimpy_ext_modules = [get_extension_2(name) for name in module_names]
+
 
 setup(name = 'kimpy',
   version = get_version(),
   packages = ['kimpy'],
-  ext_modules = all_modules,
+  ext_modules = kimpy_ext_modules,
   install_requires = ['pybind11', 'numpy', 'pytest'],
   author = 'Mingjian Wen',
   author_email = 'wenxx151@umn.edu',
@@ -162,6 +161,9 @@ setup(name = 'kimpy',
   description = 'Python interface to the KIM API',
   classifiers = (
     'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
     'License :: OSI Approved :: Common Development and Distribution License 1.0 (CDDL-1.0)',
     'Operating System :: OS Independent',
   ),
