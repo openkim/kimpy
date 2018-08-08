@@ -12,10 +12,6 @@ def create_fcc_argon(alat=5.26):
   return argon
 
 
-# neighbor list
-neigh = dict()
-
-# get neigh function
 def get_neigh(data, cutoffs, neighbor_list_index, particle_number):
   error = 0
 
@@ -207,6 +203,9 @@ def test_main():
   check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
 
+  # neighbor list
+  neigh = dict()
+
   # register get neigh callback
   error = compute_arguments.set_callback(
       kimpy.compute_callback_name.GetNeighborList,
@@ -256,7 +255,7 @@ def test_main():
 
   for a in all_alat:
     argon = create_fcc_argon(a)
-    np.copyto(coords, argon.get_positions())   # NOTE should change coords aneighress
+    np.copyto(coords, argon.get_positions())   # NOTE should not change coords address
     create_neigh(coords, model_influence_dist, neigh)  # NOTE safe to change content of neigh
     error = kim_model.compute(compute_arguments)
     print('{:18.10e} {:18.10e} {:18.10e}'.format(energy[0], np.linalg.norm(forces), a))
