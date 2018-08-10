@@ -145,7 +145,7 @@ PYBIND11_MODULE(model, module) {
   .def("get_species_support_and_code",
     [](Model& self, SpeciesName const speciesName) {
       int speciesIsSupported;
-      int code;
+      int code = -1;
       int error = self.GetSpeciesSupportAndCode(speciesName, &speciesIsSupported, &code);
 
       py::tuple re(3);
