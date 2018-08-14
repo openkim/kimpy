@@ -83,7 +83,7 @@ def get_includes():
 
 
 def get_extra_compile_args():
-  return ['-std=c++11']
+  return ['-std=c++11', '-fvisibility=hidden']
 
 
 def get_version(fname=os.path.join('kimpy', '__init__.py')):

@@ -2,6 +2,7 @@
 #include <pybind11/numpy.h>
 
 #include "KIM_SimulatorHeaders.hpp"
+#include "sim_buffer.h"
 
 namespace py = pybind11;
 using namespace KIM;
@@ -117,6 +118,17 @@ PYBIND11_MODULE(model, module) {
 
   .def("compute_arguments_destroy",
     [](Model& self, ComputeArguments * computeArguments) {
+
+      SimBuffer * sim_buffer;
+      computeArguments->GetSimulatorBufferPointer((void **) &sim_buffer);
+      if (sim_buffer != NULL) {
+        for (size_t i=0; i<sim_buffer->callbacks.size(); i++) {
+          delete sim_buffer->callbacks[i];
+        }
+        delete sim_buffer;
+        sim_buffer = NULL;
+      }
+
       int error = self.ComputeArgumentsDestroy(&computeArguments);
       return error;
     },

@@ -4,6 +4,7 @@
 
 #include "callbacks.hpp"
 #include "KIM_SimulatorHeaders.hpp"
+#include "sim_buffer.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -88,7 +89,6 @@ PYBIND11_MODULE(compute_arguments, module) {
     py::arg("ptr").noconvert()
   )
 
-
   .def("set_argument_null_pointer",
     [](ComputeArguments& self,
       ComputeArgumentName const computeArgumentName
@@ -98,7 +98,6 @@ PYBIND11_MODULE(compute_arguments, module) {
     },
     py::arg("ComputeArgumentName")
   )
-
 
   .def("set_callback_pointer",
     [](ComputeArguments& self,
@@ -114,10 +113,9 @@ PYBIND11_MODULE(compute_arguments, module) {
       return error;
     },
     py::arg("ComputeCallbackName"),
-    py::arg("ptr"),
+    py::arg("callback_fn"),
     py::arg("dataObject")
   )
-
 
   .def("set_callback",
     [](ComputeArguments& self,
@@ -127,30 +125,15 @@ PYBIND11_MODULE(compute_arguments, module) {
     ) {
 
       // pack python callback function and dataObject into a new dict
-      //dataObject["function"] = pyfunc;
       py::dict * d = new py::dict("pyfunc"_a=pyfunc, "pydata"_a = dataObject);
 
-      // Make a copy of dataObject, because it is a copy of the python dictionary,
-      // with scope only in this function.
-      // TODO check back to see whether pybind11 allows pass arguments by referenc
-      //py::dict* d = new py::dict(dataObject);
-      auto pd = reinterpret_cast<void const * const> (d);
-
-      // add 'pd' as attribute of python class `compute_arguments`, which helps to
-      // automatically deallocate the memory of `d`, when this class is destroyed.
-      // Cannot use `d` directly in the below line (valgrind will report memory leak),
-      // type matters?
-      auto locals = py::dict( "self"_a = self, "callback"_a = pd);
-      // embed python code
-      py::exec(R"(
-        self = locals()['self']
-        callback = locals()['callback']
-        # add pointer to callback
-        if not hasattr(self, 'callback'):
-          self.callbacks = []
-        self.callbacks.append(callback)
-       )", py::globals(), locals);
-
+      SimBuffer * sim_buffer;
+      self.GetSimulatorBufferPointer((void **) &sim_buffer);
+      if (sim_buffer == NULL) {
+        sim_buffer = new SimBuffer;
+        self.SetSimulatorBufferPointer((void *) sim_buffer);
+      }
+      sim_buffer->callbacks.push_back(d);
 
       // select wrapper callback function
       KIM::func * wrap_fptr;
@@ -170,12 +153,12 @@ PYBIND11_MODULE(compute_arguments, module) {
 
      // register callback to kim api
       error = error || self.SetCallbackPointer(computeCallbackName,
-        LANGUAGE_NAME::cpp, wrap_fptr, pd);
+        LANGUAGE_NAME::cpp, wrap_fptr, reinterpret_cast<void const * const> (d));
 
       return error;
     },
     py::arg("ComputeCallbackName"),
-    py::arg("ptr"),
+    py::arg("callback_fn"),
     py::arg("dataObject")
   )
 
@@ -195,7 +178,6 @@ PYBIND11_MODULE(compute_arguments, module) {
   .def("push_log_verbosity", &ComputeArguments::PushLogVerbosity)
 
   .def("pop_log_verbosity", &ComputeArguments::PopLogVerbosity);
-
 
 }
 
