@@ -1,0 +1,6 @@
+This directory contains an example showing how to use the neighlist codes as
+a shared library for cpp codes.
+
+to run:
+$ make
+$ ./graphite

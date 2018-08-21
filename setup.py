@@ -79,7 +79,8 @@ class get_pybind11_includes(object):
 def get_includes():
   kim_inc = get_kim_includes()
   pybind11_inc =[get_pybind11_includes(), get_pybind11_includes(user=True)]
-  return kim_inc + pybind11_inc
+  neighlist_inc = [os.path.join(os.getcwd(), 'kimpy', 'neighlist')]
+  return kim_inc + pybind11_inc + neighlist_inc
 
 
 def get_extra_compile_args():
@@ -153,11 +154,16 @@ module_names = [
 
 kimpy_ext_modules = [get_extension_2(name) for name in module_names]
 
+neighlist_ext_module = [get_extension(
+  'kimpy.neighlist',
+  ['kimpy/neighlist/neighbor_list.cpp',
+   'kimpy/neighlist/neighbor_list_bind.cpp']
+)]
 
 setup(name = 'kimpy',
   version = get_version(),
   packages = ['kimpy'],
-  ext_modules = kimpy_ext_modules,
+  ext_modules = kimpy_ext_modules + neighlist_ext_module,
   install_requires = ['pybind11', 'numpy', 'pytest'],
   author = 'Mingjian Wen',
   author_email = 'wenxx151@umn.edu',

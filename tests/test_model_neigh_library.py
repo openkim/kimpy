@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import numpy as np
 import kimpy
-import neighlist as nl
+from kimpy import neighlist as nl
 from error import check_error, report_error
 from ase.lattice.cubic import FaceCenteredCubic
 

@@ -2,11 +2,13 @@ build/
 dist/
 ase_kim_calculator.egg-info/
 *.so
+*.o
 *.pyc
 .eggs
 kimpy.egg-info
 kim.log
 .cache
+.pytest_cache/
 
 kimpy/SpeciesName_attributes.cpp
 kimpy/*Unit_bind.cpp

@@ -18,6 +18,7 @@ from . import temperature_unit
 from . import time_unit
 from . import sem_ver
 from . import log
+from . import neighlist
 
 
 # needed by `from kimpy import *`
@@ -39,5 +40,6 @@ __all__ = [
   'time_unit',
   'sem_ver',
   'log',
+  'neighlist',
 ]
 
