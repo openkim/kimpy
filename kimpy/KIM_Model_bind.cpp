@@ -55,30 +55,24 @@ PYBIND11_MODULE(model, module) {
     [](Model& self) {
       int numberOfCutoffs;
       double const * cutoff_ptr;
-      int const * paddingNeighborHints_ptr;
-      int const * halfListHints_ptr;
+      int const * paddingNoNeighborHints_ptr;
       self.GetNeighborListPointers(&numberOfCutoffs, &cutoff_ptr,
-          &paddingNeighborHints_ptr, &halfListHints_ptr);
+          &paddingNoNeighborHints_ptr);
 
       py::array_t<double, py::array::c_style> cutoffs (
           {static_cast<size_t> (numberOfCutoffs)});
-      py::array_t<int, py::array::c_style> paddingNeighborHints (
-          {static_cast<size_t> (numberOfCutoffs)});
-      py::array_t<int, py::array::c_style> halfListHints (
+      py::array_t<int, py::array::c_style> paddingNoNeighborHints (
           {static_cast<size_t> (numberOfCutoffs)});
       auto cut = cutoffs.mutable_data(0);
-      auto pnh = paddingNeighborHints.mutable_data(0);
-      auto hlh = halfListHints.mutable_data(0);
+      auto pnh = paddingNoNeighborHints.mutable_data(0);
       for(int i=0; i<numberOfCutoffs; i++) {
         cut[i] = cutoff_ptr[i];
-        pnh[i] = paddingNeighborHints_ptr[i];
-        hlh[i] = halfListHints_ptr[i];
+        pnh[i] = paddingNoNeighborHints_ptr[i];
       }
 
-      py::tuple re(3);
+      py::tuple re(2);
       re[0] = cutoffs;
-      re[1] = paddingNeighborHints;
-      re[2] = halfListHints;
+      re[1] = paddingNoNeighborHints;
 
       return re;
     }

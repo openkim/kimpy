@@ -176,13 +176,10 @@ def test_main():
 
   # influence distance and cutoff of model
   model_influence_dist = kim_model.get_influence_distance()
-  model_cutoffs,padding_hints,half_hints = kim_model.get_neighbor_list_cutoffs_and_hints()
-  if(model_cutoffs.size != 1):
-    report_error('too many cutoffs')
+  model_cutoffs,padding_not_require_neigh_hints= kim_model.get_neighbor_list_cutoffs_and_hints()
   print('Model influence distance:', model_influence_dist)
   print('Model cutoffs:', model_cutoffs)
-  print('Model padding neighbors hints:', padding_hints)
-  print('Model half list hints:', half_hints)
+  print('Model padding neighbors hints:', padding_not_require_neigh_hints)
   print()
 
    # species support and code
@@ -219,7 +216,7 @@ def test_main():
   for a in all_alat:
     argon = create_fcc_argon(a)
     np.copyto(coords, argon.get_positions())   # NOTE cannot change coords address
-    error = nl.build(neigh, model_influence_dist, coords, need_neigh)
+    error = nl.build(neigh, coords, model_influence_dist, model_cutoffs, need_neigh)
     check_error(error, 'nl.build')
     error = kim_model.compute(compute_arguments)
     print('{:18.10e} {:18.10e} {:18.10e}'.format(energy[0], np.linalg.norm(forces), a))
