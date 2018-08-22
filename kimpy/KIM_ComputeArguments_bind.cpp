@@ -105,7 +105,7 @@ PYBIND11_MODULE(compute_arguments, module) {
       void const * const fptr,  // cannpt use: KIM::func * const fptr
                                 // the argument passed in is of type: void const *
                                 // we cast type explicitly in the funciton body
-      void const * const dataObject
+      void * const dataObject
     ) {
       KIM::func * new_fptr = (KIM::func*) fptr;
       int error = self.SetCallbackPointer(computeCallbackName,
@@ -153,7 +153,7 @@ PYBIND11_MODULE(compute_arguments, module) {
 
      // register callback to kim api
       error = error || self.SetCallbackPointer(computeCallbackName,
-        LANGUAGE_NAME::cpp, wrap_fptr, reinterpret_cast<void const * const> (d));
+        LANGUAGE_NAME::cpp, wrap_fptr, reinterpret_cast<void * const> (d));
 
       return error;
     },
