@@ -116,7 +116,6 @@ def get_extension(module_name, sources):
                      libraries=get_kim_ldlibs(),
                      extra_compile_args=get_extra_compile_args(),
                      extra_link_args=get_kim_extra_link_args(),
-                     runtime_library_dirs=get_kim_libdirs(),
                      language='c++')
 
 
@@ -133,7 +132,6 @@ def get_extension_2(name):
                      libraries=get_kim_ldlibs(),
                      extra_compile_args=get_extra_compile_args(),
                      extra_link_args=get_kim_extra_link_args(),
-                     runtime_library_dirs=get_kim_libdirs(),
                      language='c++')
 
 
