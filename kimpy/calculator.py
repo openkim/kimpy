@@ -167,7 +167,9 @@ class KIMModelCalculator(Calculator):
       except:
         raise ValueError('Supercell\n{}\nis not invertible.'.format(cell))
       pad_coords, pad_code, self.pad_image = nl.set_padding(
-          cell.ravel(), pbc, self.cutoff, coords, particle_code)
+          np.asarray(cell.ravel(), dtype=np.double), np.asarray(pbc, dtype=np.intc),
+          self.cutoff, np.asarray(coords, dtype=np.double),
+          np.asarray(particle_code, dtype=np.intc))
       npad = pad_code.size
 
       self.km_nparticles = np.array([nparticles + npad], dtype=np.intc)
