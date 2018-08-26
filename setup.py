@@ -25,7 +25,7 @@ def inquire_kim_api(key):
                                          universal_newlines=True)
     except:
         raise Exception('"libkim-api-v2" not found. Make sure "kim-api-v2" is '
-                        'installed and do forget to '
+                        'installed and do not forget to '
                         '"source path/to/kim-api-v2-activate".')
 
     split_config = [s for s in config.strip().split(' ')]
