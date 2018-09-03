@@ -172,19 +172,21 @@ PYBIND11_MODULE(model, module) {
     }
   )
 
-  .def("get_parameter_data_type_extent_and_description",
+  .def("get_parameter_data_type_extent_name_and_description",
     [](Model& self, int const index) {
       DataType dataType;
       int extent;
+      std::string const * name;
       std::string const * description;
 
-      int error = self.GetParameterDataTypeExtentAndDescription(
-        index, &dataType, &extent, &description);
-      py::tuple re(4);
+      int error = self.GetParameterDataTypeExtentNameAndDescription(
+        index, &dataType, &extent, &name, &description);
+      py::tuple re(5);
       re[0] = dataType;
       re[1] = extent;
-      re[2] = *description;
-      re[3] = error;
+      re[2] = *name;
+      re[3] = *description;
+      re[4] = error;
       return re;
     },
     py::arg("index"),
