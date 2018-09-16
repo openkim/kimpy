@@ -102,12 +102,12 @@ PYBIND11_MODULE(compute_arguments, module) {
   .def("set_callback_pointer",
     [](ComputeArguments& self,
       ComputeCallbackName const computeCallbackName,
-      void const * const fptr,  // cannpt use: KIM::func * const fptr
+      void const * const fptr,  // cannpt use: KIM::Function * const fptr
                                 // the argument passed in is of type: void const *
                                 // we cast type explicitly in the funciton body
       void * const dataObject
     ) {
-      KIM::func * new_fptr = (KIM::func*) fptr;
+      KIM::Function * new_fptr = (KIM::Function*) fptr;
       int error = self.SetCallbackPointer(computeCallbackName,
         LANGUAGE_NAME::cpp, new_fptr, dataObject);
       return error;
@@ -136,16 +136,16 @@ PYBIND11_MODULE(compute_arguments, module) {
       sim_buffer->callbacks.push_back(d);
 
       // select wrapper callback function
-      KIM::func * wrap_fptr;
+      KIM::Function * wrap_fptr;
       int error = false;
       if (computeCallbackName == COMPUTE_CALLBACK_NAME::GetNeighborList) {
-        wrap_fptr = reinterpret_cast<KIM::func*> (&get_neigh);
+        wrap_fptr = reinterpret_cast<KIM::Function*> (&get_neigh);
       }
       else if (computeCallbackName == COMPUTE_CALLBACK_NAME::ProcessDEDrTerm) {
-        wrap_fptr = reinterpret_cast<KIM::func*> (&process_dEdr);
+        wrap_fptr = reinterpret_cast<KIM::Function*> (&process_dEdr);
       }
       else if (computeCallbackName == COMPUTE_CALLBACK_NAME::ProcessD2EDr2Term) {
-        wrap_fptr = reinterpret_cast<KIM::func*> (&process_d2Edr2);
+        wrap_fptr = reinterpret_cast<KIM::Function*> (&process_d2Edr2);
       }
       else {
         error = true;
