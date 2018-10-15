@@ -56,7 +56,7 @@ def create_neigh(coords, cutoff, neigh):
 def test_main():
 
     modelname = 'ex_model_Ar_P_Morse_07C'
-    modelname = 'Three_Body_Stillinger_Weber_Si__MO_405512056662_004'
+    #modelname = 'Three_Body_Stillinger_Weber_Si__MO_405512056662_004'
     #modelname = 'LennardJones612_Universal__MO_826355984548_002'
     print()
     print('='*80)

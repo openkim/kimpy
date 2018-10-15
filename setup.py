@@ -3,6 +3,7 @@ from distutils.sysconfig import get_config_vars
 import sys
 import os
 import subprocess
+from api_compatibility import check_kim_api_compatibility
 
 
 # remove `-Wstrict-prototypes' that is for C not C++
@@ -133,6 +134,15 @@ def get_extension_2(name):
                      extra_compile_args=get_extra_compile_args(),
                      extra_link_args=get_kim_extra_link_args(),
                      language='c++')
+
+
+# check api compatibility
+kimpy_v = get_version()
+v = inquire_kim_api('--modversion')[0]
+kim_api_v = v.split('-')[0]
+msg = check_kim_api_compatibility(kimpy_v, kim_api_v)
+if msg is not None:
+    raise Exception(msg)
 
 
 module_names = [
