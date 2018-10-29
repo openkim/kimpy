@@ -11,9 +11,8 @@ PYBIND11_MODULE(sem_ver, module) {
 
   module.def("get_sem_ver",
     []() {
-      std::string const * version;
-      SEM_VER::GetSemVer(&version);
-      return *version;
+      std::string const & version = SEM_VER::GetSemVer();
+      return version;
     }
   );
 

@@ -172,15 +172,14 @@ PYBIND11_MODULE(model, module) {
     }
   )
 
-  .def("get_parameter_data_type_extent_name_and_description",
+  .def("get_parameter_metadata",
     [](Model& self, int const index) {
       DataType dataType;
       int extent;
       std::string const * name;
       std::string const * description;
 
-      int error = self.GetParameterDataTypeExtentNameAndDescription(
-        index, &dataType, &extent, &name, &description);
+      int error = self.GetParameterMetadata(index, &dataType, &extent, &name, &description);
       py::tuple re(5);
       re[0] = dataType;
       re[1] = extent;
