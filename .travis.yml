@@ -30,6 +30,9 @@ install:
   - sudo make install
   - sudo ldconfig
 
+  # ase
+  - pip install ase
+
 
 script:
   - cd $KIMPY_DIR
