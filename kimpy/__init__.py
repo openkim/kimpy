@@ -1,4 +1,4 @@
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 # import all modules
 from . import model
@@ -23,23 +23,22 @@ from . import neighlist
 
 # needed by `from kimpy import *`
 __all__ = [
-  'model',
-  'compute_arguments',
-  'compute_argument_name',
-  'compute_callback_name',
-  'data_type',
-  'species_name',
-  'language_name',
-  'numbering',
-  'support_status',
-  'log_verbosity',
-  'length_unit',
-  'energy_unit',
-  'charge_unit',
-  'temperature_unit',
-  'time_unit',
-  'sem_ver',
-  'log',
-  'neighlist',
+    'model',
+    'compute_arguments',
+    'compute_argument_name',
+    'compute_callback_name',
+    'data_type',
+    'species_name',
+    'language_name',
+    'numbering',
+    'support_status',
+    'log_verbosity',
+    'length_unit',
+    'energy_unit',
+    'charge_unit',
+    'temperature_unit',
+    'time_unit',
+    'sem_ver',
+    'log',
+    'neighlist',
 ]
-

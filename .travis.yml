@@ -13,34 +13,27 @@ before_install:
   - sudo apt-get install gcc
   - sudo apt-get install gfortran
 
-  # keep record of kliff directory
+  # environment variable
   - export KIMPY_DIR=$PWD
+  - export KIM_API_VERSION=v2.0.0-beta.2
 
 
 install:
   # kim-api
   - cd $KIMPY_DIR && cd ..
-  - wget http://s3.openkim.org/kim-api/kim-api-v2.0.0-beta.1.txz
-  - tar xJf kim-api-v2.0.0-beta.1.txz
-  - cd kim-api-v2.0.0-beta.1
-  - ./configure
-  - make
+  - wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
+  - tar Jxvf kim-api-$KIM_API_VERSION.txz
+  - cd kim-api-$KIM_API_VERSION
+  - mkdir build
+  - cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=Release
   - sudo make install
   - sudo ldconfig
-  - cd examples
-  - make all-user
-
-  # neighlist
-  - cd $KIMPY_DIR && cd ..
-  - git clone https://github.com/mjwen/neighlist.git
-  - cd neighlist/python
-  - pip install -e .
-
-  - pip install ase
 
 
 script:
   - cd $KIMPY_DIR
   - pip install -e .
+  - cd tests
   - pytest
 
