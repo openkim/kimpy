@@ -1,4 +1,6 @@
 recursive-include kimpy *.hpp
+recursive-include kimpy *.h
 recursive-include tests *.py
 recursive-include scripts *.py *-template
 include README.md
+include api_compatibility.py
