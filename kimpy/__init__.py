@@ -8,6 +8,7 @@ from . import compute_callback_name
 from . import data_type
 from . import species_name
 from . import language_name
+from . import model_routine_name
 from . import numbering
 from . import support_status
 from . import log_verbosity
@@ -30,6 +31,7 @@ __all__ = [
     'data_type',
     'species_name',
     'language_name',
+    'model_routine_name',
     'numbering',
     'support_status',
     'log_verbosity',

@@ -43,6 +43,22 @@ PYBIND11_MODULE(model, module) {
     }
   ))
 
+  .def("is_routine_present",
+    [](Model& self, ModelRoutineName const modelRoutineName) {
+      int present;
+      int required;
+      int error = self.IsRoutinePresent(modelRoutineName, &present, &required);
+      py::tuple re(3);
+      re[0] = present;
+      re[1] = required;
+      re[2] = error;
+
+      return re;
+    },
+    py::arg("ModelRoutineName"),
+    "Return(present, required, error)"
+  )
+
   .def("get_influence_distance",
     [](Model& self) {
       double influenceDistance;
@@ -75,7 +91,8 @@ PYBIND11_MODULE(model, module) {
       re[1] = paddingNoNeighborHints;
 
       return re;
-    }
+    },
+    "Return (cutoffs, model_not_request_neighbors_of_noncontributing_particles)"
   )
 
   .def("get_units",
@@ -147,6 +164,16 @@ PYBIND11_MODULE(model, module) {
 
   .def("clear_then_refresh",
       &Model::ClearThenRefresh)
+
+  .def("write_parameterized_model",
+    [](Model& self, std::string const & path, std::string const & modelName) {
+      int error = self.WriteParameterizedModel(path, modelName);
+
+      return error;
+    },
+    py::arg("path"),
+    py::arg("modelName")
+  )
 
   .def("get_species_support_and_code",
     [](Model& self, SpeciesName const speciesName) {

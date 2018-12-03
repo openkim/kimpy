@@ -113,10 +113,10 @@ def test_main():
     print('Number of parameters:', num_params)
     print()
     for i in range(num_params):
-        out = kim_model.get_parameter_data_type_extent_name_and_description(i)
+        out = kim_model.get_parameter_metadata(i)
         dtype, extent, name, description, error = out
         check_error(
-            error, 'kim_model.get_parameter_data_type_extent_and_description')
+            error, 'kim_model.get_parameter_metadata')
         print('Parameter No.', i)
         print('    data type:', dtype)
         print('    extent:', extent)

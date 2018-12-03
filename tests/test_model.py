@@ -55,7 +55,7 @@ def create_neigh(coords, cutoff, neigh):
 
 def test_main():
 
-    modelname = 'ex_model_Ar_P_Morse_07C'
+    modelname = 'ex_model_Ar_P_Morse'
     #modelname = 'Three_Body_Stillinger_Weber_Si__MO_405512056662_004'
     #modelname = 'LennardJones612_Universal__MO_826355984548_002'
     print()
@@ -156,10 +156,10 @@ def test_main():
     print()
 
     for i in range(num_params):
-        out = kim_model.get_parameter_data_type_extent_name_and_description(i)
+        out = kim_model.get_parameter_metadata(i)
         dtype, extent, name, description, error = out
         check_error(
-            error, 'kim_model.get_parameter_data_type_extent_and_description')
+            error, 'kim_model.get_parameter_metadata')
         print('Parameter No.', i)
         print('    data type:', dtype)
         print('    extent:', extent)
@@ -263,6 +263,14 @@ def test_main():
     # destory compute arguments
     error = kim_model.compute_arguments_destroy(compute_arguments)
     check_error(error, 'kim_model.compute_arguments_destroy')
+
+    out = kim_model.is_routine_present(kimpy.model_routine_name.WriteParameterizedModel)
+    present, required, error = out
+    check_error(error, 'kim_model.is_routine_present')
+    if present:
+      kim_model.write_parameterized_model('.', 'Morse_Ar')
+
+
 
     # destory model
     kimpy.model.destroy(kim_model)

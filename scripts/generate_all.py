@@ -2,14 +2,15 @@ import os
 import subprocess
 
 all_fnames = [
-  'generate_SpeciesName_bind_test.py',
-  'generate_UnitSystem_bind_test.py',
+  'generate_LogVerbosity_bind_test.py',
   'generate_DataType_bind_test.py',
-  'generate_Numbering_bind_test.py',
   'generate_LanguageName_bind_test.py',
+  'generate_ModelRoutineName_bind_test.py',
+  'generate_SpeciesName_bind_test.py',
+  'generate_Numbering_bind_test.py',
+  'generate_UnitSystem_bind_test.py',
   'generate_ComputeCallbackName_bind_test.py',
   'generate_SupportStatus_bind_test.py',
-  'generate_LogVerbosity_bind_test.py',
 ]
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

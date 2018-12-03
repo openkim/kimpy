@@ -153,6 +153,7 @@ module_names = [
     'data_type',
     'species_name',
     'language_name',
+    'model_routine_name',
     'numbering',
     'support_status',
     'log_verbosity',
