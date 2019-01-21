@@ -255,7 +255,7 @@ PYBIND11_MODULE(model, module) {
   .def("set_parameter",
       (int (Model::*)(int const, int const, double const)) &Model::SetParameter)
 
-  .def("__repr__", &Model::String)
+  .def("__repr__", &Model::ToString)
 
   .def("set_log_id", &Model::SetLogID)
 

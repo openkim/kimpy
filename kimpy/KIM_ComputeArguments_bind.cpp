@@ -171,7 +171,7 @@ PYBIND11_MODULE(compute_arguments, module) {
     }
   )
 
-  .def("__repr__", &ComputeArguments::String)
+  .def("__repr__", &ComputeArguments::ToString)
 
   .def("set_log_id", &ComputeArguments::SetLogID)
 
