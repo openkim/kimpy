@@ -20,6 +20,7 @@ PYBIND11_MODULE(compute_argument_name, module) {
   cl.def(py::init<>())
   .def(py::init<int const>())
   .def(py::init<std::string const>())
+  .def("known", &ComputeArgumentName::Known)
   .def(py::self == py::self)
   .def(py::self != py::self)
   .def("__repr__", &ComputeArgumentName::ToString);

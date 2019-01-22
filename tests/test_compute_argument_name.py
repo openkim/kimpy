@@ -60,6 +60,10 @@ def test_main():
     for j in range(i+1, N):
       assert all_instances[i] != all_instances[j]
 
+  # test known
+  for inst in all_instances:
+    assert inst.known() == True
+
   # test out of bound
   inst,error = kimpy.compute_argument_name.get_compute_argument_name(N)
   assert error == True

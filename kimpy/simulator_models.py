@@ -529,7 +529,7 @@ class ksm_object(object):
                     [self.kim_api_sm_util, self.extended_kim_id, str(1+i), "name"]).strip()
             except:
                 raise KIMSMError(
-                    'ERROR: Unable to obtain file name for parameter file %d.' % 1+i)
+                    'ERROR: Unable to obtain file name for parameter file %d.' % (1+i))
             parameter_file = self.sm_dirname + "/" + param_filename
             try:
                 f = open(parameter_file, "w")

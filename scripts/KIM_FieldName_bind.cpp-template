@@ -16,6 +16,7 @@ PYBIND11_MODULE(field_name, module) {
   cl.def(py::init<>())
   .def(py::init<int const>())
   .def(py::init<std::string const>())
+  .def("known", &FieldName::Known)
   .def(py::self == py::self)
   .def(py::self != py::self)
   .def("__repr__", &FieldName::ToString);
