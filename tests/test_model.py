@@ -268,9 +268,7 @@ def test_main():
     present, required, error = out
     check_error(error, 'kim_model.is_routine_present')
     if present:
-      kim_model.write_parameterized_model('.', 'Morse_Ar')
-
-
+        kim_model.write_parameterized_model('.', 'Morse_Ar')
 
     # destory model
     kimpy.model.destroy(kim_model)
