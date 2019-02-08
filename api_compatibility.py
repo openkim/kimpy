@@ -114,4 +114,4 @@ def check_kim_api_compatibility(kimpy_v, api_v):
 
 if __name__ == '__main__':
     msg = check_kim_api_compatibility('0.1.6', '2.0.0')
-    print (msg)
+    print(msg)

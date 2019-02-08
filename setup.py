@@ -139,7 +139,12 @@ def get_extension_2(name):
 # check api compatibility
 kimpy_v = get_version()
 v = inquire_kim_api('--modversion')[0]
-kim_api_v = v.split('-')[0]
+if '-' in v:
+    kim_api_v = v.split('-')[0]
+elif '+' in v:
+    kim_api_v = v.split('+')[0]
+else:
+    kim_api_v = v
 msg = check_kim_api_compatibility(kimpy_v, kim_api_v)
 if msg is not None:
     raise Exception(msg)
