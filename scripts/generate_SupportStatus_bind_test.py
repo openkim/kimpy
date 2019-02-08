@@ -14,13 +14,11 @@ fields['field_name'] = 'support_status'
 
 
 attributes = [
-  'requiredByAPI',
-  'notSupported',
-  'required',
-  'optional',
-]
+    'requiredByAPI',
+    'notSupported',
+    'required',
+    'optional']
 
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)
-

@@ -14,15 +14,13 @@ fields['field_name'] = 'log_verbosity'
 
 
 attributes = [
-  'silent',
-  'fatal',
-  'error',
-  'warning',
-  'information',
-  'debug',
-]
+    'silent',
+    'fatal',
+    'error',
+    'warning',
+    'information',
+    'debug']
 
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)
-
