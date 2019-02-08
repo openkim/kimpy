@@ -28,6 +28,9 @@ PYBIND11_MODULE(log, module) {
     }
   ))
 
+
+  .def("pop_default_verbosity", &Log::PopDefaultVerbosity)
+
   .def("get_id", &Log::GetID)
 
   .def("set_id", &Log::SetID)
