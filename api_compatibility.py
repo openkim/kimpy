@@ -6,10 +6,8 @@ from collections import OrderedDict
 CompatibleTable = OrderedDict()
 CompatibleTable['0.1.1'] = {'target': '2.0.0', 'backward': '2.0.0'}
 CompatibleTable['0.1.2'] = {'target': '2.0.0', 'backward': '2.0.0'}
-CompatibleTable['0.1.3'] = {'target': '2.1.0', 'backward': '2.0.0'}
-CompatibleTable['0.1.4'] = {'target': '2.1.0', 'backward': '2.0.0'}
-CompatibleTable['0.1.5'] = {'target': '2.2.0', 'backward': '2.0.0'}
-CompatibleTable['0.1.6'] = {'target': '2.2.0', 'backward': '2.1.0'}
+CompatibleTable['0.1.3'] = {'target': '2.0.0', 'backward': '2.0.0'}
+CompatibleTable['0.2.0'] = {'target': '2.0.0', 'backward': '2.0.0'}
 
 
 def compare_version(x, y):
