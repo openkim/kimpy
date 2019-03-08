@@ -6,6 +6,8 @@ import re
 import os
 import subprocess
 import json
+import ast
+
 try:
     import requests
     requests_available = True
