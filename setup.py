@@ -186,6 +186,8 @@ setup(name='kimpy',
       author_email='wenxx151@umn.edu',
       url='https://github.com/mjwen/kimpy',
       description='Python interface to the KIM API',
+      long_description='Python interface to the KIM API. For more information '
+                       'about the KIM API, please see: https://openkim.org/kim-api/',
       classifiers=(
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3.5',
