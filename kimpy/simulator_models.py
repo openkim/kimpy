@@ -6,8 +6,6 @@ import re
 import os
 import subprocess
 import json
-import ast
-
 try:
     import requests
     requests_available = True
@@ -550,7 +548,7 @@ class ksm_object(object):
             f.close()
         return param_filenames
 
-    def __init__(self, extended_kim_id='LOCAL', model_metadata_file='NONE',
+    def __init__(self, extended_kim_id='NONE', model_metadata_file='NONE',
                  param_filenames=[]):
         '''
         Creates a KIM Simulator Model object.
@@ -560,15 +558,21 @@ class ksm_object(object):
         '''
 
         # Validate input
-        if (extended_kim_id == 'LOCAL' and model_metadata_file == 'NONE'):
+        if (extended_kim_id == 'NONE' and model_metadata_file == 'NONE'):
             raise KIMSMError(
-                'ERROR: Cannot initialize KIM Simulator Model, if not providing a model name, then must provide the model metadata file and parameters.')
+                'ERROR: Cannot initialize KIM Simulator Model. Model name not provided.')
 
-        # Unless in LOCAL mode, verify that the requested model is a
-        # Simulator Model and identify it's short KIM ID if the model name
-        # is passed as an extended KIM ID.
+        # Determine if in local mode (metadata file and parameter files provided
+        # as arguments and not obtained from installed SM) or check mode (verifying
+        # correctness of metadata file).
+        local_or_check_mode = False
+        if model_metadata_file != 'NONE':
+            local_or_check_mode = True
+
+        # Unless in local or check mode, verify that the requested model is an SM
+        # and create subdirectory for SM files
         self.extended_kim_id = extended_kim_id
-        if self.extended_kim_id != 'LOCAL':
+        if not local_or_check_mode:
             if not is_simulator_model(self.extended_kim_id):
                 raise KIMSMError(
                     'ERROR: Request model %s is not a Simulator Model.' % self.extended_kim_id)
@@ -576,19 +580,14 @@ class ksm_object(object):
             # to obtain short KIM_ID. This is used to name the directory
             # containing the SM files.
             try:
-                self.kim_id = re.search(
-                    'SM_[0-9]{12}_[0-9]{3}', self.extended_kim_id).group(0)
+                self.kim_id = re.search('SM_[0-9]{12}_[0-9]{3}', self.extended_kim_id).group(0)
             except AttributeError:
-                self.kim_id = self.extended_kim_id  # Model name does not
-                # contain a short KIM ID,
-                # so use full model name
-                # for the file directory.
-
-        # Create subdirectory where SM files will be placed
-        self._create_SM_files_directory()
+                self.kim_id = self.extended_kim_id  # Model name does not contain a short KIM ID,
+            # Create subdirectory where SM files will be placed
+            self._create_SM_files_directory()
 
         # Get metadata filename and parameter filenames
-        if model_metadata_file == 'NONE':
+        if not local_or_check_mode:
             self.model_metadata_file = self._extract_model_metadata()
             self.param_filenames = self._extract_model_paramfiles()
         else:
