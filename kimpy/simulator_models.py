@@ -479,6 +479,7 @@ class ksm_object(object):
         try:
             metadata_filename = subprocess.check_output(
                 [self.kim_api_sm_util, self.extended_kim_id, "metadata-file", "name"]).strip()
+            metadata_filename = str(metadata_filename)
         except:
             raise KIMSMError('ERROR: Unable to obtain metadata file name.')
         # construct name of simulator json file (kim-id.json)
@@ -527,6 +528,7 @@ class ksm_object(object):
             try:
                 param_filename = subprocess.check_output(
                     [self.kim_api_sm_util, self.extended_kim_id, str(1+i), "name"]).strip()
+                param_filename = str(param_filename)
             except:
                 raise KIMSMError(
                     'ERROR: Unable to obtain file name for parameter file %d.' % (1+i))
