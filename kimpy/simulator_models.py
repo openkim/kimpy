@@ -415,12 +415,12 @@ def get_kim_api_simulator_model_utility():
     '''
     try:
         libexec_path = subprocess.check_output(
-            ["pkg-config", "--variable=libexecdir", "libkim-api-v2"],
+            ["pkg-config", "--variable=libexecdir", "libkim-api"],
             universal_newlines=True).strip().rstrip("/")
     except:
         raise KIMSMError(
             'ERROR: Unable to obtain libexec-path from KIM API utility.')
-    return os.path.join(libexec_path, "kim-api-v2", "kim-api-v2-simulator-model")
+    return os.path.join(libexec_path, "kim-api", "kim-api-simulator-model")
 
 
 def is_simulator_model(model):

@@ -10,6 +10,7 @@ CompatibleTable['0.1.3'] = {'target': '2.0.0', 'backward': '2.0.0'}
 CompatibleTable['0.2.0'] = {'target': '2.0.0', 'backward': '2.0.0'}
 CompatibleTable['0.2.1'] = {'target': '2.0.1', 'backward': '2.0.0'}
 CompatibleTable['0.2.2'] = {'target': '2.0.1', 'backward': '2.0.0'}
+CompatibleTable['0.2.3'] = {'target': '2.0.2', 'backward': '2.0.0'}
 
 
 def compare_version(x, y):

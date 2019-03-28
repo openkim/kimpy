@@ -22,12 +22,12 @@ subprocess.call(['python', fname])
 def inquire_kim_api(key):
     """ Get compile and link flags of kim-api."""
     try:
-        config = subprocess.check_output(['pkg-config', key, 'libkim-api-v2'],
+        config = subprocess.check_output(['pkg-config', key, 'libkim-api'],
                                          universal_newlines=True)
     except:
-        raise Exception('"libkim-api-v2" not found. Make sure "kim-api-v2" is '
+        raise Exception('"libkim-api" not found. Make sure "kim-api" is '
                         'installed and do not forget to '
-                        '"source path/to/kim-api-v2-activate".')
+                        '"source path/to/kim-api-activate".')
 
     split_config = [s for s in config.strip().split(' ')]
 
