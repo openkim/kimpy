@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/openkim/kimpy.svg?branch=master)](https://travis-ci.org/openkim/kimpy)
 
-Kimpy is the Python interface to the KIM API. For more information about the KIM API, see: https://openkim.org/kim-api/
+kimpy is a Python interface to the KIM API. For more information about the KIM
+API, see: https://openkim.org/kim-api/
 
 
 ## Installation
@@ -29,12 +30,12 @@ $ pip install -e ./kimpy
 
 For an example of using `kimpy`, take a look at `kimpy/tests/test_model.py`.
 
-In the above example, the neighbor list is built within python. We provide a [neighbor list building library](https://github.com/mjwen/neighlist) that accelerates the creation of neighbor list and works seamlessly with `kimpy`. See `kimpy/tests/test_model_neigh_library.py`for an example of using this library.
-
 
 ## Help
 
-Kimpy is designed to closely mimic the C++ KIM API with only a few changes of names. In case one wants to know the names and arguments of a class or function, Use `help(object)` to get help for any objects in the package.
+kimpy is designed to closely mimic the C++ KIM API with only a few changes of
+names. In case one wants to know the names and arguments of a class or
+function, Use `help(object)` to get help for any objects in the package.
 
 For exampe:
 
@@ -74,7 +75,9 @@ FUNCTIONS
 		Return(ComputeArgumentName, error)
 ```
 
-shows that the function `get_compute_argument_name` takes an integer `index` as input, and returns a tuple of two outputs: `ComputeArgumentName` and `error`. You can refer to `KIM API` docs for the meaning of the input and outputs.
+shows that the function `get_compute_argument_name` takes an integer `index` as
+input, and returns a tuple of two outputs: `ComputeArgumentName` and `error`.
+You can refer to `KIM API` docs for the meaning of the input and outputs.
 
 All the attributes of the module are listed under `DATA`. For example,
 
