@@ -1,6 +1,6 @@
 # kimpy
 
-[![Build Status](https://travis-ci.com/openkim/kimpy.svg?branch=master)](https://travis-ci.com/openkim/kimpy)
+[![Build Status](https://travis-ci.org/openkim/kimpy.svg?branch=master)](https://travis-ci.org/openkim/kimpy)
 
 Kimpy is the Python interface to the KIM API. For more information about the KIM API, see: https://openkim.org/kim-api/
 
