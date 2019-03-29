@@ -184,7 +184,7 @@ setup(name='kimpy',
       install_requires=['pybind11', 'numpy', 'pytest'],
       author='Mingjian Wen',
       author_email='wenxx151@umn.edu',
-      url='https://github.com/mjwen/kimpy',
+      url='https://github.com/openkim/kimpy',
       description='Python interface to the KIM API',
       long_description='Python interface to the KIM API. For more information '
                        'about the KIM API, please see: https://openkim.org/kim-api/',
