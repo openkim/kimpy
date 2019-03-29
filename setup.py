@@ -3,7 +3,7 @@ from distutils.sysconfig import get_config_vars
 import sys
 import os
 import subprocess
-from api_compatibility import check_kim_api_compatibility
+from scripts.api_compatibility import check_kim_api_compatibility
 
 
 # remove `-Wstrict-prototypes' that is for C not C++

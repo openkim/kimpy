@@ -15,7 +15,7 @@ before_install:
 
   # environment variable
   - export KIMPY_DIR=$PWD
-  - export KIM_API_VERSION=0.2.3
+  - export KIM_API_VERSION=2.0.2
 
 
 install:

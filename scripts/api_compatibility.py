@@ -1,16 +1,31 @@
 from collections import OrderedDict
+import os
 
-# key: kimpy version
-# value['target']: the version of kim-api that kimpy targets for
-# value['backward']: the version of kim-api that kimpy is backward compatible with
-CompatibleTable = OrderedDict()
-CompatibleTable['0.1.1'] = {'target': '2.0.0', 'backward': '2.0.0'}
-CompatibleTable['0.1.2'] = {'target': '2.0.0', 'backward': '2.0.0'}
-CompatibleTable['0.1.3'] = {'target': '2.0.0', 'backward': '2.0.0'}
-CompatibleTable['0.2.0'] = {'target': '2.0.0', 'backward': '2.0.0'}
-CompatibleTable['0.2.1'] = {'target': '2.0.1', 'backward': '2.0.0'}
-CompatibleTable['0.2.2'] = {'target': '2.0.1', 'backward': '2.0.0'}
-CompatibleTable['0.2.3'] = {'target': '2.0.2', 'backward': '2.0.0'}
+
+def read_compatible_table(path=None):
+    """Read the compatible table.
+
+    Return
+    ------
+    An OrderedDict, with
+    key: kimpy version
+    value['target']: kim-api version that kimpy targets for
+    value['backward']: kim-api version that kimpy is backward compatible with
+    """
+    if path is None:
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(os.path.dirname(this_dir), 'api_compatibility.txt')
+
+    CompatibleTable = OrderedDict()
+    with open(path, 'r') as fin:
+        for line in fin:
+            line = line.strip()
+            if not line or line[0] == '#':
+                continue
+            kimpy_v, api_target_v, api_backward_v = line.split()
+            CompatibleTable[kimpy_v] = {'target': api_target_v,
+                                        'backward': api_backward_v}
+    return CompatibleTable
 
 
 def compare_version(x, y):
@@ -41,7 +56,7 @@ def compare_version(x, y):
                 return '='
 
 
-def suggest_kimpy(api_v):
+def suggest_kimpy(api_v, CompatibleTable):
     """Suggestion a kimpy version for the given api version.
 
     Always suggest the latest kimpy compatible with the given api.
@@ -62,6 +77,8 @@ def suggest_kimpy(api_v):
 
 
 def check_kim_api_compatibility(kimpy_v, api_v):
+
+    CompatibleTable = read_compatible_table()
 
     # check whether we have kimpy for the specified api
     latest_kimpy = next(reversed(CompatibleTable))  # last key in OrderedDict
@@ -103,7 +120,7 @@ def check_kim_api_compatibility(kimpy_v, api_v):
                     'yet. Ask Mingjian Wen (wenxx151@umn.edu) to update kimpy.\n'
                     .format(api_v))
         else:
-            compatible_kimpy = suggest_kimpy(api_v)
+            compatible_kimpy = suggest_kimpy(api_v, CompatibleTable)
             msg3 = ('  (2) Switch kimpy version. The detected KIM-API is '
                     'compatible with kimpy version "{}".\n'.format(compatible_kimpy))
         msg = msg1 + msg2 + msg3
@@ -114,5 +131,5 @@ def check_kim_api_compatibility(kimpy_v, api_v):
 
 
 if __name__ == '__main__':
-    msg = check_kim_api_compatibility('0.1.6', '2.0.0')
+    msg = check_kim_api_compatibility('0.2.3', '2.0.1')
     print(msg)
