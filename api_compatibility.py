@@ -14,7 +14,7 @@ def read_compatible_table(path=None):
     """
     if path is None:
         this_dir = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.join(os.path.dirname(this_dir), 'api_compatibility.txt')
+        path = os.path.join(this_dir, 'api_compatibility.txt')
 
     CompatibleTable = OrderedDict()
     with open(path, 'r') as fin:
