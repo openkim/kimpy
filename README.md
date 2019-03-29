@@ -1,6 +1,6 @@
 # kimpy
 
-[![Build Status](https://travis-ci.com/mjwen/kimpy.svg?branch=master)](https://travis-ci.com/mjwen/kimpy)
+[![Build Status](https://travis-ci.com/openkim/kimpy.svg?branch=master)](https://travis-ci.com/openkim/kimpy)
 
 Kimpy is the Python interface to the KIM API. For more information about the KIM API, see: https://openkim.org/kim-api/
 
@@ -84,7 +84,3 @@ All the attributes of the module are listed under `DATA`. For example,
     	...
     	particleSpeciesCodes = particleSpeciesCodes
 
-
-## Contact
-
-Mingjian Wen (wenxx151@umn.edu)
