@@ -31,3 +31,5 @@ tests/test_model_routine_name.py
 tests/test_compute_callback_name.py
 tests/test_support_status.py
 tests/test_log_verbosity.py
+tests/test_collection.py
+tests/test_collection_item_type.py
