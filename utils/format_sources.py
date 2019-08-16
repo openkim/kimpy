@@ -34,7 +34,7 @@ def format_py_code(path):
     print('Formatting .py files done.')
 
 
-def format_cpp_code(path):
+def format_cpp_code(path, exclude=['KIM_ComputeArguments_bind.cpp']):
     path = os.path.abspath(path)
     print(
         'Formating CPP files in directory "{}" and its subdirectories using '
@@ -42,10 +42,17 @@ def format_cpp_code(path):
     )
     files = get_files(path)
     for f in files:
+        ignore = False
+        for i in exclude:
+            if i in f:
+                ignore = True
+                break
+        if ignore:
+            continue
         subprocess.call(['clang-format', '-i', '-style=file', f])
     print('Formatting CPP files done.')
 
 
 if __name__ == '__main__':
     format_py_code('../')
-    # format_cpp_code('../')
+    format_cpp_code('../')
