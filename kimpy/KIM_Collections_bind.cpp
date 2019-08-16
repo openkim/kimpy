@@ -88,7 +88,7 @@ PYBIND11_MODULE(collections, module) {
       re[2] = fileRawData;
       re[3] = availableAsString;
       re[4] = *fileString;
-      re[6] = error;
+      re[5] = error;
       return re;
     },
     "Return(fileName, fileLength, fileRawData, availableAsString, fileString, error)"
@@ -192,7 +192,7 @@ PYBIND11_MODULE(collections, module) {
       re[2] = fileRawData;
       re[3] = availableAsString;
       re[4] = *fileString;
-      re[6] = error;
+      re[5] = error;
       return re;
     },
     "Return(fileName, fileLength, fileRawData, availableAsString, fileString, error)"
@@ -257,6 +257,7 @@ PYBIND11_MODULE(collections, module) {
       py::tuple re(2);
       re[0] = extent;
       re[1] = error;
+      return re;
     },
     "Return(extent, error)"
   )
@@ -269,6 +270,7 @@ PYBIND11_MODULE(collections, module) {
       py::tuple re(2);
       re[0] = *directoryName;
       re[1] = error;
+      return re;
     },
     "Return(directoryName, error)"
   )
@@ -296,8 +298,8 @@ PYBIND11_MODULE(collections, module) {
   );
 
   module.def("destroy",
-    [](Model * self) {
-      Model::Destroy(&self);
+    [](Collections * self) {
+      Collections::Destroy(&self);
     }
   );
 
