@@ -24,7 +24,7 @@ PYBIND11_MODULE(collections, module) {
   // python constructor needs to return a pointer to the C++ instance
   cl.def(py::init(
     [](py::array_t<int> error) {
-      Collection * co;
+      Collections * co;
       int* e = error.mutable_data(0);
       e[0] = Collections::Create(&co);
       return co;
@@ -34,7 +34,7 @@ PYBIND11_MODULE(collections, module) {
   .def("get_item_type",
     [](Collections& self, std::string const & itemName) {
       CollectionItemType itemType;
-      int error = self.GetInfluenceDistance(&itemType);
+      int error = self.GetItemType(itemName, &itemType);
 
       py::tuple re(2);
       re[0] = itemType;
@@ -62,7 +62,7 @@ PYBIND11_MODULE(collections, module) {
   .def("cache_list_of_item_metadata_files",
     [](Collections& self, CollectionItemType const itemType, std::string const & itemName) {
       int extent;
-      int error = CacheListOfItemMetadataFiles(itemType, itemName, &extent);
+      int error = self.CacheListOfItemMetadataFiles(itemType, itemName, &extent);
 
       py::tuple re(2);
       re[0] = extent;
@@ -97,7 +97,7 @@ PYBIND11_MODULE(collections, module) {
   .def("cache_list_of_item_names_by_type",
     [](Collections& self, CollectionItemType const itemType) {
       int extent;
-      int error = self.CacheListOfItemNamesByType(modelDriver, &extent);
+      int error = self.CacheListOfItemNamesByType(itemType, &extent);
 
       py::tuple re(2);
       re[0] = extent;
@@ -108,7 +108,7 @@ PYBIND11_MODULE(collections, module) {
   )
 
   .def("get_item_name_by_type",
-    [](Collections& self, int const intex) {
+    [](Collections& self, int const index) {
       std::string const * name;
       int error = self.GetItemNameByType(index, &name);
 
@@ -137,7 +137,7 @@ PYBIND11_MODULE(collections, module) {
   .def("get_item_name_by_collection_and_type",
     [](Collections& self, int const index) {
       std::string const * name;
-      int error = self.GetItemNameByCollectionAndType(i, &name);
+      int error = self.GetItemNameByCollectionAndType(index, &name);
 
       py::tuple re(2);
       re[0] = *name;
@@ -199,7 +199,7 @@ PYBIND11_MODULE(collections, module) {
     "Return(fileName, fileLength, fileRawData, availableAsString, fileString, error)"
   )
 
-  .def("get_project_name_and_semver",
+  .def("get_project_name_and_sem_ver",
     [](Collections& self) {
       std::string const * project;
       std::string const * semVer;
@@ -230,7 +230,7 @@ PYBIND11_MODULE(collections, module) {
     [](Collections& self) {
       std::string const * name;
       std::string const * value;
-      self.GetConfigurationFileEnvironmentVariable(name, value);
+      self.GetConfigurationFileEnvironmentVariable(&name, &value);
 
       py::tuple re(2);
       re[0] = *name;
@@ -262,10 +262,10 @@ PYBIND11_MODULE(collections, module) {
     "Return(extent, error)"
   )
 
-  .def(" ",
+  .def("get_directory_name",
     [](Collections& self, int const index) {
       std::string const * directoryName;
-      int error = self.GetDirectoryName(intex, &directoryName);
+      int error = self.GetDirectoryName(index, &directoryName);
 
       py::tuple re(2);
       re[0] = *directoryName;
@@ -274,20 +274,19 @@ PYBIND11_MODULE(collections, module) {
     "Return(directoryName, error)"
   )
 
-  .def("set_log_id", &Model::SetLogID)
+  .def("set_log_id", &Collections::SetLogID)
 
-  .def("push_log_verbosity", &Model::PushLogVerbosity)
+  .def("push_log_verbosity", &Collections::PushLogVerbosity)
 
-  .def("pop_log_verbosity", &Model::PopLogVerbosity);
+  .def("pop_log_verbosity", &Collections::PopLogVerbosity);
 
 
   // module functions
 
   module.def("create",
     []() {
-      Collection * co;
+      Collections * co;
       int error = Collections::Create(&co);
-      return co;
 
       py::tuple re(2);
       re[0] = co;

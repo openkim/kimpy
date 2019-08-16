@@ -13,10 +13,10 @@ for key, value in cfg_vars.items():
         cfg_vars[key] = value.replace('-Wstrict-prototypes', '')
 
 
-# run scripts to generate files
-dir_path = os.path.dirname(os.path.realpath(__file__))
-fname = os.path.join(dir_path, 'scripts', 'generate_all.py')
-subprocess.call(['python', fname])
+## run scripts to generate files
+#dir_path = os.path.dirname(os.path.realpath(__file__))
+#fname = os.path.join(dir_path, 'scripts', 'generate_all.py')
+#subprocess.call(['python', fname])
 
 
 def inquire_kim_api(key):
@@ -168,7 +168,11 @@ module_names = [
     'temperature_unit',
     'time_unit',
     'sem_ver',
-    'log']
+    'log',
+    'collections',
+    'collection',
+    'collection_item_type',
+    ]
 
 kimpy_ext_modules = [get_extension_2(name) for name in module_names]
 

@@ -1,4 +1,4 @@
-__version__ = "0.2.4"
+__version__ = "0.3.0"
 
 # import all modules
 from . import model
@@ -19,6 +19,10 @@ from . import temperature_unit
 from . import time_unit
 from . import sem_ver
 from . import log
+from . import collections
+from . import collection
+from . import collection_item_type
+
 from . import neighlist
 
 
@@ -42,5 +46,8 @@ __all__ = [
     'time_unit',
     'sem_ver',
     'log',
+    'collections',
+    'collection',
+    'collection_item_type',
     'neighlist',
 ]
