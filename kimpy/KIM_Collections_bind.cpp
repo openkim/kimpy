@@ -44,7 +44,7 @@ PYBIND11_MODULE(collections, module) {
     "Return(itemType, error)"
   )
 
-  .def("get_item_library_filename_and_collection",
+  .def("get_item_library_file_name_and_collection",
     [](Collections& self, CollectionItemType const itemType, std::string const & itemName) {
       std::string const * fileName;
       Collection collection;
@@ -109,15 +109,15 @@ PYBIND11_MODULE(collections, module) {
 
   .def("get_item_name_by_type",
     [](Collections& self, int const index) {
-      std::string const * name;
-      int error = self.GetItemNameByType(index, &name);
+      std::string const * itemName;
+      int error = self.GetItemNameByType(index, &itemName);
 
       py::tuple re(2);
-      re[0] = *name;
+      re[0] = *itemName;
       re[1] = error;
       return re;
     },
-    "Return(name, error)"
+    "Return(itemName, error)"
   )
 
   .def("cache_list_of_item_names_by_collection_and_type",
@@ -133,18 +133,17 @@ PYBIND11_MODULE(collections, module) {
     "Return(extent, error)"
   )
 
-
   .def("get_item_name_by_collection_and_type",
     [](Collections& self, int const index) {
-      std::string const * name;
-      int error = self.GetItemNameByCollectionAndType(index, &name);
+      std::string const * itemName;
+      int error = self.GetItemNameByCollectionAndType(index, &itemName);
 
       py::tuple re(2);
-      re[0] = *name;
+      re[0] = *itemName;
       re[1] = error;
       return re;
     },
-    "Return(name, error)"
+    "Return(itemName, error)"
   )
 
   .def("get_item_library_file_name_by_collection_and_type",
@@ -201,16 +200,16 @@ PYBIND11_MODULE(collections, module) {
 
   .def("get_project_name_and_sem_ver",
     [](Collections& self) {
-      std::string const * project;
+      std::string const * projectName;
       std::string const * semVer;
-      self.GetProjectNameAndSemVer(&project, &semVer);
+      self.GetProjectNameAndSemVer(&projectName, &semVer);
 
       py::tuple re(2);
-      re[0] = *project;
+      re[0] = *projectName;
       re[1] = *semVer;
       return re;
     },
-    "Return(project, semVer)"
+    "Return(projectName, semVer)"
   )
 
   .def("get_environment_variable_name",
@@ -240,7 +239,7 @@ PYBIND11_MODULE(collections, module) {
     "Return(name, value)"
   )
 
-  .def("get_configuration_filename",
+  .def("get_configuration_file_name",
     [](Collections& self) {
       std::string const * fileName;
       self.GetConfigurationFileName(&fileName);
