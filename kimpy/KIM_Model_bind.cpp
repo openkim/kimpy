@@ -54,22 +54,25 @@ PYBIND11_MODULE(model, module)
             int required;
             int error
                 = self.IsRoutinePresent(modelRoutineName, &present, &required);
+
             py::tuple re(3);
             re[0] = present;
             re[1] = required;
             re[2] = error;
-
             return re;
           },
           py::arg("ModelRoutineName"),
           "Return(present, required, error)")
 
-      .def("get_influence_distance",
-           [](Model & self) {
-             double influenceDistance;
-             self.GetInfluenceDistance(&influenceDistance);
-             return influenceDistance;
-           })
+      .def(
+          "get_influence_distance",
+          [](Model & self) {
+            double influenceDistance;
+            self.GetInfluenceDistance(&influenceDistance);
+
+            return influenceDistance;
+          },
+          "Return influenceDistance")
 
       .def(
           "get_neighbor_list_cutoffs_and_hints",
@@ -95,7 +98,6 @@ PYBIND11_MODULE(model, module)
             py::tuple re(2);
             re[0] = cutoffs;
             re[1] = paddingNoNeighborHints;
-
             return re;
           },
           "Return (cutoffs, "
@@ -154,7 +156,8 @@ PYBIND11_MODULE(model, module)
             int error = self.ComputeArgumentsDestroy(&computeArguments);
             return error;
           },
-          py::arg("ComputeArguments"))
+          py::arg("ComputeArguments"),
+          "Return error")
 
       .def(
           "compute",
@@ -174,7 +177,8 @@ PYBIND11_MODULE(model, module)
             }
           },
           py::arg("ComputeArguments"),
-          py::arg("release_GIL") = false)
+          py::arg("release_GIL") = false,
+          "Return error")
 
       .def("clear_then_refresh", &Model::ClearThenRefresh)
 
@@ -188,7 +192,8 @@ PYBIND11_MODULE(model, module)
             return error;
           },
           py::arg("path"),
-          py::arg("modelName"))
+          py::arg("modelName"),
+          "Return error")
 
       .def(
           "get_species_support_and_code",
@@ -207,12 +212,14 @@ PYBIND11_MODULE(model, module)
           py::arg("SpeciesName"),
           "Return(speciesIsSupported, code, error)")
 
-      .def("get_number_of_parameters",
-           [](Model & self) {
-             int numberOfParameters;
-             self.GetNumberOfParameters(&numberOfParameters);
-             return numberOfParameters;
-           })
+      .def(
+          "get_number_of_parameters",
+          [](Model & self) {
+            int numberOfParameters;
+            self.GetNumberOfParameters(&numberOfParameters);
+            return numberOfParameters;
+          },
+          "Return numberOfParameters")
 
       .def(
           "get_parameter_metadata",
@@ -271,6 +278,7 @@ PYBIND11_MODULE(model, module)
       .def("set_parameter",
            (int (Model::*)(int const, int const, int const))
                & Model::SetParameter)
+
       .def("set_parameter",
            (int (Model::*)(int const, int const, double const))
                & Model::SetParameter)

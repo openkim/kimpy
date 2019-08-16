@@ -43,11 +43,12 @@ PYBIND11_MODULE(field_name, module) {
       int numberOfFieldNames;
       FIELD_NAME::GetNumberOfFieldNames(&numberOfFieldNames);
       return numberOfFieldNames;
-    }
+    },
+    "Return numberOfFieldNames"
   );
 
 
-  // attrributes
+  // attributes
 rpls_attributes
 
 }

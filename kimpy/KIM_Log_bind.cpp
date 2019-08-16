@@ -42,22 +42,33 @@ PYBIND11_MODULE(log, module)
       // set_parameters in KIM_Model.hpp, because here the first argument is a
       // self-defined class. If we do that, pybind11 will report argument type
       // matching error.
-      .def("log_entry",
-           [](Log & self,
-              LogVerbosity const logVerbosity,
-              std::string const & message,
-              int const lineNumber,
-              std::string const & fileName) {
-             self.LogEntry(logVerbosity, message, lineNumber, fileName);
-           })
-      .def("log_entry",
-           [](Log & self,
-              LogVerbosity const logVerbosity,
-              std::stringstream const & message,
-              int const lineNumber,
-              std::string const & fileName) {
-             self.LogEntry(logVerbosity, message, lineNumber, fileName);
-           });
+      .def(
+          "log_entry",
+          [](Log & self,
+             LogVerbosity const logVerbosity,
+             std::string const & message,
+             int const lineNumber,
+             std::string const & fileName) {
+            self.LogEntry(logVerbosity, message, lineNumber, fileName);
+          },
+          py::arg("logVerbosity"),
+          py::arg("message"),
+          py::arg("lineNumber"),
+          py::arg("fileNmae"))
+
+      .def(
+          "log_entry",
+          [](Log & self,
+             LogVerbosity const logVerbosity,
+             std::stringstream const & message,
+             int const lineNumber,
+             std::string const & fileName) {
+            self.LogEntry(logVerbosity, message, lineNumber, fileName);
+          },
+          py::arg("logVerbosity"),
+          py::arg("message"),
+          py::arg("lineNumber"),
+          py::arg("fileNmae"));
 
 
   // module functions

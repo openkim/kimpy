@@ -42,6 +42,7 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("itemName"),
           "Return(itemType, error)")
 
       .def(
@@ -60,6 +61,8 @@ PYBIND11_MODULE(collections, module)
             re[2] = error;
             return re;
           },
+          py::arg("itemType"),
+          py::arg("itemName"),
           "Return(fileName, collection, error)")
 
       .def(
@@ -76,6 +79,8 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("itemType"),
+          py::arg("itemName"),
           "Return(extent, error)")
 
       .def(
@@ -102,6 +107,7 @@ PYBIND11_MODULE(collections, module)
             re[5] = error;
             return re;
           },
+          py::arg("index"),
           "Return(fileName, fileLength, fileRawData, availableAsString, "
           "fileString, error)")
 
@@ -116,6 +122,7 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("itemType"),
           "Return(extent, error)")
 
       .def(
@@ -129,6 +136,7 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("index"),
           "Return(itemName, error)")
 
       .def(
@@ -145,6 +153,8 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("collection"),
+          py::arg("itemType"),
           "Return(extent, error)")
 
       .def(
@@ -158,6 +168,7 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("index"),
           "Return(itemName, error)")
 
       .def(
@@ -175,6 +186,9 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("collection"),
+          py::arg("itemType"),
+          py::arg("itemName"),
           "Return(fileName, error)")
 
       .def(
@@ -192,6 +206,9 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("collection"),
+          py::arg("itemType"),
+          py::arg("itemName"),
           "Return(extent, error)")
 
       .def(
@@ -219,6 +236,7 @@ PYBIND11_MODULE(collections, module)
             re[5] = error;
             return re;
           },
+          py::arg("index"),
           "Return(fileName, fileLength, fileRawData, availableAsString, "
           "fileString, error)")
 
@@ -247,6 +265,7 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("itemType"),
           "Return(name, error)")
 
       .def(
@@ -287,6 +306,8 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("collection"),
+          py::arg("itemType"),
           "Return(extent, error)")
 
       .def(
@@ -300,6 +321,7 @@ PYBIND11_MODULE(collections, module)
             re[1] = error;
             return re;
           },
+          py::arg("index"),
           "Return(directoryName, error)")
 
       .def("set_log_id", &Collections::SetLogID)

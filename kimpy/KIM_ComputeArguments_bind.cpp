@@ -105,7 +105,7 @@ PYBIND11_MODULE(compute_arguments, module)
           [](ComputeArguments & self,
              ComputeCallbackName const computeCallbackName,
              void const * const
-                 fptr,  // cannpt use: KIM::Function * const fptr
+                 fptr,  // cannot use: KIM::Function * const fptr
                         // the argument passed in is of type: void const *
                         // we cast type explicitly in the funciton body
              void * const dataObject) {

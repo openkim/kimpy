@@ -64,6 +64,7 @@ PYBIND11_MODULE(simulator_model, module)
             re[1] = error;
             return re;
           },
+          py::arg("index"),
           "Return(speciesName, error)")
 
       .def("open_and_initialize_template_map",
@@ -74,7 +75,6 @@ PYBIND11_MODULE(simulator_model, module)
       .def("add_template_map", &SimulatorModel::AddTemplateMap)
 
       .def("close_template_map", &SimulatorModel::CloseTemplateMap)
-
 
       .def(
           "get_number_of_simulator_fields",
@@ -100,6 +100,7 @@ PYBIND11_MODULE(simulator_model, module)
             re[2] = error;
             return re;
           },
+          py::arg("fieldIndex"),
           "Return(extent, fieldName, error)")
 
       .def(
@@ -114,6 +115,8 @@ PYBIND11_MODULE(simulator_model, module)
             re[1] = error;
             return re;
           },
+          py::arg("fieldIndex"),
+          py::arg("lineIndex"),
           "Return(lineValue, error)")
 
       .def(
@@ -157,6 +160,7 @@ PYBIND11_MODULE(simulator_model, module)
             re[1] = error;
             return re;
           },
+          py::arg("index"),
           "Return(paramFileName, error)")
 
       .def("__repr__", &SimulatorModel::ToString)
