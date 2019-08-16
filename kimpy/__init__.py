@@ -22,6 +22,7 @@ from . import log
 from . import collections
 from . import collection
 from . import collection_item_type
+from . import simulator_model
 
 from . import neighlist
 
@@ -49,5 +50,6 @@ __all__ = [
     'collections',
     'collection',
     'collection_item_type',
+    'simulator_model',
     'neighlist',
 ]

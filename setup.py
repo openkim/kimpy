@@ -172,6 +172,7 @@ module_names = [
     'collections',
     'collection',
     'collection_item_type',
+    'simulator_model',
     ]
 
 kimpy_ext_modules = [get_extension_2(name) for name in module_names]
