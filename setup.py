@@ -13,29 +13,33 @@ for key, value in cfg_vars.items():
         cfg_vars[key] = value.replace('-Wstrict-prototypes', '')
 
 
-## run scripts to generate files
-#dir_path = os.path.dirname(os.path.realpath(__file__))
-#fname = os.path.join(dir_path, 'scripts', 'generate_all.py')
-#subprocess.call(['python', fname])
+# run scripts to generate files
+dir_path = os.path.dirname(os.path.realpath(__file__))
+fname = os.path.join(dir_path, 'scripts', 'generate_all.py')
+subprocess.call(['python', fname])
 
 
 def inquire_kim_api(key):
     """ Get compile and link flags of kim-api."""
     try:
-        config = subprocess.check_output(['pkg-config', key, 'libkim-api'],
-                                         universal_newlines=True)
+        config = subprocess.check_output(
+            ['pkg-config', key, 'libkim-api'], universal_newlines=True
+        )
     except:
-        raise Exception('"libkim-api" not found. Make sure "kim-api" is '
-                        'installed and do not forget to '
-                        '"source path/to/kim-api-activate".')
+        raise Exception(
+            '"libkim-api" not found. Make sure "kim-api" is '
+            'installed and do not forget to '
+            '"source path/to/kim-api-activate".'
+        )
 
     split_config = [s for s in config.strip().split(' ')]
 
     # remove identifer
     identifier = key[-2:]
     if identifier in ['-I', '-L', '-l']:
-        split_config = [s.replace(identifier, '')
-                        for s in split_config if s.startswith(identifier)]
+        split_config = [
+            s.replace(identifier, '') for s in split_config if s.startswith(identifier)
+        ]
 
     # remove empty string
     split_config = [s for s in split_config if s != '']
@@ -80,6 +84,7 @@ class get_pybind11_includes(object):
 
     def __str__(self):
         import pybind11
+
         return pybind11.get_include(self.user)
 
 
@@ -110,14 +115,16 @@ def get_version(fname=os.path.join('kimpy', '__init__.py')):
 
 
 def get_extension(module_name, sources):
-    return Extension(module_name,
-                     sources=sources,
-                     include_dirs=get_includes(),
-                     library_dirs=get_kim_libdirs(),
-                     libraries=get_kim_ldlibs(),
-                     extra_compile_args=get_extra_compile_args(),
-                     extra_link_args=get_kim_extra_link_args(),
-                     language='c++')
+    return Extension(
+        module_name,
+        sources=sources,
+        include_dirs=get_includes(),
+        library_dirs=get_kim_libdirs(),
+        libraries=get_kim_ldlibs(),
+        extra_compile_args=get_extra_compile_args(),
+        extra_link_args=get_kim_extra_link_args(),
+        language='c++',
+    )
 
 
 def get_extension_2(name):
@@ -126,14 +133,16 @@ def get_extension_2(name):
     name = [i.title() for i in name]
     name = ''.join(name)
     sources = ['kimpy/KIM_{}_bind.cpp'.format(name)]
-    return Extension(module_name,
-                     sources=sources,
-                     include_dirs=get_includes(),
-                     library_dirs=get_kim_libdirs(),
-                     libraries=get_kim_ldlibs(),
-                     extra_compile_args=get_extra_compile_args(),
-                     extra_link_args=get_kim_extra_link_args(),
-                     language='c++')
+    return Extension(
+        module_name,
+        sources=sources,
+        include_dirs=get_includes(),
+        library_dirs=get_kim_libdirs(),
+        libraries=get_kim_ldlibs(),
+        extra_compile_args=get_extra_compile_args(),
+        extra_link_args=get_kim_extra_link_args(),
+        language='c++',
+    )
 
 
 # check api compatibility
@@ -173,32 +182,36 @@ module_names = [
     'collection',
     'collection_item_type',
     'simulator_model',
-    ]
+]
 
 kimpy_ext_modules = [get_extension_2(name) for name in module_names]
 
-neighlist_ext_module = [get_extension(
-    'kimpy.neighlist',
-    ['kimpy/neighlist/neighbor_list.cpp',
-     'kimpy/neighlist/neighbor_list_bind.cpp'])]
+neighlist_ext_module = [
+    get_extension(
+        'kimpy.neighlist',
+        ['kimpy/neighlist/neighbor_list.cpp', 'kimpy/neighlist/neighbor_list_bind.cpp'],
+    )
+]
 
-setup(name='kimpy',
-      version=get_version(),
-      packages=['kimpy'],
-      ext_modules=kimpy_ext_modules + neighlist_ext_module,
-      install_requires=['pybind11', 'numpy', 'pytest'],
-      author='Mingjian Wen',
-      author_email='wenxx151@umn.edu',
-      url='https://github.com/openkim/kimpy',
-      description='Python interface to the KIM API',
-      long_description='Python interface to the KIM API. For more information '
-                       'about the KIM API, please see: https://openkim.org/kim-api/',
-      classifiers=(
-          'Programming Language :: Python :: 2.7',
-          'Programming Language :: Python :: 3.5',
-          'Programming Language :: Python :: 3.6',
-          'Programming Language :: Python :: 3.7',
-          'License :: OSI Approved :: Common Development and Distribution License 1.0 (CDDL-1.0)',
-          'Operating System :: OS Independent',
-      ),
-      zip_safe=False)
+setup(
+    name='kimpy',
+    version=get_version(),
+    packages=['kimpy'],
+    ext_modules=kimpy_ext_modules + neighlist_ext_module,
+    install_requires=['pybind11', 'numpy', 'pytest'],
+    author='Mingjian Wen',
+    author_email='wenxx151@umn.edu',
+    url='https://github.com/openkim/kimpy',
+    description='Python interface to the KIM API',
+    long_description='Python interface to the KIM API. For more information '
+    'about the KIM API, please see: https://openkim.org/kim-api/',
+    classifiers=[
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'License :: OSI Approved :: Common Development and Distribution License 1.0 (CDDL-1.0)',
+        'Operating System :: OS Independent',
+    ],
+    zip_safe=False,
+)

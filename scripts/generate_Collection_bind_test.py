@@ -5,14 +5,11 @@ fields = {
     'FIELD_NAME': 'COLLECTION',
     'FieldName': 'Collection',
     'fieldName': 'collection',
-    'field_name': 'collection'}
+    'field_name': 'collection',
+}
 
 
-attributes = [
-    'system',
-    'user',
-    'environmentVariable',
-    'currentWorkingDirectory']
+attributes = ['system', 'user', 'environmentVariable', 'currentWorkingDirectory']
 
 
 generate_bind(fields, attributes)

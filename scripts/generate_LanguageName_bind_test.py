@@ -5,13 +5,11 @@ fields = {
     'FIELD_NAME': 'LANGUAGE_NAME',
     'FieldName': 'LanguageName',
     'fieldName': 'languageName',
-    'field_name': 'language_name'}
+    'field_name': 'language_name',
+}
 
 
-attributes = [
-    'cpp',
-    'c',
-    'fortran']
+attributes = ['cpp', 'c', 'fortran']
 
 
 generate_bind(fields, attributes)

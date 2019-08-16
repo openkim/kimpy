@@ -8,16 +8,16 @@ def create_graphite_unit_cell(alat=2.46, d=3.35):
 
     cell = np.zeros(9).reshape(3, 3)
     cell[0][0] = alat
-    cell[1][0] = 0.5*alat
-    cell[1][1] = np.sqrt(3)*0.5*alat
-    cell[2][2] = 2*d
+    cell[1][0] = 0.5 * alat
+    cell[1][1] = np.sqrt(3) * 0.5 * alat
+    cell[2][2] = 2 * d
     cell = np.asarray(cell, dtype=np.double)
 
     coords = []
     coords.append([0, 0, 0])
-    coords.append(cell[0]/3. + cell[1]/3.)
-    coords.append(cell[0]/3. + cell[1]/3. + cell[2]/2.)
-    coords.append(cell[0]*2/3. + cell[1]*2/3. + cell[2]/2.)
+    coords.append(cell[0] / 3.0 + cell[1] / 3.0)
+    coords.append(cell[0] / 3.0 + cell[1] / 3.0 + cell[2] / 2.0)
+    coords.append(cell[0] * 2 / 3.0 + cell[1] * 2 / 3.0 + cell[2] / 2.0)
     coords = np.asarray(coords, dtype=np.double)
 
     species = np.array([1, 1, 2, 2], dtype=np.intc)
@@ -48,8 +48,11 @@ def write_XYZ(fname, lat_vec, species, coords):
         # body
         for i in range(len(species)):
             fout.write('{:3d} '.format(species[i]))
-            fout.write('{:13.5e} {:13.5e} {:13.5e}'.format(
-                coords[i][0], coords[i][1], coords[i][2]))
+            fout.write(
+                '{:13.5e} {:13.5e} {:13.5e}'.format(
+                    coords[i][0], coords[i][1], coords[i][2]
+                )
+            )
             fout.write('\n')
 
 
@@ -61,16 +64,15 @@ def test_main():
     cell, contrib_coords, contrib_species = create_graphite_unit_cell(alat, d)
 
     # create padding atoms
-    cutoffs = np.array([d+0.01, d+0.02], dtype=np.double)
+    cutoffs = np.array([d + 0.01, d + 0.02], dtype=np.double)
     influence_dist = cutoffs[1]
     pbc = np.array([1, 1, 1], dtype=np.intc)
-    out = nl.create_paddings(influence_dist, cell, pbc,
-                             contrib_coords, contrib_species)
+    out = nl.create_paddings(influence_dist, cell, pbc, contrib_coords, contrib_species)
     pad_coords, pad_species, pad_image, error = out
     check_error(error, 'nl.create_padding')
 
     assert pad_coords.shape == (96, 3)
-    #print('pad_coords is of shape:', pad_coords.shape)
+    # print('pad_coords is of shape:', pad_coords.shape)
 
     coords = np.concatenate((contrib_coords, pad_coords))
     coords = np.asarray(coords, dtype=np.double)
@@ -97,8 +99,7 @@ def test_main():
     # test get neigh function
     neigh_list_index = 0
     particle = 1
-    num_neigh, neighbors, error = nl.get_neigh(
-        neigh, cutoffs, neigh_list_index, particle)
+    num_neigh, neighbors, error = nl.get_neigh(neigh, cutoffs, neigh_list_index, particle)
     check_error(error, 'nl.get_neigh')
     assert num_neigh == 14
     # print('Atom 1 has {} neighbors:'.format(num_neigh), end=' ')
@@ -107,16 +108,15 @@ def test_main():
 
     neigh_list_index = 1
     particle = 4
-    num_neigh, neighbors, error = nl.get_neigh(
-        neigh, cutoffs, neigh_list_index, particle)
+    num_neigh, neighbors, error = nl.get_neigh(neigh, cutoffs, neigh_list_index, particle)
     check_error(error, 'nl.get_neigh')
     assert num_neigh == 0
 
     # expect error message from this
-    #neigh_list_index = 1
-    #particle = n_contrib + n_pad
-    #num_neigh, neighbors, error = nl.get_neigh(neigh, cutoffs, neigh_list_index, particle)
-    #assert error == 1
+    # neigh_list_index = 1
+    # particle = n_contrib + n_pad
+    # num_neigh, neighbors, error = nl.get_neigh(neigh, cutoffs, neigh_list_index, particle)
+    # assert error == 1
 
     # delete neighbor list
     nl.clean(neigh)

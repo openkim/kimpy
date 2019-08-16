@@ -20,6 +20,8 @@ kimpy/KIM_ModelRoutineName_bind.cpp
 kimpy/KIM_ComputeCallbackName_bind.cpp
 kimpy/KIM_SupportStatus_bind.cpp
 kimpy/KIM_LogVerbosity_bind.cpp
+kimpy/KIM_Collection_bind.cpp
+kimpy/KIM_CollectionItemType_bind.cpp
 
 tests/species_name_attributes.py
 tests/*_unit.py

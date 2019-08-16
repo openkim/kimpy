@@ -5,14 +5,11 @@ fields = {
     'FIELD_NAME': 'COLLECTION_ITEM_TYPE',
     'FieldName': 'CollectionItemType',
     'fieldName': 'collectionItemType',
-    'field_name': 'collection_item_type'}
+    'field_name': 'collection_item_type',
+}
 
 
-attributes = [
-    'modelDriver',
-    'portableModel',
-    'simulatorModel'
-    ]
+attributes = ['modelDriver', 'portableModel', 'simulatorModel']
 
 
 generate_bind(fields, attributes)

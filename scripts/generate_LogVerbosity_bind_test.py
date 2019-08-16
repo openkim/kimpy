@@ -13,13 +13,7 @@ fields['fieldName'] = 'logVerbosity'
 fields['field_name'] = 'log_verbosity'
 
 
-attributes = [
-    'silent',
-    'fatal',
-    'error',
-    'warning',
-    'information',
-    'debug']
+attributes = ['silent', 'fatal', 'error', 'warning', 'information', 'debug']
 
 
 generate_bind(fields, attributes)

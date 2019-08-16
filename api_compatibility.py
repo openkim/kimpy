@@ -23,8 +23,10 @@ def read_compatible_table(path=None):
             if not line or line[0] == '#':
                 continue
             kimpy_v, api_target_v, api_backward_v = line.split()
-            CompatibleTable[kimpy_v] = {'target': api_target_v,
-                                        'backward': api_backward_v}
+            CompatibleTable[kimpy_v] = {
+                'target': api_target_v,
+                'backward': api_backward_v,
+            }
     return CompatibleTable
 
 
@@ -108,21 +110,30 @@ def check_kim_api_compatibility(kimpy_v, api_v):
             c2 = True
 
     if not c1 or not c2:
-        msg1 = ('KIM-API version "{}" detected, which is incompatible with the '
-                'current kimpy of version "{}".\nTry one of the below:\n'
-                .format(api_v, kimpy_v))
-        msg2 = ('  (1) Update KIM-API. The current kimpy is compatible with '
-                'KIM-API versions "{}" ~ "{}" (including).\n'
-                .format(backward, target))
+        msg1 = (
+            'KIM-API version "{}" detected, which is incompatible with the '
+            'current kimpy of version "{}".\nTry one of the below:\n'.format(
+                api_v, kimpy_v
+            )
+        )
+        msg2 = (
+            '  (1) Update KIM-API. The current kimpy is compatible with '
+            'KIM-API versions "{}" ~ "{}" (including).\n'.format(backward, target)
+        )
         if not c1:
-            msg3 = ('  (2) Use the latest kimpy. If you are using the latest kimpy, '
-                    'it seems there is not a kimpy compatible with KIM-API version "{}" '
-                    'yet. Ask Mingjian Wen (wenxx151@umn.edu) to update kimpy.\n'
-                    .format(api_v))
+            msg3 = (
+                '  (2) Use the latest kimpy. If you are using the latest kimpy, '
+                'it seems there is not a kimpy compatible with KIM-API version "{}" '
+                'yet. Ask Mingjian Wen (wenxx151@umn.edu) to update kimpy.\n'.format(
+                    api_v
+                )
+            )
         else:
             compatible_kimpy = suggest_kimpy(api_v, CompatibleTable)
-            msg3 = ('  (2) Switch kimpy version. The detected KIM-API is '
-                    'compatible with kimpy version "{}".\n'.format(compatible_kimpy))
+            msg3 = (
+                '  (2) Switch kimpy version. The detected KIM-API is '
+                'compatible with kimpy version "{}".\n'.format(compatible_kimpy)
+            )
         msg = msg1 + msg2 + msg3
 
     else:

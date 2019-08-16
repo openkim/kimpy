@@ -10,7 +10,8 @@ attributes = [
     kimpy.compute_argument_name.partialForces,
     kimpy.compute_argument_name.partialParticleEnergy,
     kimpy.compute_argument_name.partialVirial,
-    kimpy.compute_argument_name.partialParticleVirial]
+    kimpy.compute_argument_name.partialParticleVirial,
+]
 
 str_names = [
     'numberOfParticles',
@@ -21,7 +22,8 @@ str_names = [
     'partialForces',
     'partialParticleEnergy',
     'partialVirial',
-    'partialParticleVirial']
+    'partialParticleVirial',
+]
 
 data_types = [
     kimpy.data_type.Integer,
@@ -32,7 +34,8 @@ data_types = [
     kimpy.data_type.Double,
     kimpy.data_type.Double,
     kimpy.data_type.Double,
-    kimpy.data_type.Double]
+    kimpy.data_type.Double,
+]
 
 
 def test_main():
@@ -45,7 +48,8 @@ def test_main():
         inst, error = kimpy.compute_argument_name.get_compute_argument_name(i)
         all_instances.append(inst)
         dtype, dtype_error = kimpy.compute_argument_name.get_compute_argument_data_type(
-            inst)
+            inst
+        )
 
         assert error == False
         assert dtype_error == False
@@ -56,7 +60,7 @@ def test_main():
     # test operator overloading
     for i in range(N):
         assert all_instances[i] == all_instances[i]
-        for j in range(i+1, N):
+        for j in range(i + 1, N):
             assert all_instances[i] != all_instances[j]
 
     # test known

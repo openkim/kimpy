@@ -6,8 +6,10 @@ import re
 import os
 import subprocess
 import json
+
 try:
     import requests
+
     requests_available = True
 except ImportError:
     requests_available = False
@@ -39,6 +41,7 @@ def which(program):
     Locate a program file in the user's path.  Return 'None' if the
     program is unavailable.
     '''
+
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
@@ -67,7 +70,8 @@ def web_call(url, querydict):
             resultvec = requests.post(url, data=querydict).json()
         except:
             raise KIMWebCallError(
-                'ERROR: KIM web call using module requests to url "%s" failed.' % url)
+                'ERROR: KIM web call using module requests to url "%s" failed.' % url
+            )
     else:
         # module requests NOT available, so try curl.
         curl_failed = True
@@ -81,7 +85,8 @@ def web_call(url, querydict):
             # execute curl command and capture output
             try:
                 curlstub = subprocess.Popen(
-                    curlcmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    curlcmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                )
                 resultvecstr, curlstderr = curlstub.communicate()
                 # turn string returned by curl into list
                 resultvec = ast.literal_eval(resultvecstr)
@@ -101,7 +106,10 @@ def web_call(url, querydict):
                 wgeturl = url + "?" + ('&').join(wgetargs)
                 try:
                     wgetstub = subprocess.Popen(
-                        ["wget", '-qO', '-', wgeturl], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        ["wget", '-qO', '-', wgeturl],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    )
                     resultvecstr, wgetstderr = wgetstub.communicate()
                     # turn string returned by curl into list
                     resultvec = ast.literal_eval(resultvecstr)
@@ -110,7 +118,8 @@ def web_call(url, querydict):
                     pass
             if wget_failed:
                 raise KIMWebCallError(
-                    'ERROR: Unable to perform KIM web call (tried requests, curl and wget).')
+                    'ERROR: Unable to perform KIM web call (tried requests, curl and wget).'
+                )
 
     if len(resultvec) == 0:
         raise KIMWebCallError('ERROR: KIM query failed to return a result.')
@@ -138,13 +147,15 @@ def _construct_querydict(stringvar, qtype):
         qargs = ["ref_data", "species", "prop", "keys", "units"]
     else:
         raise KIMWebCallError(
-            'ERROR: _construct_query called with unknown query type = "%s"' % qtype)
+            'ERROR: _construct_query called with unknown query type = "%s"' % qtype
+        )
     # Find the opening parenthesis
     try:
         ind_open_paren = stringvar.index("(")
     except:
         raise KIMWebCallError(
-            'ERROR: Open parenthesis "(" missing in "%s" query.' % qtype)
+            'ERROR: Open parenthesis "(" missing in "%s" query.' % qtype
+        )
     # Find arguments and put in dictionary
     querydict = {}
     for i in range(0, len(qargs)):
@@ -153,25 +164,34 @@ def _construct_querydict(stringvar, qtype):
             ind_arg = stringvar.index(qargs[i], ind_open_paren)
         except:
             raise KIMWebCallError(
-                'ERROR: Argument "%s" missing in "%s" query.' % (qargs[i], qtype))
+                'ERROR: Argument "%s" missing in "%s" query.' % (qargs[i], qtype)
+            )
         # For argument i, find the value between the "=" after the argument and the
         # following "," or ")"
         try:
             ind_value_start = stringvar.index("=", ind_arg) + 1
         except:
             raise KIMWebCallError(
-                'ERROR: Argument "%s" not followed by "=" in "%s" query.' % (qargs[i], qtype))
+                'ERROR: Argument "%s" not followed by "=" in "%s" query.'
+                % (qargs[i], qtype)
+            )
         end_delimiter = re.compile(",|\)")
         match_obj = end_delimiter.search(stringvar[ind_value_start:])
         try:
             ind_value_end = match_obj.start() + ind_value_start
         except:
             raise KIMWebCallError(
-                'ERROR: Value of argument "%s" not followed by "," or ")" in "%s" query.' % (qargs[i], qtype))
+                'ERROR: Value of argument "%s" not followed by "," or ")" in "%s" query.'
+                % (qargs[i], qtype)
+            )
         value = stringvar[ind_value_start:ind_value_end]
-        if (value.startswith('"') and not value.endswith('"')) or (value.endswith('"') and not value.startswith('"')):
+        if (value.startswith('"') and not value.endswith('"')) or (
+            value.endswith('"') and not value.startswith('"')
+        ):
             raise KIMWebCallError(
-                'ERROR: Value of argument "%s" is followed by a string that only starts or ends in quotes in "%s" query.' % (qargs[i], qtype))
+                'ERROR: Value of argument "%s" is followed by a string that only starts or ends in quotes in "%s" query.'
+                % (qargs[i], qtype)
+            )
         if value.startswith('"') and value.endswith('"'):
             value = value[1:-1]
         # Place arg-value pair into query dictionary
@@ -186,24 +206,25 @@ def template_check_and_strip_space(stringraw):
     stringvar = ''
     intemplate = False  # True when i points to character within @<...>@
     for i in range(0, len(stringraw)):
-        if stringraw[i:i+2] in ("<@", "@>"):
+        if stringraw[i : i + 2] in ("<@", "@>"):
             raise KIMSMError(
-                'ERROR: Backwards template marker, either "<@" or "@>" detected.')
+                'ERROR: Backwards template marker, either "<@" or "@>" detected.'
+            )
         if intemplate:
-            if stringraw[i:i+2] == '@<':
-                raise KIMSMError(
-                    'ERROR: Invalid template "@< ... @<" detected.')
-            if stringraw[i:i+2] == '>@':
+            if stringraw[i : i + 2] == '@<':
+                raise KIMSMError('ERROR: Invalid template "@< ... @<" detected.')
+            if stringraw[i : i + 2] == '>@':
                 intemplate = False
-            if stringraw[i:i+1] != ' ':
-                stringvar += stringraw[i:i+1]
+            if stringraw[i : i + 1] != ' ':
+                stringvar += stringraw[i : i + 1]
         else:
-            if stringraw[i:i+2] == '>@':
+            if stringraw[i : i + 2] == '>@':
                 raise KIMSMError(
-                    'ERROR: Invalid template ">@" detected without preceding "@<".')
-            if stringraw[i:i+2] == '@<':
+                    'ERROR: Invalid template ">@" detected without preceding "@<".'
+                )
+            if stringraw[i : i + 2] == '@<':
                 intemplate = True
-            stringvar += stringraw[i:i+1]
+            stringvar += stringraw[i : i + 1]
     if intemplate:
         raise KIMSMError('ERROR: Unclosed template "@<..." detected.')
     return stringvar
@@ -220,25 +241,34 @@ def _do_atom_type_template_replacements(stringvar, son, atom_type_son_list_strin
         son = son.strip().lower()
         # Replace @<atom-type-sym-list>@ templates
         stringvar = stringvar.replace(
-            "@<atom-type-"+son+"-list>@", atom_type_son_list_string)
+            "@<atom-type-" + son + "-list>@", atom_type_son_list_string
+        )
         # Loop over all atom types and replace @<atom-type-sym-*>@ templates
         for i in range(0, len(atom_type_son_list_string.split(' '))):
-            atom_type_string = "@<atom-type-"+son+"-" + \
-                str(i+1).strip() + ">@"  # atom types numbered from 1
-            stringvar = stringvar.replace(atom_type_string,
-                                          atom_type_son_list_string.split(' ')[i])
+            atom_type_string = (
+                "@<atom-type-" + son + "-" + str(i + 1).strip() + ">@"
+            )  # atom types numbered from 1
+            stringvar = stringvar.replace(
+                atom_type_string, atom_type_son_list_string.split(' ')[i]
+            )
         # Make sure there are no atom-type-sym-n templates left in stringvar.
         # If there are it means that the requested number n is unavailable
-        if re.search("@<atom-type-"+son+"-[0-9]+", stringvar):
-            req = re.search("@<atom-type-"+son+"-[0-9]+", stringvar).group(0)
-            raise KIMSMError('ERROR: Model requests "%s" out of range of available mapping "%s" from LAMMPS script.' % (
-                req[2:], atom_type_son_list_string))
+        if re.search("@<atom-type-" + son + "-[0-9]+", stringvar):
+            req = re.search("@<atom-type-" + son + "-[0-9]+", stringvar).group(0)
+            raise KIMSMError(
+                'ERROR: Model requests "%s" out of range of available mapping "%s" from LAMMPS script.'
+                % (req[2:], atom_type_son_list_string)
+            )
     return stringvar
 
 
-def template_substitution(stringraw, param_filenames, sm_dirname,
-                          atom_type_sym_list_string="",
-                          atom_type_num_list_string=""):
+def template_substitution(
+    stringraw,
+    param_filenames,
+    sm_dirname,
+    atom_type_sym_list_string="",
+    atom_type_num_list_string="",
+):
     '''
     Substitute standard KIM templates of the form @<...>@ with appropriate text
 
@@ -321,15 +351,17 @@ def template_substitution(stringraw, param_filenames, sm_dirname,
     # Process @<atom-type-*-list>@ and @<atom-type-*-n>@ templates
     #
     stringvar = _do_atom_type_template_replacements(
-        stringvar, 'sym', atom_type_sym_list_string)
+        stringvar, 'sym', atom_type_sym_list_string
+    )
     stringvar = _do_atom_type_template_replacements(
-        stringvar, 'num', atom_type_num_list_string)
+        stringvar, 'num', atom_type_num_list_string
+    )
     #
     # Process @<parameter-file-n>@ template
     #
     # Loop over all parameter files and replace with parameter file names
     for i in range(0, len(param_filenames)):
-        param_string = "@<parameter-file-" + str(i+1).strip() + ">@"
+        param_string = "@<parameter-file-" + str(i + 1).strip() + ">@"
         stringvar = stringvar.replace(param_string, param_filenames[i])
     # Make sure there are no parameter file templates left in stringvar.
     # If there are it means that the requested number is unavailable
@@ -363,10 +395,12 @@ def template_substitution(stringraw, param_filenames, sm_dirname,
         # a "atom-type-sym-list" or "atom-type-sym-n" template, which is
         # left in intentionally if atom_type_sym_list_string is not
         # provided.
-        if req != "@<atom-type-sym-list>@" and \
-           not re.search("@<atom-type-sym-[0-9]+>@", req) and \
-           req != "@<atom-type-num-list>@" and \
-           not re.search("@<atom-type-num-[0-9]+>@", req):
+        if (
+            req != "@<atom-type-sym-list>@"
+            and not re.search("@<atom-type-sym-[0-9]+>@", req)
+            and req != "@<atom-type-num-list>@"
+            and not re.search("@<atom-type-num-[0-9]+>@", req)
+        ):
             raise KIMSMError('ERROR: Encountered unknown template: "%s"' % req)
     #
     # Exit with result
@@ -379,31 +413,134 @@ def get_atomic_number(sym):
     Return the atomic number associated with chemical symbol "sym".
     '''
     # Define table of atomic numbers
-    atomic_number = dict(H=1, He=2, Li=3, Be=4, B=5, C=6,
-                         N=7, O=8, F=9, Ne=10, Na=11, Mg=12,
-                         Al=13, Si=14, P=15, S=16, Cl=17, Ar=18,
-                         K=19, Ca=20, Sc=21, Ti=22, V=23, Cr=24,
-                         Mn=25, Fe=26, Co=27, Ni=28, Cu=29, Zn=30,
-                         Ga=31, Ge=32, As=33, Se=34, Br=35, Kr=36,
-                         Rb=37, Sr=38, Y=39, Zr=40, Nb=41, Mo=42,
-                         Tc=43, Ru=44, Rh=45, Pd=46, Ag=47, Cd=48,
-                         In=49, Sn=50, Sb=51, Te=52, I=53, Xe=54,
-                         Cs=55, Ba=56, La=57, Ce=58, Pr=59, Nd=60,
-                         Pm=61, Sm=62, Eu=63, Gd=64, Tb=65, Dy=66,
-                         Ho=67, Er=68, Tm=69, Yb=70, Lu=71, Hf=72,
-                         Ta=73, W=74, Re=75, Os=76, Ir=77, Pt=78,
-                         Au=79, Hg=80, Tl=81, Pb=82, Bi=83, Po=84,
-                         At=85, Rn=86, Fr=87, Ra=88, Ac=89, Th=90,
-                         Pa=91, U=92, Np=93, Pu=94, Am=95, Cm=96,
-                         Bk=97, Cf=98, Es=99, Fm=100, Md=101, No=102,
-                         Lr=103, Rf=104, Db=105, Sg=106, Bh=107, Hs=108,
-                         Mt=109, Ds=110, Rg=111, Cn=112, Nh=113, Fl=114,
-                         Mc=115, Lv=116, Ts=117, Og=118)
+    atomic_number = dict(
+        H=1,
+        He=2,
+        Li=3,
+        Be=4,
+        B=5,
+        C=6,
+        N=7,
+        O=8,
+        F=9,
+        Ne=10,
+        Na=11,
+        Mg=12,
+        Al=13,
+        Si=14,
+        P=15,
+        S=16,
+        Cl=17,
+        Ar=18,
+        K=19,
+        Ca=20,
+        Sc=21,
+        Ti=22,
+        V=23,
+        Cr=24,
+        Mn=25,
+        Fe=26,
+        Co=27,
+        Ni=28,
+        Cu=29,
+        Zn=30,
+        Ga=31,
+        Ge=32,
+        As=33,
+        Se=34,
+        Br=35,
+        Kr=36,
+        Rb=37,
+        Sr=38,
+        Y=39,
+        Zr=40,
+        Nb=41,
+        Mo=42,
+        Tc=43,
+        Ru=44,
+        Rh=45,
+        Pd=46,
+        Ag=47,
+        Cd=48,
+        In=49,
+        Sn=50,
+        Sb=51,
+        Te=52,
+        I=53,
+        Xe=54,
+        Cs=55,
+        Ba=56,
+        La=57,
+        Ce=58,
+        Pr=59,
+        Nd=60,
+        Pm=61,
+        Sm=62,
+        Eu=63,
+        Gd=64,
+        Tb=65,
+        Dy=66,
+        Ho=67,
+        Er=68,
+        Tm=69,
+        Yb=70,
+        Lu=71,
+        Hf=72,
+        Ta=73,
+        W=74,
+        Re=75,
+        Os=76,
+        Ir=77,
+        Pt=78,
+        Au=79,
+        Hg=80,
+        Tl=81,
+        Pb=82,
+        Bi=83,
+        Po=84,
+        At=85,
+        Rn=86,
+        Fr=87,
+        Ra=88,
+        Ac=89,
+        Th=90,
+        Pa=91,
+        U=92,
+        Np=93,
+        Pu=94,
+        Am=95,
+        Cm=96,
+        Bk=97,
+        Cf=98,
+        Es=99,
+        Fm=100,
+        Md=101,
+        No=102,
+        Lr=103,
+        Rf=104,
+        Db=105,
+        Sg=106,
+        Bh=107,
+        Hs=108,
+        Mt=109,
+        Ds=110,
+        Rg=111,
+        Cn=112,
+        Nh=113,
+        Fl=114,
+        Mc=115,
+        Lv=116,
+        Ts=117,
+        Og=118,
+    )
     try:
         num = atomic_number[sym.strip().title()]
     except:
-        raise KeyError('Cannot map chemical symbol to atomic number; Unknown symbol {}.'.format(
-            sym.strip().title()))
+        raise KeyError(
+            'Cannot map chemical symbol to atomic number; Unknown symbol {}.'.format(
+                sym.strip().title()
+            )
+        )
 
     return num
 
@@ -414,12 +551,16 @@ def get_kim_api_simulator_model_utility():
     the executable including full path.
     '''
     try:
-        libexec_path = subprocess.check_output(
-            ["pkg-config", "--variable=libexecdir", "libkim-api"],
-            universal_newlines=True).strip().rstrip("/")
+        libexec_path = (
+            subprocess.check_output(
+                ["pkg-config", "--variable=libexecdir", "libkim-api"],
+                universal_newlines=True,
+            )
+            .strip()
+            .rstrip("/")
+        )
     except:
-        raise KIMSMError(
-            'ERROR: Unable to obtain libexec-path from KIM API utility.')
+        raise KIMSMError('ERROR: Unable to obtain libexec-path from KIM API utility.')
     return os.path.join(libexec_path, "kim-api", "kim-api-simulator-model")
 
 
@@ -434,12 +575,12 @@ def is_simulator_model(model):
         # generated by the utility to be echoed to the screen
     except:
         raise KIMSMError(
-            'ERROR: Unable to determine whether %s is a Simulator Model.' % model)
+            'ERROR: Unable to determine whether %s is a Simulator Model.' % model
+        )
     if ret == 0:
         is_sm = True  # success; this is a Simulator Model
     elif ret == 1:
-        raise KIMSMError(
-            'ERROR: Model %s does not appear to be installed.' % model)
+        raise KIMSMError('ERROR: Model %s does not appear to be installed.' % model)
     else:
         is_sm = False
     return is_sm
@@ -450,9 +591,17 @@ class ksm_object(object):
     ksm_object class which initializes a KIM Simulator Model object
     and provides access to query and process this information.
     '''
+
     # Required keys in KIM Simulator Model metadata
-    ksm_required_keys = ["extended-id", "simulator-name", "simulator-version", "model-init",
-                         "model-defn", "supported-species", "units"]
+    ksm_required_keys = [
+        "extended-id",
+        "simulator-name",
+        "simulator-version",
+        "model-init",
+        "model-defn",
+        "supported-species",
+        "units",
+    ]
 
     # Get kim-api-simulator-model utility executable including full path
     kim_api_sm_util = get_kim_api_simulator_model_utility()
@@ -468,8 +617,7 @@ class ksm_object(object):
             try:
                 os.makedirs(self.sm_dirname)
             except:
-                raise KIMSMError(
-                    'ERROR: Unable to create directory for parameter files.')
+                raise KIMSMError('ERROR: Unable to create directory for parameter files.')
 
     def _extract_model_metadata(self):
         '''
@@ -478,7 +626,8 @@ class ksm_object(object):
         # Get kim-simulator-model metadata file
         try:
             metadata_filename = subprocess.check_output(
-                [self.kim_api_sm_util, self.extended_kim_id, "metadata-file", "name"]).strip()
+                [self.kim_api_sm_util, self.extended_kim_id, "metadata-file", "name"]
+            ).strip()
             metadata_filename = str(metadata_filename)
         except:
             raise KIMSMError('ERROR: Unable to obtain metadata file name.')
@@ -489,22 +638,29 @@ class ksm_object(object):
             f = open(model_metadata_file, "w")
         except:
             raise KIMSMError(
-                'ERROR: Unable to open KIM Simulator Model metadata file "%s" for writing.' % model_metadata_file)
+                'ERROR: Unable to open KIM Simulator Model metadata file "%s" for writing.'
+                % model_metadata_file
+            )
         # call KIM API routine to get back simulator model metadata file for the
         # specified extended KIM ID and write it to "model_metadata_file" defined above
         try:
             exit_status = subprocess.call(
-                [self.kim_api_sm_util, self.extended_kim_id, "metadata-file", "data"], stdout=f)
+                [self.kim_api_sm_util, self.extended_kim_id, "metadata-file", "data"],
+                stdout=f,
+            )
         except OSError as e:
             if e.errno == os.errno.ENOENT:
-                raise KIMSMError('ERROR: "%s" utility not found.' %
-                                 self.kim_api_sm_util)
+                raise KIMSMError('ERROR: "%s" utility not found.' % self.kim_api_sm_util)
             else:
                 raise KIMSMError(
-                    'ERROR: Unable to write KIM Simulator Model metadata file "%s".' % model_metadata_file)
+                    'ERROR: Unable to write KIM Simulator Model metadata file "%s".'
+                    % model_metadata_file
+                )
         if exit_status != 0:
             raise KIMSMError(
-                'ERROR: KIM Simulator Model "%s" not installed in KIM API.' % self.extended_kim_id)
+                'ERROR: KIM Simulator Model "%s" not installed in KIM API.'
+                % self.extended_kim_id
+            )
         # close json file
         f.close()
         return model_metadata_file
@@ -517,41 +673,55 @@ class ksm_object(object):
         param_filenames = []
         # get number of parameter files
         try:
-            number_param_files = int(subprocess.check_output(
-                [self.kim_api_sm_util, self.extended_kim_id, "number-of-parameter-files"]))
+            number_param_files = int(
+                subprocess.check_output(
+                    [
+                        self.kim_api_sm_util,
+                        self.extended_kim_id,
+                        "number-of-parameter-files",
+                    ]
+                )
+            )
         except:
-            raise KIMSMError(
-                'ERROR: Unable to obtain number of parameter files.')
+            raise KIMSMError('ERROR: Unable to obtain number of parameter files.')
         # loop of parameter files, obtain them from KIM API routine, and store in local files
         for i in range(0, number_param_files):
             # Get parameter file name
             try:
                 param_filename = subprocess.check_output(
-                    [self.kim_api_sm_util, self.extended_kim_id, str(1+i), "name"]).strip()
+                    [self.kim_api_sm_util, self.extended_kim_id, str(1 + i), "name"]
+                ).strip()
                 param_filename = str(param_filename)
             except:
                 raise KIMSMError(
-                    'ERROR: Unable to obtain file name for parameter file %d.' % (1+i))
+                    'ERROR: Unable to obtain file name for parameter file %d.' % (1 + i)
+                )
             parameter_file = self.sm_dirname + "/" + param_filename
             try:
                 f = open(parameter_file, "w")
             except:
                 raise KIMSMError(
-                    'ERROR: Unable to open parameter file "%s" for writing.' % parameter_file)
+                    'ERROR: Unable to open parameter file "%s" for writing.'
+                    % parameter_file
+                )
             # call KIM API routine to obtain parameter file "1+i" for the specified
             # extended KIM ID and write it to "parameter_file" defined above
             try:
                 subprocess.call(
-                    [self.kim_api_sm_util, self.extended_kim_id, str(1+i), "data"], stdout=f)
+                    [self.kim_api_sm_util, self.extended_kim_id, str(1 + i), "data"],
+                    stdout=f,
+                )
             except:
                 raise KIMSMError(
-                    'ERROR: Unable to write parameter file "%s".' % parameter_file)
+                    'ERROR: Unable to write parameter file "%s".' % parameter_file
+                )
             param_filenames.append(parameter_file)
             f.close()
         return param_filenames
 
-    def __init__(self, extended_kim_id='NONE', model_metadata_file='NONE',
-                 param_filenames=[]):
+    def __init__(
+        self, extended_kim_id='NONE', model_metadata_file='NONE', param_filenames=[]
+    ):
         '''
         Creates a KIM Simulator Model object.
 
@@ -560,9 +730,10 @@ class ksm_object(object):
         '''
 
         # Validate input
-        if (extended_kim_id == 'NONE' and model_metadata_file == 'NONE'):
+        if extended_kim_id == 'NONE' and model_metadata_file == 'NONE':
             raise KIMSMError(
-                'ERROR: Cannot initialize KIM Simulator Model. Model name not provided.')
+                'ERROR: Cannot initialize KIM Simulator Model. Model name not provided.'
+            )
 
         # Determine if in local mode (metadata file and parameter files provided
         # as arguments and not obtained from installed SM) or check mode (verifying
@@ -577,14 +748,20 @@ class ksm_object(object):
         if not local_or_check_mode:
             if not is_simulator_model(self.extended_kim_id):
                 raise KIMSMError(
-                    'ERROR: Request model %s is not a Simulator Model.' % self.extended_kim_id)
+                    'ERROR: Request model %s is not a Simulator Model.'
+                    % self.extended_kim_id
+                )
             # Try to parse model name assuming it has an extended KIM ID format
             # to obtain short KIM_ID. This is used to name the directory
             # containing the SM files.
             try:
-                self.kim_id = re.search('SM_[0-9]{12}_[0-9]{3}', self.extended_kim_id).group(0)
+                self.kim_id = re.search(
+                    'SM_[0-9]{12}_[0-9]{3}', self.extended_kim_id
+                ).group(0)
             except AttributeError:
-                self.kim_id = self.extended_kim_id  # Model name does not contain a short KIM ID,
+                self.kim_id = (
+                    self.extended_kim_id
+                )  # Model name does not contain a short KIM ID,
             # Create subdirectory where SM files will be placed
             self._create_SM_files_directory()
 
@@ -603,16 +780,22 @@ class ksm_object(object):
                     self.model_metadata_dict = json.load(json_data)
                 except:
                     raise KIMSMError(
-                        'ERROR: KIM Simulator Model metadata file "%s" is invalid JSON.' % self.model_metadata_file)
+                        'ERROR: KIM Simulator Model metadata file "%s" is invalid JSON.'
+                        % self.model_metadata_file
+                    )
         else:
             raise KIMSMError(
-                'ERROR: KIM Simulator Model metadata file "%s" not found.' % self.model_metadata_file)
+                'ERROR: KIM Simulator Model metadata file "%s" not found.'
+                % self.model_metadata_file
+            )
 
         # Check that all required keys are present and any contained templates are valid
         for key in self.ksm_required_keys:
             if key not in self.model_metadata_dict:
-                raise KIMSMError('ERROR: Required key "%s" not found in KIM Simulator Model metadata file "%s".' % (
-                    key, self.model_metadata_file))
+                raise KIMSMError(
+                    'ERROR: Required key "%s" not found in KIM Simulator Model metadata file "%s".'
+                    % (key, self.model_metadata_file)
+                )
             if isinstance(self.model_metadata_dict[key], list):
                 for stringraw in self.model_metadata_dict[key]:
                     dummy = template_check_and_strip_space(stringraw)
@@ -626,7 +809,7 @@ class ksm_object(object):
         tabs with single spaces, and reduce multiple internal spaces to one
 
         '''
-        retstr = retstr.strip()           # remove spaces and newlines
+        retstr = retstr.strip()  # remove spaces and newlines
         retstr = retstr.replace('\t', ' ')  # replace tabs by spaces
         retstr = re.sub(' +', ' ', retstr)  # replace multiple spaces with one
         return retstr
@@ -635,22 +818,19 @@ class ksm_object(object):
         '''
         Get the KIM Simulator Model simulator name
         '''
-        return self.full_strip(
-            self.model_metadata_dict["simulator-name"])
+        return self.full_strip(self.model_metadata_dict["simulator-name"])
 
     def get_model_simulator_version(self):
         '''
         Get the KIM Simulator Model simulator name
         '''
-        return self.full_strip(
-            self.model_metadata_dict["simulator-version"])
+        return self.full_strip(self.model_metadata_dict["simulator-version"])
 
     def get_model_extended_kim_id(self):
         '''
         Get the KIM Simulator Model extended KIM ID
         '''
-        return self.full_strip(
-            self.model_metadata_dict["extended-id"])
+        return self.full_strip(self.model_metadata_dict["extended-id"])
 
     def get_model_supported_species(self):
         '''
@@ -659,8 +839,7 @@ class ksm_object(object):
         supported_species_string = self.model_metadata_dict["supported-species"]
         supported_species_list = supported_species_string.split(' ')
         for i in range(0, len(supported_species_list)):
-            supported_species_list[i] = \
-                self.full_strip(supported_species_list[i])
+            supported_species_list[i] = self.full_strip(supported_species_list[i])
         return supported_species_list
 
     def get_model_init_lines(self):
@@ -691,5 +870,4 @@ class ksm_object(object):
         '''
         Get the KIM Simulator Model definitions lines
         '''
-        return self.full_strip(
-            self.model_metadata_dict["units"])
+        return self.full_strip(self.model_metadata_dict["units"])

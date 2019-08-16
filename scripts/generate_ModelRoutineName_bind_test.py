@@ -5,7 +5,8 @@ fields = {
     'FIELD_NAME': 'MODEL_ROUTINE_NAME',
     'FieldName': 'ModelRoutineName',
     'fieldName': 'modelRoutineName',
-    'field_name': 'model_routine_name'}
+    'field_name': 'model_routine_name',
+}
 
 
 attributes = [
@@ -16,7 +17,8 @@ attributes = [
     'Refresh',
     'WriteParameterizedModel',
     'ComputeArgumentsDestroy',
-    'Destroy']
+    'Destroy',
+]
 
 
 generate_bind(fields, attributes)

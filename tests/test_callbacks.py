@@ -21,8 +21,9 @@ import pytest
 
 # create a dimer of two atoms
 def get_dimer():
-    argon = Atoms('ArAr', positions=[(0, 0, 0), (.1, .2, .2)],
-                  cell=(10, 10, 10), pbc=(0, 0, 0))
+    argon = Atoms(
+        'ArAr', positions=[(0, 0, 0), (0.1, 0.2, 0.2)], cell=(10, 10, 10), pbc=(0, 0, 0)
+    )
     return argon
 
 
@@ -44,7 +45,7 @@ def assert_2d_array(A, B):
 
 # neigh
 neigh_data = dict()
-neigh_data['cutoff'] = 1.
+neigh_data['cutoff'] = 1.0
 neigh_data['num_particles'] = 2
 neigh_data['neighbors'] = np.array([[1], [0]], dtype=np.intc)
 neigh_data['key'] = 1
@@ -53,18 +54,18 @@ neigh_data['num_called'] = 0
 
 def get_neigh(data, cutoffs, neighbor_list_index, particle_number):
     if data['num_called'] < 2:  # 1st call of kim_model.compute
-        assert data['cutoff'] == pytest.approx(1., 1e-6)
+        assert data['cutoff'] == pytest.approx(1.0, 1e-6)
         assert data['num_particles'] == 2
         assert_2d_array(data['neighbors'], [[1], [0]])
         assert data['key'] == 1
     else:  # 2nd call of kim_model.compute
-        assert data['cutoff'] == pytest.approx(1., 1e-6)
+        assert data['cutoff'] == pytest.approx(1.0, 1e-6)
         assert data['num_particles'] == 2
         assert_2d_array(data['neighbors'], [[1], [0]])
         assert data['key'] == 2
 
     if data['num_called'] == 3:  # last call of this function
-        data['key'] = 3   # modify original key
+        data['key'] = 3  # modify original key
         data['new_key'] = 1  # add new key
     data['num_called'] += 1
     error = 0
@@ -88,7 +89,7 @@ def process_dEdr(data, de, r, dx, i, j):
     else:
         assert data['key'] == 2
     if data['num_called'] == 1:  # last call of this function
-        data['key'] = 3   # modify original key
+        data['key'] = 3  # modify original key
         data['new_key'] = 1  # add new key
     data['num_called'] += 1
     error = 0
@@ -109,7 +110,7 @@ def process_d2Edr2(data, de, r, dx, i, j):
     else:
         assert data['key'] == 2
     if data['num_called'] == 1:  # last call of this function
-        data['key'] = 3   # modify original key
+        data['key'] = 3  # modify original key
         data['new_key'] = 1  # add new key
     data['num_called'] += 1
     error = 0
@@ -128,7 +129,7 @@ def test_main():
         kimpy.charge_unit.e,
         kimpy.temperature_unit.K,
         kimpy.time_unit.ps,
-        modelname
+        modelname,
     )
     check_error(error, 'kimpy.model.create')
     if not requestedUnitsAccepted:
@@ -144,38 +145,45 @@ def test_main():
     coords = np.asarray(argon.get_positions(), dtype=np.double)
     N = coords.shape[0]
     forces = np.zeros((N, 3), dtype=np.double)
-    energy = np.array([0.], dtype=np.double)
+    energy = np.array([0.0], dtype=np.double)
     num_particles = np.array([N], dtype=np.intc)
     species_code = np.zeros(num_particles, dtype=np.intc)
     particle_contributing = np.zeros(num_particles, dtype=np.intc)
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.numberOfParticles, num_particles)
+        kimpy.compute_argument_name.numberOfParticles, num_particles
+    )
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.particleSpeciesCodes, species_code)
+        kimpy.compute_argument_name.particleSpeciesCodes, species_code
+    )
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.particleContributing, particle_contributing)
+        kimpy.compute_argument_name.particleContributing, particle_contributing
+    )
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.coordinates, coords)
+        kimpy.compute_argument_name.coordinates, coords
+    )
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.partialEnergy, energy)
+        kimpy.compute_argument_name.partialEnergy, energy
+    )
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.partialForces, forces)
+        kimpy.compute_argument_name.partialForces, forces
+    )
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     # species support and code
     species_support, code, error = kim_model.get_species_support_and_code(
-        kimpy.species_name.Ar)
+        kimpy.species_name.Ar
+    )
     check_error(error or not species_support, 'kim_model.get_species_support_and_code')
 
     # setup particle species
@@ -186,23 +194,17 @@ def test_main():
 
     # register callbacks
     error = compute_arguments.set_callback(
-        kimpy.compute_callback_name.GetNeighborList,
-        get_neigh,
-        neigh_data
+        kimpy.compute_callback_name.GetNeighborList, get_neigh, neigh_data
     )
     check_error(error, 'kimpy.compute_argument.set_callback')
 
     error = compute_arguments.set_callback(
-        kimpy.compute_callback_name.ProcessDEDrTerm,
-        process_dEdr,
-        dEdr_data
+        kimpy.compute_callback_name.ProcessDEDrTerm, process_dEdr, dEdr_data
     )
     check_error(error, 'kimpy.compute_argument.set_callback')
 
     error = compute_arguments.set_callback(
-        kimpy.compute_callback_name.ProcessD2EDr2Term,
-        process_d2Edr2,
-        d2Edr2_data
+        kimpy.compute_callback_name.ProcessD2EDr2Term, process_d2Edr2, d2Edr2_data
     )
     check_error(error, 'kimpy.compute_argument.set_callback')
 

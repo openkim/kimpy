@@ -13,11 +13,7 @@ fields['fieldName'] = 'supportStatus'
 fields['field_name'] = 'support_status'
 
 
-attributes = [
-    'requiredByAPI',
-    'notSupported',
-    'required',
-    'optional']
+attributes = ['requiredByAPI', 'notSupported', 'required', 'optional']
 
 
 generate_bind(fields, attributes)

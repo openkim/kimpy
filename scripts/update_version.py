@@ -31,14 +31,14 @@ def update_version(version, path, key, in_quotes=False, extra_space=False):
         for line in lines:
             if key in line:
                 idx = line.index('=')
-                line = line[:idx+1]
+                line = line[: idx + 1]
                 if extra_space:
                     line += ' '
                 if in_quotes:
                     v = '"{}"'.format(version)
                 else:
                     v = '{}'.format(version)
-                fout.write(line+v+'\n')
+                fout.write(line + v + '\n')
             else:
                 fout.write(line)
 

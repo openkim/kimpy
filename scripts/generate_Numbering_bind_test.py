@@ -5,12 +5,11 @@ fields = {
     'FIELD_NAME': 'NUMBERING',
     'FieldName': 'Numbering',
     'fieldName': 'numbering',
-    'field_name': 'numbering'}
+    'field_name': 'numbering',
+}
 
 
-attributes = [
-    'zeroBased',
-    'oneBased']
+attributes = ['zeroBased', 'oneBased']
 
 
 generate_bind(fields, attributes)

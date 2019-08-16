@@ -5,12 +5,11 @@ fields = {
     'FIELD_NAME': 'DATA_TYPE',
     'FieldName': 'DataType',
     'fieldName': 'dataType',
-    'field_name': 'data_type'}
+    'field_name': 'data_type',
+}
 
 
-attributes = [
-    'Integer',
-    'Double']
+attributes = ['Integer', 'Double']
 
 
 generate_bind(fields, attributes)

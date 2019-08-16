@@ -139,14 +139,16 @@ species = [
     'user17',
     'user18',
     'user19',
-    'user20']
+    'user20',
+]
 
 
 fields = {
     'FIELD_NAME': 'SPECIES_NAME',
     'FieldName': 'SpeciesName',
     'fieldName': 'speciesName',
-    'field_name': 'species_name'}
+    'field_name': 'species_name',
+}
 
 
 generate_bind(fields, species)
