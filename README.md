@@ -8,13 +8,13 @@ API, see: https://openkim.org/kim-api/
 
 ## Installation
 
-### Package managers
+### package managers
 
 ```
 $ pip install kimpy
 ```
 
-### From source
+### from source
 
 Get the source
 ```
@@ -87,3 +87,7 @@ All the attributes of the module are listed under `DATA`. For example,
     	...
     	particleSpeciesCodes = particleSpeciesCodes
 
+
+## Contact
+
+Mingjian Wen (wenxx151@umn.edu)
