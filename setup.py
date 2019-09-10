@@ -1,8 +1,10 @@
 from setuptools import setup, Extension
 from distutils.sysconfig import get_config_vars
-import sys
 import os
 import subprocess
+
+
+
 from api_compatibility import check_kim_api_compatibility
 
 
@@ -78,7 +80,7 @@ class get_pybind11_includes(object):
         try:
             import pybind11
         except ImportError:
-            if subprocess.call([sys.executable, '-m', 'pip', 'install', 'pybind11']):
+            if subprocess.call([sys.executable, '-m', 'pip', 'install', 'pybind11==2.2.4']):
                 raise RuntimeError('pybind11 install failed.')
         self.user = user
 
@@ -198,7 +200,7 @@ setup(
     version=get_version(),
     packages=['kimpy'],
     ext_modules=kimpy_ext_modules + neighlist_ext_module,
-    install_requires=['pybind11', 'numpy', 'pytest'],
+    install_requires=['pybind11==2.2.4', 'numpy', 'pytest'],
     author='Mingjian Wen',
     author_email='wenxx151@umn.edu',
     url='https://github.com/openkim/kimpy',
