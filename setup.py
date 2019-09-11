@@ -4,7 +4,6 @@ import os
 import subprocess
 
 
-
 from api_compatibility import check_kim_api_compatibility
 
 
@@ -80,7 +79,9 @@ class get_pybind11_includes(object):
         try:
             import pybind11
         except ImportError:
-            if subprocess.call([sys.executable, '-m', 'pip', 'install', 'pybind11==2.2.4']):
+            if subprocess.call(
+                [sys.executable, '-m', 'pip', 'install', 'pybind11==2.2.4']
+            ):
                 raise RuntimeError('pybind11 install failed.')
         self.user = user
 

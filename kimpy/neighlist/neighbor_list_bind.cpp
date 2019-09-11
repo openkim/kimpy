@@ -27,8 +27,8 @@ PYBIND11_MODULE(neighlist, module)
   module.doc() = "Python binding to neighbor list.";
 
   // py::nodelete, not to destroy object by python garbage collection
-  py::class_<NeighList, std::unique_ptr<NeighList, py::nodelete> >(module,
-                                                                   "NeighList")
+  py::class_<NeighList, std::unique_ptr<NeighList, py::nodelete> >(
+      module, "NeighList", py::module_local())
       .def(py::init());
 
   module.def("initialize", []() {
