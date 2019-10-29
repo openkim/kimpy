@@ -86,7 +86,9 @@ class get_pybind11_includes(object):
 def get_includes():
     kim_inc = get_kim_includes()
     pybind11_inc = [get_pybind11_includes(), get_pybind11_includes(user=True)]
-    neighlist_inc = [os.path.join(os.getcwd(), 'kimpy', 'neighlist')]
+    neighlist_inc = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'kimpy', 'neighlist')
+    ]
     return kim_inc + pybind11_inc + neighlist_inc
 
 

@@ -1,0 +1,11 @@
+==========
+Change Log
+==========
+
+v0.3.3 (2019/10/28)
+==================
+
+- update setup.py to not explicitly use `pip` and `python`
+
+- remove pybind11==2.2.3 version dependence, since the `get_include()` of
+  pybind11 is fixed
