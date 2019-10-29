@@ -1,9 +1,8 @@
 from setuptools import setup, Extension
 from distutils.sysconfig import get_config_vars
+import sys
 import os
 import subprocess
-
-
 from api_compatibility import check_kim_api_compatibility
 
 
@@ -17,7 +16,7 @@ for key, value in cfg_vars.items():
 # run scripts to generate files
 dir_path = os.path.dirname(os.path.realpath(__file__))
 fname = os.path.join(dir_path, 'scripts', 'generate_all.py')
-subprocess.call(['python', fname])
+subprocess.call([sys.executable, fname])
 
 
 def inquire_kim_api(key):
@@ -35,7 +34,7 @@ def inquire_kim_api(key):
 
     split_config = [s for s in config.strip().split(' ')]
 
-    # remove identifer
+    # remove identifier
     identifier = key[-2:]
     if identifier in ['-I', '-L', '-l']:
         split_config = [
@@ -76,13 +75,6 @@ class get_pybind11_includes(object):
     """
 
     def __init__(self, user=False):
-        try:
-            import pybind11
-        except ImportError:
-            if subprocess.call(
-                [sys.executable, '-m', 'pip', 'install', 'pybind11==2.2.4']
-            ):
-                raise RuntimeError('pybind11 install failed.')
         self.user = user
 
     def __str__(self):
@@ -200,10 +192,11 @@ setup(
     name='kimpy',
     version=get_version(),
     packages=['kimpy'],
+    setup_requires=['pybind11'],
+    install_requires=['pybind11', 'numpy', 'pytest'],
     ext_modules=kimpy_ext_modules + neighlist_ext_module,
-    install_requires=['pybind11==2.2.4', 'numpy', 'pytest'],
     author='Mingjian Wen',
-    author_email='wenxx151@umn.edu',
+    author_email='wenxx151@gmail.com',
     url='https://github.com/openkim/kimpy',
     description='Python interface to the KIM API',
     long_description='Python interface to the KIM API. For more information '
