@@ -3,6 +3,4 @@ recursive-include tests *.py
 recursive-include scripts *.py *-template
 recursive-include examples *.py
 recursive-include utils *.py
-include README.md
-include api_compatibility.txt
-include api_compatibility.py
+include README.md LICENSE api_compatibility.txt api_compatibility.py
