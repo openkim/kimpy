@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 
 all_fnames = [
@@ -19,4 +20,4 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 for fname in all_fnames:
     fname = os.path.join(dir_path, fname)
     print('\nRunning script:\n{}\nto generate binding and test files.\n'.format(fname))
-    subprocess.call(['python', fname])
+    subprocess.call([sys.executable, fname])
