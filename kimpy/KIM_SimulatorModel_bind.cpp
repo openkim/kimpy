@@ -163,6 +163,20 @@ PYBIND11_MODULE(simulator_model, module)
           py::arg("index"),
           "Return(paramFileName, error)")
 
+      .def(
+          "get_parameter_file_base_name",
+          [](SimulatorModel & self, int const index) {
+            std::string const * paramFileBaseName;
+            int error = self.GetParameterFileBasename(index, &paramFileBaseName);
+
+            py::tuple re(2);
+            re[0] = *paramFileBaseName;
+            re[1] = error;
+            return re;
+          },
+          py::arg("index"),
+          "Return(paramFileBaseName, error)")
+
       .def("__repr__", &SimulatorModel::ToString)
 
       .def("set_log_id", &SimulatorModel::SetLogID)
