@@ -2,6 +2,7 @@
 #include <pybind11/pybind11.h>
 
 #include <cstddef>
+#include <memory>
 #include <string>
 
 #include "KIM_SimulatorHeaders.hpp"
