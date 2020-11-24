@@ -2,11 +2,13 @@
 #define SIM_BUFFER_
 
 #include <pybind11/pybind11.h>
+
+#include <vector>
+
 namespace py = pybind11;
 
-typedef struct SimBuffer
-{
+struct SimBuffer {
   std::vector<py::dict *> callbacks;
-} SimBuffer;
+};
 
 #endif  // SIM_BUFFER_
