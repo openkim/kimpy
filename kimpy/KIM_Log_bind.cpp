@@ -1,6 +1,11 @@
+
+#include <pybind11/pybind11.h>
+
+#include <memory> 
+#include <string>
+
 #include "KIM_Log.hpp"
 #include "KIM_LogVerbosity.hpp"
-#include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 using namespace KIM;
