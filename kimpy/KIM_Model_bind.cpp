@@ -1,6 +1,9 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include <cstddef>
+#include <string>
+
 #include "KIM_SimulatorHeaders.hpp"
 #include "sim_buffer.h"
 
@@ -83,10 +86,10 @@ PYBIND11_MODULE(model, module)
             self.GetNeighborListPointers(
                 &numberOfCutoffs, &cutoff_ptr, &paddingNoNeighborHints_ptr);
 
-            py::array_t<double, py::array::c_style> cutoffs(
-                {static_cast<size_t>(numberOfCutoffs)});
-            py::array_t<int, py::array::c_style> paddingNoNeighborHints(
-                {static_cast<size_t>(numberOfCutoffs)});
+            py::array_t<double, py::array::c_style> cutoffs(numberOfCutoffs);
+            py::array_t<int, py::array::c_style> 
+              paddingNoNeighborHints(numberOfCutoffs);
+            
             auto cut = cutoffs.mutable_data(0);
             auto pnh = paddingNoNeighborHints.mutable_data(0);
             for (int i = 0; i < numberOfCutoffs; i++)
@@ -145,12 +148,14 @@ PYBIND11_MODULE(model, module)
           [](Model & self, ComputeArguments * computeArguments) {
             SimBuffer * sim_buffer;
             computeArguments->GetSimulatorBufferPointer((void **) &sim_buffer);
-            if (sim_buffer != NULL)
+            if (sim_buffer)
             {
-              for (size_t i = 0; i < sim_buffer->callbacks.size(); i++)
-              { delete sim_buffer->callbacks[i]; }
+              for (std::size_t i = 0; i < sim_buffer->callbacks.size(); i++)
+              { 
+                if (sim_buffer->callbacks[i]) delete sim_buffer->callbacks[i]; 
+              }
               delete sim_buffer;
-              sim_buffer = NULL;
+              sim_buffer = nullptr;
             }
 
             int error = self.ComputeArgumentsDestroy(&computeArguments);
