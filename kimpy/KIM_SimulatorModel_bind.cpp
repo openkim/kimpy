@@ -23,8 +23,8 @@ PYBIND11_MODULE(simulator_model, module)
   // destroy function from the C++ side to avoid memory leaks. For more info,
   // see http://pybind11.readthedocs.io/en/stable/advanced/classes.html
 
-  py::class_<SimulatorModel, std::unique_ptr<SimulatorModel, py::nodelete> > cl(
-      module, "SimulatorModel");
+  py::class_<SimulatorModel, std::unique_ptr<SimulatorModel, py::nodelete> > 
+    cl(module, "SimulatorModel");
 
   // python constructor needs to return a pointer to the C++ instance
   cl.def(py::init([](std::string const & simulatorModelName,
@@ -45,7 +45,7 @@ PYBIND11_MODULE(simulator_model, module)
             re[1] = *simulatorVersion;
             return re;
           },
-          "Return(SimulatorName, SimulatorVersion)")
+          "Return(simulatorName, simulatorVersion)")
 
       .def(
           "get_number_of_supported_species",

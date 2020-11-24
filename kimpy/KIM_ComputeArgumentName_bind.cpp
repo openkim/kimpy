@@ -52,7 +52,7 @@ PYBIND11_MODULE(compute_argument_name, module)
     COMPUTE_ARGUMENT_NAME::GetNumberOfComputeArgumentNames(
         &numberOfComputeArguments);
     return numberOfComputeArguments;
-  });
+  }, "Return numberOfComputeArguments");
 
   module.def(
       "get_compute_argument_data_type",

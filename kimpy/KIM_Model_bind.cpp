@@ -104,7 +104,7 @@ PYBIND11_MODULE(model, module)
             re[1] = paddingNoNeighborHints;
             return re;
           },
-          "Return (cutoffs, "
+          "Return(cutoffs, "
           "model_not_request_neighbors_of_noncontributing_particles)")
 
       .def(
@@ -153,7 +153,7 @@ PYBIND11_MODULE(model, module)
             {
               for (std::size_t i = 0; i < sim_buffer->callbacks.size(); i++)
               { 
-                if (sim_buffer->callbacks[i]) delete sim_buffer->callbacks[i]; 
+                if (sim_buffer->callbacks[i]) delete sim_buffer->callbacks[i];
               }
               delete sim_buffer;
               sim_buffer = nullptr;
