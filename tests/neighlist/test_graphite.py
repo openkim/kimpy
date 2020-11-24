@@ -1,7 +1,6 @@
-from __future__ import absolute_import, division, print_function
 import numpy as np
 from kimpy import neighlist as nl
-from error import check_error
+from kimpy import check_error
 
 
 def create_graphite_unit_cell(alat=2.46, d=3.35):
@@ -67,7 +66,8 @@ def test_main():
     cutoffs = np.array([d + 0.01, d + 0.02], dtype=np.double)
     influence_dist = cutoffs[1]
     pbc = np.array([1, 1, 1], dtype=np.intc)
-    out = nl.create_paddings(influence_dist, cell, pbc, contrib_coords, contrib_species)
+    out = nl.create_paddings(influence_dist, cell, pbc,
+                             contrib_coords, contrib_species)
     pad_coords, pad_species, pad_image, error = out
     check_error(error, 'nl.create_padding')
 
@@ -99,7 +99,8 @@ def test_main():
     # test get neigh function
     neigh_list_index = 0
     particle = 1
-    num_neigh, neighbors, error = nl.get_neigh(neigh, cutoffs, neigh_list_index, particle)
+    num_neigh, neighbors, error = nl.get_neigh(
+        neigh, cutoffs, neigh_list_index, particle)
     check_error(error, 'nl.get_neigh')
     assert num_neigh == 14
     # print('Atom 1 has {} neighbors:'.format(num_neigh), end=' ')
@@ -108,7 +109,8 @@ def test_main():
 
     neigh_list_index = 1
     particle = 4
-    num_neigh, neighbors, error = nl.get_neigh(neigh, cutoffs, neigh_list_index, particle)
+    num_neigh, neighbors, error = nl.get_neigh(
+        neigh, cutoffs, neigh_list_index, particle)
     check_error(error, 'nl.get_neigh')
     assert num_neigh == 0
 
