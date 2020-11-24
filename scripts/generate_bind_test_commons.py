@@ -1,4 +1,4 @@
-"""Generate binding tests files."""
+"""Generate binding & tests files."""
 
 from os.path import dirname, realpath, join
 
