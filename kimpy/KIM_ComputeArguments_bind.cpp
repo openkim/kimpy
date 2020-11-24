@@ -2,6 +2,8 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include <memory>
+
 #include "KIM_SimulatorHeaders.hpp"
 #include "callbacks.hpp"
 #include "sim_buffer.h"
