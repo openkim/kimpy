@@ -1,8 +1,6 @@
-from __future__ import absolute_import, division, print_function
 import kimpy
-import os
-import subprocess
-from error import check_error, report_error
+from kimpy import check_error, report_error
+from os.path import join
 
 
 def example_main():
@@ -30,7 +28,7 @@ def example_main():
     for i in range(number_fields):
         extent, field_name, error = sm.get_simulator_field_metadata(i)
         check_error(error, 'get_simulator_field_metadata')
-        print('Field {} is {} and has lines:'.format(i, field_name, extent))
+        print('Field {} is {} and has lines:'.format(i, field_name))
         for j in range(extent):
             field_line, error = sm.get_simulator_field_line(i, j)
             check_error(error, 'get_simulator_field_line')
@@ -41,8 +39,9 @@ def example_main():
 
     specname = sm.get_specification_file_name()
     print('Simulator model specification file name is:', specname)
-    fname = os.path.join(dirname, specname)
-    subprocess.call(['cat', fname])
+    fname = join(dirname, specname)
+    with open(fname, 'r') as f:
+        print(f.read())
 
     num_param_files = sm.get_number_of_parameter_files()
     print('Simulator model has {} parameter files.'.format(num_param_files))
@@ -50,8 +49,9 @@ def example_main():
         paramname, error = sm.get_parameter_file_name(i)
         check_error(error, 'get_parameter_file_name')
         print('Parameter file {} has name: {}'.format(i, paramname))
-        fname = os.path.join(dirname, paramname)
-        subprocess.call(['cat', fname])
+        fname = join(dirname, paramname)
+        with open(fname, 'r') as f:
+            print(f.read())
 
     kimpy.simulator_model.destroy(sm)
 
