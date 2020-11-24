@@ -7,6 +7,7 @@ sys.path.insert(0, abspath('kimpy'))
 
 from err import KimPyError
 
+
 def read_compatible_table():
     """Read the compatible table.
 
