@@ -19,6 +19,7 @@ def remove_generated_files(path):
         'kimpy',
         'scripts',
         'tests',
+        join('tests', 'neighlist'),
     ]
 
     dir_list_files = {
@@ -67,6 +68,10 @@ def remove_generated_files(path):
             "test_model_neigh_library.py",
             "test_sem_ver.py",
         ],
+        join('tests', 'neighlist'): [
+            'cpp_example',
+            'test_graphite.py',
+        ]
     }
 
     for dir_name in dir_list:
