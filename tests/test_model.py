@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import kimpy
 from kimpy import check_error, report_error
@@ -284,9 +285,16 @@ def test_main():
     check_error(error, 'kim_model.is_routine_present')
     if present:
         kim_model.write_parameterized_model('.', 'Morse_Ar')
+        try:
+            os.remove('Morse_Ar.params')
+            os.remove('CMakeLists.txt')
+            os.remove('kim.log')
+        except:
+            pass
 
     # destory model
     kimpy.model.destroy(kim_model)
+
 
 
 if __name__ == '__main__':

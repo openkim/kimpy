@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from kimpy import neighlist as nl
 from kimpy import check_error
@@ -122,6 +123,13 @@ def test_main():
 
     # delete neighbor list
     nl.clean(neigh)
+
+    # remove the created file
+    try:
+        os.remove(fname)
+        os.remove('kim.log')
+    except:
+        pass
 
 
 if __name__ == '__main__':
