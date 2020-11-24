@@ -97,7 +97,7 @@ PYBIND11_MODULE(compute_arguments, module)
           [](ComputeArguments & self,
              ComputeArgumentName const computeArgumentName) {
             int error = self.SetArgumentPointer(
-                computeArgumentName, reinterpret_cast<double *>(nullptr));
+                computeArgumentName, static_cast<double *>(nullptr));
             return error;
           },
           py::arg("ComputeArgumentName"))
