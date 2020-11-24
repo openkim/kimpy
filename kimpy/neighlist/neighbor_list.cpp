@@ -2,9 +2,11 @@
 
 #include "neighbor_list.h"
 #include "helper.hpp"
+
 #include <cmath>
 #include <cstring>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #define DIM 3
@@ -13,22 +15,25 @@
 
 void nbl_clean_content(NeighList * const nl)
 {
-  if (nl != NULL)
+  if (nl)
   {
-    for (int i = 0; i < nl->numberOfNeighborLists; i++)
+    if (nl->lists)
     {
-      NeighListOne * cnl = &(nl->lists[i]);
-      delete[] cnl->Nneighbors;
-      delete[] cnl->neighborList;
-      delete[] cnl->beginIndex;
-      cnl->numberOfParticles = 0;
-      cnl->cutoff = 0.0;
-      cnl->Nneighbors = NULL;
-      cnl->neighborList = NULL;
-      cnl->beginIndex = NULL;
+      for (int i = 0; i < nl->numberOfNeighborLists; i++)
+      {
+        NeighListOne * cnl = &(nl->lists[i]);
+        if (cnl->Nneighbors) delete[] cnl->Nneighbors;
+        if (cnl->neighborList) delete[] cnl->neighborList;
+        if (cnl->beginIndex) delete[] cnl->beginIndex;
+        cnl->numberOfParticles = 0;
+        cnl->cutoff = 0.0;
+        cnl->Nneighbors = nullptr;
+        cnl->neighborList = nullptr;
+        cnl->beginIndex = nullptr;
+      }
+      delete[] nl->lists;
     }
-    delete[] nl->lists;
-    nl->lists = NULL;
+    nl->lists = nullptr;
     nl->numberOfNeighborLists = 0;
   }
 }
@@ -38,16 +43,16 @@ void nbl_allocate_memory(NeighList * const nl,
                          int const numberOfCutoffs,
                          int const numberOfParticles)
 {
-  nl->lists = new NeighListOne[numberOfCutoffs];
-  nl->numberOfNeighborLists = numberOfCutoffs;
-  for (int i = 0; i < numberOfCutoffs; i++)
+  if (nl)
   {
-    NeighListOne * cnl = &(nl->lists[i]);
-    cnl->numberOfParticles = 0;
-    cnl->cutoff = 0.0;
-    cnl->Nneighbors = new int[numberOfParticles];
-    cnl->neighborList = NULL;
-    cnl->beginIndex = new int[numberOfParticles];
+    nl->lists = new NeighListOne[numberOfCutoffs];
+    nl->numberOfNeighborLists = numberOfCutoffs;
+    for (int i = 0; i < numberOfCutoffs; i++)
+    {
+      NeighListOne * cnl = &(nl->lists[i]);
+      cnl->Nneighbors = new int[numberOfParticles];
+      cnl->beginIndex = new int[numberOfParticles];
+    }
   }
 }
 
@@ -55,19 +60,20 @@ void nbl_allocate_memory(NeighList * const nl,
 void nbl_initialize(NeighList ** const nl)
 {
   *nl = new NeighList;
-  (*nl)->numberOfNeighborLists = 0;
-  (*nl)->lists = NULL;
 }
 
 
 void nbl_clean(NeighList ** const nl)
 {
-  nbl_clean_content(*nl);
+  if (*nl)
+  {
+    nbl_clean_content(*nl);
 
-  delete (*nl);
+    delete (*nl);
+  }
 
   // nullify pointer
-  (*nl) = NULL;
+  (*nl) = nullptr;
 }
 
 
@@ -131,15 +137,14 @@ int nbl_build(NeighList * const nl,
   nbl_clean_content(nl);
   nbl_allocate_memory(nl, numberOfCutoffs, numberOfParticles);
 
-  double * cutsqs = new double[numberOfCutoffs];
+  std::vector<double> cutsqs(numberOfCutoffs);
   for (int i = 0; i < numberOfCutoffs; i++)
   { cutsqs[i] = cutoffs[i] * cutoffs[i]; }
 
   // temporary neigh container
   std::vector<int> * tmp_neigh = new std::vector<int>[numberOfCutoffs];
-  int * total = new int[numberOfCutoffs];
-  int * num_neigh = new int[numberOfCutoffs];
-  for (int k = 0; k < numberOfCutoffs; k++) { total[k] = 0; }
+  std::vector<int> total(numberOfCutoffs, 0);
+  std::vector<int> num_neigh(numberOfCutoffs);
 
   for (int i = 0; i < numberOfParticles; i++)
   {
@@ -165,7 +170,7 @@ int nbl_build(NeighList * const nl,
           {
             int idx = ii + jj * size[0] + kk * size[0] * size[1];
 
-            for (size_t m = 0; m < cells[idx].size(); m++)
+            for (std::size_t m = 0; m < cells[idx].size(); m++)
             {
               int n = cells[idx][m];
               if (n != i)
@@ -221,10 +226,7 @@ int nbl_build(NeighList * const nl,
         nl->lists[k].neighborList, tmp_neigh[k].data(), sizeof(int) * total[k]);
   }
 
-  delete[] cutsqs;
   delete[] tmp_neigh;
-  delete[] num_neigh;
-  delete[] total;
 
   return 0;
 }
@@ -327,7 +329,7 @@ int nbl_create_paddings(int const numberOfParticles,
 
   // number of cells in each direction
   double ratio[DIM];
-  double size[DIM];
+  int size[DIM];
   for (int i = 0; i < DIM; i++)
   {
     ratio[i] = cutoff / dist[i];
@@ -393,7 +395,7 @@ int nbl_create_paddings(int const numberOfParticles,
     }
   }
 
-  numberOfPaddings = masterOfPaddings.size();
+  numberOfPaddings = static_cast<int>(masterOfPaddings.size());
 
   return 0;
 }
