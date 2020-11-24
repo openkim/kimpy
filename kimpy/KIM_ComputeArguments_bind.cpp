@@ -95,7 +95,7 @@ PYBIND11_MODULE(compute_arguments, module)
           [](ComputeArguments & self,
              ComputeArgumentName const computeArgumentName) {
             int error = self.SetArgumentPointer(
-                computeArgumentName, reinterpret_cast<double *>(NULL));
+                computeArgumentName, reinterpret_cast<double *>(nullptr));
             return error;
           },
           py::arg("ComputeArgumentName"))
@@ -130,7 +130,7 @@ PYBIND11_MODULE(compute_arguments, module)
 
             SimBuffer * sim_buffer;
             self.GetSimulatorBufferPointer((void **) &sim_buffer);
-            if (sim_buffer == NULL)
+            if (!sim_buffer)
             {
               sim_buffer = new SimBuffer;
               self.SetSimulatorBufferPointer((void *) sim_buffer);
@@ -158,12 +158,11 @@ PYBIND11_MODULE(compute_arguments, module)
             }
 
             // register callback to kim api
-            error
-                = error
-                  || self.SetCallbackPointer(computeCallbackName,
-                                             LANGUAGE_NAME::cpp,
-                                             wrap_fptr,
-                                             reinterpret_cast<void * const>(d));
+            error = error || 
+              self.SetCallbackPointer(computeCallbackName,
+                                      LANGUAGE_NAME::cpp,
+                                      wrap_fptr,
+                                      reinterpret_cast<void * const>(d));
 
             return error;
           },
