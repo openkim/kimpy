@@ -95,14 +95,14 @@ int nbl_build(NeighList * const nl,
     min[k] = coordinates[k];
     max[k] = coordinates[k] + 1.0;  // +1 to prevent max==min for 1D and 2D case
   }
+  
   for (int i = 0; i < numberOfParticles; i++)
   {
     for (int j = 0; j < DIM; j++)
     {
-      if (max[j] < coordinates[DIM * i + j])
-      { max[j] = coordinates[DIM * i + j]; }
-      if (min[j] > coordinates[DIM * i + j])
-      { min[j] = coordinates[DIM * i + j]; }
+      int const l = DIM * i + j;
+      if (max[j] < coordinates[l]) {max[j] = coordinates[l]; }
+      if (min[j] > coordinates[l]) {min[j] = coordinates[l]; }
     }
   }
 
@@ -112,7 +112,7 @@ int nbl_build(NeighList * const nl,
   for (int i = 0; i < DIM; i++)
   {
     size[i] = static_cast<int>((max[i] - min[i]) / influenceDistance);
-    size[i] = size[i] <= 0 ? 1 : size[i];
+    if (size[i] <= 0) size[i] = 1;
     size_total *= size[i];
   }
   if (size_total > 1000000000)
