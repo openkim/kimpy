@@ -4,23 +4,21 @@
 #define HELPER_HPP_
 
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
-#include <stdlib.h>
-#include <vector>
-
 
 #define SMALL 1.0e-10
 
 #define MY_ERROR(message)                                             \
   {                                                                   \
-    std::cout << "* Error (Neighbor List): \"" << message             \
+    std::cerr << "* Error (Neighbor List): \"" << message             \
               << "\" : " << __LINE__ << ":" << __FILE__ << std::endl; \
-    exit(1);                                                          \
+    std::exit(1);                                                     \
   }
 
 #define MY_WARNING(message)                                           \
   {                                                                   \
-    std::cout << "* Error (Neighbor List) : \"" << message            \
+    std::cerr << "* Error (Neighbor List) : \"" << message            \
               << "\" : " << __LINE__ << ":" << __FILE__ << std::endl; \
   }
 
