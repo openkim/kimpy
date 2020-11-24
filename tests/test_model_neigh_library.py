@@ -1,8 +1,7 @@
-from __future__ import absolute_import, division, print_function
 import numpy as np
 import kimpy
 from kimpy import neighlist as nl
-from error import check_error, report_error
+from kimpy import check_error, report_error
 from ase.lattice.cubic import FaceCenteredCubic
 
 
@@ -18,7 +17,6 @@ def create_fcc_argon(alat=5.26):
 
 
 def test_main():
-
     modelname = 'ex_model_Ar_P_Morse_07C'
     print()
     print('=' * 80)
@@ -36,6 +34,7 @@ def test_main():
         modelname,
     )
     check_error(error, 'kimpy.model.create')
+
     if not requestedUnitsAccepted:
         report_error('requested units not accepted in kimpy.model.create')
 
@@ -60,18 +59,20 @@ def test_main():
     print('Number of compute_arguments:', num_compute_arguments)
 
     for i in range(num_compute_arguments):
-
         name, error = kimpy.compute_argument_name.get_compute_argument_name(i)
         check_error(error, 'kim_model.get_compute_argument_name')
 
-        dtype, error = kimpy.compute_argument_name.get_compute_argument_data_type(name)
+        dtype, error = \
+            kimpy.compute_argument_name.get_compute_argument_data_type(name)
         check_error(error, 'kim_model.get_compute_argument_data_type')
 
-        support_status, error = compute_arguments.get_argument_support_status(name)
+        support_status, error = \
+            compute_arguments.get_argument_support_status(name)
         check_error(error, 'compute_argument.get_argument_support_status')
 
         n_space_1 = 21 - len(str(name))
         n_space_2 = 7 - len(str(dtype))
+
         print(
             'Compute Argument name "{}" '.format(name)
             + ' ' * n_space_1
@@ -82,34 +83,29 @@ def test_main():
 
         # can only handle energy and force as a required arg
         if support_status == kimpy.support_status.required:
-            if (
-                name != kimpy.compute_argument_name.partialEnergy
-                or name != kimpy.compute_argument_name.partialForces
-            ):
+            if name not in (kimpy.compute_argument_name.partialEnergy,
+                            kimpy.compute_argument_name.partialForces):
                 report_error('Unsupported required ComputeArgument')
 
         # must have energy and forces
-        if (
-            name == kimpy.compute_argument_name.partialEnergy
-            or name == kimpy.compute_argument_name.partialForces
-        ):
-            if not (
-                support_status == kimpy.support_status.required
-                or support_status == kimpy.support_status.optional
-            ):
+        if name in (kimpy.compute_argument_name.partialEnergy,
+                    kimpy.compute_argument_name.partialForces):
+            if support_status not in (kimpy.support_status.required,
+                                      kimpy.support_status.optional):
                 report_error('Energy or forces not available')
     print()
 
     # check compute callbacks
-    num_callbacks = kimpy.compute_callback_name.get_number_of_compute_callback_names()
+    num_callbacks = \
+        kimpy.compute_callback_name.get_number_of_compute_callback_names()
     print('Number of callbacks:', num_callbacks)
 
     for i in range(num_callbacks):
-
         name, error = kimpy.compute_callback_name.get_compute_callback_name(i)
         check_error(error, 'kim_model.get_compute_callback_name')
 
-        support_status, error = compute_arguments.get_callback_support_status(name)
+        support_status, error = \
+            compute_arguments.get_callback_support_status(name)
         check_error(error, 'compute_argument.get_callback_support_status')
 
         n_space = 18 - len(str(name))
@@ -152,33 +148,33 @@ def test_main():
     particle_contributing = np.zeros(num_particles, dtype=np.intc)
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.numberOfParticles, num_particles
-    )
+        kimpy.compute_argument_name.numberOfParticles,
+        num_particles)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.particleSpeciesCodes, species_code
-    )
+        kimpy.compute_argument_name.particleSpeciesCodes,
+        species_code)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.particleContributing, particle_contributing
-    )
+        kimpy.compute_argument_name.particleContributing,
+        particle_contributing)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.coordinates, coords
-    )
+        kimpy.compute_argument_name.coordinates,
+        coords)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.partialEnergy, energy
-    )
+        kimpy.compute_argument_name.partialEnergy,
+        energy)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.partialForces, forces
-    )
+        kimpy.compute_argument_name.partialForces,
+        forces)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     # create neighbor list
@@ -187,8 +183,8 @@ def test_main():
     # register get neigh callback
 
     error = compute_arguments.set_callback_pointer(
-        kimpy.compute_callback_name.GetNeighborList, nl.get_neigh_kim(), neigh
-    )
+        kimpy.compute_callback_name.GetNeighborList,
+        nl.get_neigh_kim(), neigh)
     check_error(error, 'kimpy.compute_argument.set_callback_pointer')
 
     # influence distance and cutoff of model
@@ -201,10 +197,10 @@ def test_main():
     print()
 
     # species support and code
-    species_support, code, error = kim_model.get_species_support_and_code(
-        kimpy.species_name.Ar
-    )
-    check_error(error or not species_support, 'kim_model.get_species_support_and_code')
+    species_support, code, error = \
+        kim_model.get_species_support_and_code(kimpy.species_name.Ar)
+    check_error(error or not species_support,
+                'kim_model.get_species_support_and_code')
     print('Species Ar is supported and its code is:', code)
     print()
 
@@ -234,11 +230,16 @@ def test_main():
         argon = create_fcc_argon(a)
         # NOTE cannot change coords address
         np.copyto(coords, argon.get_positions())
-        error = nl.build(neigh, coords, model_influence_dist, model_cutoffs, need_neigh)
+        error = nl.build(neigh,
+                         coords,
+                         model_influence_dist,
+                         model_cutoffs,
+                         need_neigh)
         check_error(error, 'nl.build')
         error = kim_model.compute(compute_arguments)
         print(
-            '{:18.10e} {:18.10e} {:18.10e}'.format(energy[0], np.linalg.norm(forces), a)
+            '{:18.10e} {:18.10e} {:18.10e}'.format(
+                energy[0], np.linalg.norm(forces), a)
         )
 
     # destory neighbor list
