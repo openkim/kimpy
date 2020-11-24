@@ -142,14 +142,12 @@ species = [
     'user20',
 ]
 
-
 fields = {
     'FIELD_NAME': 'SPECIES_NAME',
     'FieldName': 'SpeciesName',
     'fieldName': 'speciesName',
     'field_name': 'species_name',
 }
-
 
 generate_bind(fields, species)
 generate_test(fields, species)
