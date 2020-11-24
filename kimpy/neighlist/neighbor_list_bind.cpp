@@ -5,6 +5,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #define MY_ERROR(message)                                             \
