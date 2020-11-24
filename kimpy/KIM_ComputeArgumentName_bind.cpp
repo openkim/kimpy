@@ -1,9 +1,12 @@
-#include "KIM_ComputeArgumentName.hpp"
-#include "KIM_DataType.hpp"  // Forward declaration in KIM_ComputeArgumentName.hpp
 #include <pybind11/embed.h>
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
+
+#include <string>
+
+#include "KIM_ComputeArgumentName.hpp"
+#include "KIM_DataType.hpp"  // Forward declaration in KIM_ComputeArgumentName.hpp
 
 namespace py = pybind11;
 using namespace py::literals;
