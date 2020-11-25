@@ -12,13 +12,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    # install dependencies
-    - name: gcc
+    - name: Install gcc
       run: |
         sudo apt-get update
         sudo apt-get install -yq gcc
         sudo apt-get install -yq gfortran
-    - name: kim-api
+    - name: Install kim-api
       run: |
         export KIMPY_DIR=${PWD}
         export KIM_API_VERSION="2.2.0"
@@ -45,6 +44,7 @@ jobs:
         python -m pip install ase
         python -m pip install pytest
     - name: Install
+      run: |
         python -m pip install .
     - name: Lint with flake8
       run: |
