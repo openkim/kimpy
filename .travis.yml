@@ -68,22 +68,20 @@ before_install:
 install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then 
       cd $KIMPY_DIR && cd .. ;
-      mkdir -p KIM-API && cd KIM-API;
-      export KIM-API_DIR=$PWD ;
+      mkdir -p KIM_API && cd KIM_API;
+      export KIM_API_DIR=$PWD ;
       cd ..;
       wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz ;
       tar Jxvf kim-api-$KIM_API_VERSION.txz ;
       cd kim-api-$KIM_API_VERSION ;
       mkdir build ;
       cd build ;
-      cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$KIM-API_DIR" ;
+      cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$KIM_API_DIR" ;
       make -j2 ;
       make install ;
-      source "$KIM-API_DIR/bin/kim-api-activate" ;
-      # ase
+      source "$KIM_API_DIR/bin/kim-api-activate" ;
       pip3 install ase ;
       cd $KIMPY_DIR ;
-      # kimpy
       pip3 install -e . ;
     fi
 
@@ -98,10 +96,8 @@ install:
       make -j2 ;
       sudo make install ;
       sudo ldconfig ;
-      # ase
       pip install ase ;
       cd $KIMPY_DIR ;
-      # kimpy
       pip install -e . ;
     fi
 
