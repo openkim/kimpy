@@ -124,7 +124,11 @@ class BuildExt(build_ext):
     }
 
     if sys.platform == 'darwin':
-        darwin_opts = ['-stdlib=libc++', '-mmacosx-version-min=10.7']
+        darwin_opts = []
+        if has_flag(super.compiler, '-stdlib=libc++'):
+            darwin_opts.append('-stdlib=libc++')
+
+        darwin_opts.append('-mmacosx-version-min=10.7')
         c_opts['unix'] += darwin_opts
         l_opts['unix'] += darwin_opts
 
