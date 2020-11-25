@@ -58,12 +58,23 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.9]
+        compiler: [clang, gcc]
     steps:
     - uses: actions/checkout@v2
-    - name: Homebrew 
-      run: brew bundle
     - name: Install gcc
-      run: brew update && brew upgrade && brew install gcc@10
+      run: brew update && brew upgrade && brew install gcc@9
+    - if: matrix.compiler == 'clang'
+      name: Set env
+      run: |
+        echo "CC=clang" >> $GITHUB_ENV
+        echo "CXX=clang++" >> $GITHUB_ENV
+        echo "FC=gfortran" >> $GITHUB_ENV
+    - if: matrix.compiler == 'gcc'
+      name: Set env
+      run: |
+        echo "CC=gcc-9" >> $GITHUB_ENV
+        echo "CXX=g++-9" >> $GITHUB_ENV
+        echo "FC=gfortran-9" >> $GITHUB_ENV
     - name: Install kim-api
       run: |
         export KIMPY_DIR=${PWD}
