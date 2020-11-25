@@ -62,7 +62,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install gcc
-      run: brew update && brew upgrade && brew install gcc@9
+      run: brew install gcc@9
     - if: matrix.compiler == 'clang'
       name: Set env
       run: |
@@ -87,7 +87,7 @@ jobs:
         tar Jxvf kim-api-$KIM_API_VERSION.txz
         cd kim-api-$KIM_API_VERSION
         mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$KIM_API_DIR"
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$KIM_API_DIR" -DCMAKE_Fortran_COMPILER=gfortran-9
         make -j2 
         make install
         source "$KIM_API_DIR/bin/kim-api-activate"
