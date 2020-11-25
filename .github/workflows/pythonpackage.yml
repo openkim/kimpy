@@ -4,17 +4,27 @@ on: [push]
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [macos-latest, ubuntu-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
     steps:
     - uses: actions/checkout@v2
-    - name: Homebrew build helpers install
-      run: brew bundle
+
+    - name: Homebrew for macOS
+      if: matrix.os == 'macos-latest'
+      run: brew bundle && brew update && brew upgrade
     - name: Install gcc
-      run: brew update && brew upgrade && brew install gcc@10
+      if: matrix.os == 'macos-latest'
+      run: brew install gcc@10
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -yq gcc
+        sudo apt-get install -yq gfortran
     - name: Install kim-api
+      if: matrix.os == 'macos-latest'
       run: |
         export KIMPY_DIR=${PWD}
         export KIM_API_VERSION="2.2.0"
@@ -31,41 +41,7 @@ jobs:
         make install
         source "$KIM_API_DIR/bin/kim-api-activate"
         cd $KIMPY_DIR
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install ase
-        python3 -m pip install pytest
-    - name: Install
-      run: |
-        python3 -m pip install .
-    - name: Lint with flake8
-      run: |
-        python3 -m pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        cd tests
-        pytest
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.6]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install gcc
-      run: |
-        sudo apt-get update
-        sudo apt-get install -yq gcc
-        sudo apt-get install -yq gfortran
-    - name: Install kim-api
+      if: matrix.os == 'ubuntu-latest'
       run: |
         export KIMPY_DIR=${PWD}
         export KIM_API_VERSION="2.2.0"
@@ -84,14 +60,32 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
+      if: matrix.os == 'macos-latest'
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install ase
+        python3 -m pip install pytest
+      if: matrix.os == 'ubuntu-latest'
       run: |
         python -m pip install --upgrade pip
         python -m pip install ase
         python -m pip install pytest
     - name: Install
+      if: matrix.os == 'macos-latest'
+      run: |
+        python3 -m pip install .
+      if: matrix.os == 'ubuntu-latest'
       run: |
         python -m pip install .
     - name: Lint with flake8
+      if: matrix.os == 'macos-latest'
+      run: |
+        python3 -m pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      if: matrix.os == 'ubuntu-latest'
       run: |
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
