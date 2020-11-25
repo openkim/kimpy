@@ -22,14 +22,11 @@ jobs:
         export KIMPY_DIR=${PWD}
         export KIM_API_VERSION="2.2.0"
         cd $KIMPY_DIR && cd ..
-        mkdir -p KIM_API && cd KIM_API
-        export KIM_API_DIR=${PWD}
-        cd ..
         wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
         tar Jxvf kim-api-$KIM_API_VERSION.txz
         cd kim-api-$KIM_API_VERSION
         mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$KIM_API_DIR"
+        cmake .. -DCMAKE_BUILD_TYPE=Release
         make -j2 
         sudo make install
         sudo ldconfig
