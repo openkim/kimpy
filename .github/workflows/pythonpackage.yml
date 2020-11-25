@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.6]
     steps:
     - uses: actions/checkout@v2
     - name: Install gcc
@@ -64,13 +64,13 @@ jobs:
     - name: Install gcc
       run: brew install gcc@9
     - if: matrix.compiler == 'clang'
-      name: Set env
+      name: Set clang env
       run: |
         echo "CC=clang" >> $GITHUB_ENV
         echo "CXX=clang++" >> $GITHUB_ENV
         echo "FC=gfortran" >> $GITHUB_ENV
     - if: matrix.compiler == 'gcc'
-      name: Set env
+      name: Set gcc env
       run: |
         echo "CC=gcc-9" >> $GITHUB_ENV
         echo "CXX=g++-9" >> $GITHUB_ENV
@@ -82,6 +82,7 @@ jobs:
         cd $KIMPY_DIR && cd ..
         mkdir -p KIM_API && cd KIM_API;
         export KIM_API_DIR=$PWD
+        echo "KIM_API_DIR=$PWD" >> $GITHUB_ENV
         cd ..
         wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
         tar Jxvf kim-api-$KIM_API_VERSION.txz
@@ -103,6 +104,7 @@ jobs:
         python3 -m pip install pytest
     - name: Install
       run: |
+        source "$KIM_API_DIR/bin/kim-api-activate"
         python3 -m pip install .
     - name: Lint with flake8
       run: |
