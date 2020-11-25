@@ -124,16 +124,16 @@ class BuildExt(build_ext):
     }
 
     if sys.platform == 'darwin':
-        darwin_opts = []
-        if has_flag(super.compiler, '-stdlib=libc++'):
-            darwin_opts.append('-stdlib=libc++')
-
-        darwin_opts.append('-mmacosx-version-min=10.7')
-        c_opts['unix'] += darwin_opts
-        l_opts['unix'] += darwin_opts
+        c_opts['unix'].append('-mmacosx-version-min=10.7')
+        l_opts['unix'].append('-mmacosx-version-min=10.7')
 
     def build_extensions(self):
         compiler_type = self.compiler.compiler_type
+
+        if sys.platform == 'darwin':
+            if has_flag(self.compiler, '-stdlib=libc++'):
+                self.c_opts['unix'].append('-stdlib=libc++')
+                self.l_opts['unix'].append('-stdlib=libc++')
 
         opts = self.c_opts.get(compiler_type, [])
         opts.append(cpp_flag(compiler_type, self.compiler))
