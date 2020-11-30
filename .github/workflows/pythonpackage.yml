@@ -120,8 +120,8 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8]
-        compiler: [gcc, clang]
+        python-version: [3.7, 3.8, 3.9]
+        compiler: [gcc]
     defaults:
       run:
         shell: msys2 {0}
