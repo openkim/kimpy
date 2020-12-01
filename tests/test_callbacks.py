@@ -34,13 +34,7 @@ def assert_1d_array(array_a, array_b):
 
 
 def assert_2d_array(array_a, array_b):
-    array_a = np.array(array_a, copy=False)
-    array_b = np.array(array_b, copy=False)
-    assert array_a.shape[0] == array_b.shape[0]
-    assert array_a.shape[1] == array_b.shape[1]
-    for i, j in zip(array_a, array_b):
-        for m, n in zip(i, j):
-            assert m == pytest.approx(n, 1e-6)
+    assert np.allclose(array_a, array_b)
 
 
 # neigh
