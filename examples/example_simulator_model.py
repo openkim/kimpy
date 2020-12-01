@@ -28,7 +28,7 @@ def example_main():
     for i in range(number_fields):
         extent, field_name, error = sm.get_simulator_field_metadata(i)
         check_error(error, 'get_simulator_field_metadata')
-        print('Field {} is {} and has lines:'.format(i, field_name))
+        print('Field {} is {} and has lines: {}'.format(i, field_name, extent))
         for j in range(extent):
             field_line, error = sm.get_simulator_field_line(i, j)
             check_error(error, 'get_simulator_field_line')
