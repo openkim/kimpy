@@ -113,7 +113,7 @@ def example_main():
 
         check_error(error, 'get_item_metadata_file')
         msg = 'Metadata file {} ({}) '.format(i, file_name)
-        msg = 'is of length {}'.format(file_length)
+        msg += 'is of length {}'.format(file_length)
         print(msg)
         print(file_str)
 
