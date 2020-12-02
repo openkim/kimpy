@@ -1,6 +1,5 @@
-from __future__ import absolute_import, division, print_function
 import kimpy
-from error import check_error, report_error
+from kimpy import charge_unit, check_error
 
 
 def dirs_for_collection(collection, col):
@@ -12,6 +11,7 @@ def dirs_for_collection(collection, col):
         extent, error = col.cache_list_of_directory_names(collection, it)
         check_error(error, 'cache_list_of_directory_names')
         print(str(collection), ':', str(it), ':')
+
         for i in range(extent):
             name, error = col.get_directory_name(i)
             check_error(error, 'get_directory_name')
@@ -24,11 +24,11 @@ def names_for_collection(collection, col):
         kimpy.collection_item_type.portableModel,
         kimpy.collection_item_type.simulatorModel,
     ]:
-        extent, error = col.cache_list_of_item_names_by_collection_and_type(
-            collection, it
-        )
+        extent, error = \
+            col.cache_list_of_item_names_by_collection_and_type(collection, it)
         check_error(error, 'cache_list_of_directory_names')
         print(str(collection), ':', str(it), ':')
+
         for i in range(extent):
             name, error = col.get_item_name_by_collection_and_type(i)
             check_error(error, 'get_item_name_by_collection_and_type')
@@ -83,20 +83,23 @@ def example_main():
         extent, error = col.cache_list_of_item_names_by_type(it)
         check_error(error, 'cache_list_of_item_names_by_type')
         print(str(it), ':')
+
         for i in range(extent):
             name, error = col.get_item_name_by_type(i)
             check_error(error, 'get_item_name_by_type')
             print('    ', name)
 
-    filename, collection, error = col.get_item_library_file_name_and_collection(
-        kimpy.collection_item_type.simulatorModel,
-        'Sim_LAMMPS_LJcut_AkersonElliott_Alchemy_PbAu',
-    )
+    filename, collection, error = \
+        col.get_item_library_file_name_and_collection(
+            kimpy.collection_item_type.simulatorModel,
+            'Sim_LAMMPS_LJcut_AkersonElliott_Alchemy_PbAu',)
+
     check_error(error, 'get_item_library_file_name_and_collection')
-    print(
-        'Simulator Model Sim_LAMMPS_LJcut_AkersonElliott_Alchemy_PbAu has library name ',
-        '"{}" and is part of the "{}" collection'.format(filename, str(collection)),
-    )
+
+    msg = 'Simulator Model Sim_LAMMPS_LJcut_AkersonElliott_Alchemy_PbAu '
+    msg += 'has library name "{}" and is part of the '.format(filename)
+    msg += '"{}" collection'.format(str(collection))
+    print(msg)
 
     extent, error = col.cache_list_of_item_metadata_files(
         kimpy.collection_item_type.simulatorModel,
@@ -105,10 +108,13 @@ def example_main():
     check_error(error, 'cache_list_of_item_metadata_files')
 
     for i in range(extent):
-        out = col.get_item_metadata_file(i)
-        file_name, file_length, file_raw_data, avail_as_str, file_str, error = out
+        file_name, file_length, file_raw_data, \
+            avail_as_str, file_str, error = col.get_item_metadata_file(i)
+
         check_error(error, 'get_item_metadata_file')
-        print('Metadata file {} ({}) is of length {}'.format(i, file_name, file_length))
+        msg = 'Metadata file {} ({}) '.format(i, file_name)
+        msg += 'is of length {}'.format(file_length)
+        print(msg)
         print(file_str)
 
     kimpy.collections.destroy(col)

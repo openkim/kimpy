@@ -1,4 +1,4 @@
-__version__ = "0.3.3"
+__version__ = "0.3.4"
 
 # import all modules
 from . import model
@@ -26,6 +26,7 @@ from . import simulator_model
 
 from . import neighlist
 
+from .err import KimPyError, check_error, report_error
 
 # needed by `from kimpy import *`
 __all__ = [
@@ -52,4 +53,7 @@ __all__ = [
     'collection_item_type',
     'simulator_model',
     'neighlist',
+    'KimPyError',
+    'check_error',
+    'report_error',
 ]

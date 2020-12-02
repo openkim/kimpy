@@ -8,9 +8,12 @@ fields = {
     'field_name': 'collection',
 }
 
-
-attributes = ['system', 'user', 'environmentVariable', 'currentWorkingDirectory']
-
+attributes = [
+    'system',
+    'user',
+    'environmentVariable',
+    'currentWorkingDirectory'
+]
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)

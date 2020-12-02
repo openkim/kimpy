@@ -1,8 +1,10 @@
-import os
+"""Generate binding & tests files."""
+
+from os.path import dirname, realpath, join
 
 
 def generate_bind(fields, attributes):
-    """ Generate binding code by replacing fields and writing attributes.
+    """Generate binding code by replacing fields and writing attributes.
 
     Arguments
     ---------
@@ -27,11 +29,10 @@ def generate_bind(fields, attributes):
 
     output: files with `fname` below
     """
-
     fname = 'KIM_FieldName_bind.cpp-template'
 
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    template_name = os.path.join(dir_path, fname)
+    dir_path = dirname(realpath(__file__))
+    template_name = join(dir_path, fname)
     with open(template_name, 'r') as fin:
         template = fin.read()
 
@@ -47,15 +48,17 @@ def generate_bind(fields, attributes):
         fname = fname.replace(key, value)
 
     # write to file
-    parent_path = os.path.dirname(dir_path)
-    fname = os.path.join(parent_path, 'kimpy', fname.split('-')[0])
+    parent_path = dirname(dir_path)
+    fname = join(parent_path, 'kimpy', fname.split('-')[0])
     with open(fname, 'w') as fout:
         fout.write('// This file is generated automatically by scripts\n')
         fout.write(template)
 
 
 def generate_test(fields, attributes):
-    """ Generate test for binding code by replacing fields and writing attributes.
+    """Generate test for binding code.
+
+    Generate test for binding codeby replacing fields and writing attributes.
 
     Argument
     --------
@@ -83,8 +86,8 @@ def generate_test(fields, attributes):
 
     fname = 'test_field_name.py-template'
 
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    template_name = os.path.join(dir_path, fname)
+    dir_path = dirname(realpath(__file__))
+    template_name = join(dir_path, fname)
     with open(template_name, 'r') as fin:
         template = fin.read()
 
@@ -111,8 +114,8 @@ def generate_test(fields, attributes):
     template = template.replace('rpls_num_attributes', str(len(attributes)))
 
     # write to file
-    parent_path = os.path.dirname(dir_path)
-    fname = os.path.join(parent_path, 'tests', fname.split('-')[0])
+    parent_path = dirname(dir_path)
+    fname = join(parent_path, 'tests', fname.split('-')[0])
     with open(fname, 'w') as fout:
         fout.write('# This file is generated automatically by scripts\n')
         fout.write(template)

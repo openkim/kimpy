@@ -1,14 +1,15 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
 build/
 dist/
 ase_kim_calculator.egg-info/
-*.so
-*.o
-*.pyc
-.eggs
-kimpy.egg-info
-kim.log
-.cache
-.pytest_cache/
 
 kimpy/SpeciesName_attributes.cpp
 kimpy/*Unit_bind.cpp
@@ -35,3 +36,37 @@ tests/test_support_status.py
 tests/test_log_verbosity.py
 tests/test_collection.py
 tests/test_collection_item_type.py
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+.vscode
+
+*.o
+*.pyc
+.eggs
+kimpy.egg-info
+kim.log
+.cache
+.pytest_cache/

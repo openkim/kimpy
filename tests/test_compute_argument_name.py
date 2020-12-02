@@ -1,4 +1,3 @@
-from __future__ import absolute_import, division, print_function
 import kimpy
 
 attributes = [
@@ -39,22 +38,21 @@ data_types = [
 
 
 def test_main():
-
     N = kimpy.compute_argument_name.get_number_of_compute_argument_names()
     assert N == 9
 
     all_instances = []
     for i in range(N):
         inst, error = kimpy.compute_argument_name.get_compute_argument_name(i)
-        all_instances.append(inst)
-        dtype, dtype_error = kimpy.compute_argument_name.get_compute_argument_data_type(
-            inst
-        )
-
-        assert error == False
-        assert dtype_error == False
+        assert not error
         assert inst == attributes[i]
         assert str(inst) == str_names[i]
+
+        all_instances.append(inst)
+
+        dtype, error = \
+            kimpy.compute_argument_name.get_compute_argument_data_type(inst)
+        assert not error
         assert dtype == data_types[i]
 
     # test operator overloading
@@ -65,11 +63,11 @@ def test_main():
 
     # test known
     for inst in all_instances:
-        assert inst.known() == True
+        assert inst.known()
 
     # test out of bound
     inst, error = kimpy.compute_argument_name.get_compute_argument_name(N)
-    assert error == True
+    assert error
 
 
 if __name__ == '__main__':

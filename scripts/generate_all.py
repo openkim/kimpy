@@ -1,4 +1,7 @@
-import os
+"""Generate tests scripts."""
+
+from os.path import dirname, realpath, join
+import sys
 import subprocess
 
 all_fnames = [
@@ -15,8 +18,10 @@ all_fnames = [
     'generate_CollectionItemType_bind_test.py',
 ]
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+dir_path = dirname(realpath(__file__))
 for fname in all_fnames:
-    fname = os.path.join(dir_path, fname)
-    print('\nRunning script:\n{}\nto generate binding and test files.\n'.format(fname))
-    subprocess.call(['python', fname])
+    fname = join(dir_path, fname)
+    MSG = '\nRunning script:\n{}\n'.format(fname)
+    MSG += 'to generate binding and test files.\n'
+    print(MSG)
+    subprocess.call([sys.executable, fname])

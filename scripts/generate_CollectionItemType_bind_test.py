@@ -9,8 +9,11 @@ fields = {
 }
 
 
-attributes = ['modelDriver', 'portableModel', 'simulatorModel']
-
+attributes = [
+    'modelDriver',
+    'portableModel',
+    'simulatorModel'
+]
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)

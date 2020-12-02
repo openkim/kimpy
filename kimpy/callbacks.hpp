@@ -39,8 +39,7 @@ int get_neigh(void const * const dataObject,
   py::dict pydata = d["pydata"];
 
   // pack cutoffs as py::array
-  py::array_t<double, py::array::c_style> pycutoffs(
-      {static_cast<size_t>(numberOfCutoffs)});
+  py::array_t<double, py::array::c_style> pycutoffs(numberOfCutoffs);
   auto p_pycutoffs = pycutoffs.mutable_data(0);
   for (int i = 0; i < numberOfCutoffs; i++) { p_pycutoffs[i] = cutoffs[i]; }
 
@@ -49,7 +48,7 @@ int get_neigh(void const * const dataObject,
   auto neigh = static_cast<py::array_t<int> >(out[0]);
   auto error = out[1].cast<int>();
   *neighborsOfParticle = neigh.data();
-  *numberOfNeighbors = neigh.size();
+  *numberOfNeighbors = static_cast<int>(neigh.size());
 
   return error;
 }
@@ -89,7 +88,7 @@ int process_dEdr(void const * const dataObject,
   py::dict pydata = d["pydata"];
 
   // pack dx as py::array
-  py::array_t<double, py::array::c_style> pydx({3});
+  py::array_t<double, py::array::c_style> pydx(3);
   auto p_pydx = pydx.mutable_data(0);
   for (int ii = 0; ii < 3; ii++) { p_pydx[ii] = dx[ii]; }
 
@@ -135,9 +134,9 @@ int process_d2Edr2(void const * const dataObject,
   py::dict pydata = d["pydata"];
 
   // pack data as py::array
-  py::array_t<double, py::array::c_style> pyr({2});
-  py::array_t<int, py::array::c_style> pyi({2});
-  py::array_t<int, py::array::c_style> pyj({2});
+  py::array_t<double, py::array::c_style> pyr(2);
+  py::array_t<int, py::array::c_style> pyi(2);
+  py::array_t<int, py::array::c_style> pyj(2);
   auto p_pyr = pyr.mutable_data(0);
   auto p_pyi = pyi.mutable_data(0);
   auto p_pyj = pyj.mutable_data(0);
@@ -147,7 +146,7 @@ int process_d2Edr2(void const * const dataObject,
     p_pyi[ii] = i[ii];
     p_pyj[ii] = j[ii];
   }
-  py::array_t<double, py::array::c_style> pydx({6});
+  py::array_t<double, py::array::c_style> pydx(6);
   auto p_pydx = pydx.mutable_data(0);
   for (int ii = 0; ii < 6; ii++) { p_pydx[ii] = dx[ii]; }
 

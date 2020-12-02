@@ -1,6 +1,9 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include <memory>
+#include <string>
+
 #include "KIM_SimulatorHeaders.hpp"
 #include "sim_buffer.h"
 
@@ -20,8 +23,8 @@ PYBIND11_MODULE(simulator_model, module)
   // destroy function from the C++ side to avoid memory leaks. For more info,
   // see http://pybind11.readthedocs.io/en/stable/advanced/classes.html
 
-  py::class_<SimulatorModel, std::unique_ptr<SimulatorModel, py::nodelete> > cl(
-      module, "SimulatorModel");
+  py::class_<SimulatorModel, std::unique_ptr<SimulatorModel, py::nodelete> > 
+    cl(module, "SimulatorModel");
 
   // python constructor needs to return a pointer to the C++ instance
   cl.def(py::init([](std::string const & simulatorModelName,
@@ -42,7 +45,7 @@ PYBIND11_MODULE(simulator_model, module)
             re[1] = *simulatorVersion;
             return re;
           },
-          "Return(SimulatorName, SimulatorVersion)")
+          "Return(simulatorName, simulatorVersion)")
 
       .def(
           "get_number_of_supported_species",
@@ -162,6 +165,20 @@ PYBIND11_MODULE(simulator_model, module)
           },
           py::arg("index"),
           "Return(paramFileName, error)")
+
+      .def(
+          "get_parameter_file_base_name",
+          [](SimulatorModel & self, int const index) {
+            std::string const * paramFileBaseName;
+            int error = self.GetParameterFileBasename(index, &paramFileBaseName);
+
+            py::tuple re(2);
+            re[0] = *paramFileBaseName;
+            re[1] = error;
+            return re;
+          },
+          py::arg("index"),
+          "Return(paramFileBaseName, error)")
 
       .def("__repr__", &SimulatorModel::ToString)
 

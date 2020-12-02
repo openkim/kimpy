@@ -11,36 +11,30 @@ KIM KPI is reflected locally by changing the data in the callbacks when it is la
 called.
 """
 
-from __future__ import absolute_import, division, print_function
 import numpy as np
 import kimpy
-from error import check_error, report_error
+from kimpy import check_error, report_error
 from ase import Atoms
 import pytest
 
 
 # create a dimer of two atoms
-def get_dimer():
-    argon = Atoms(
-        'ArAr', positions=[(0, 0, 0), (0.1, 0.2, 0.2)], cell=(10, 10, 10), pbc=(0, 0, 0)
-    )
+def get_argon_dimer():
+    argon = Atoms('ArAr',
+                  positions=[(0, 0, 0), (0.1, 0.2, 0.2)],
+                  cell=(10, 10, 10),
+                  pbc=(0, 0, 0))
     return argon
 
 
-def assert_1d_array(A, B):
-    assert len(A) == len(B)
-    for i, j in zip(A, B):
+def assert_1d_array(array_a, array_b):
+    assert len(array_a) == len(array_b)
+    for i, j in zip(array_a, array_b):
         assert i == pytest.approx(j, 1e-6)
 
 
-def assert_2d_array(A, B):
-    A = np.array(A)
-    B = np.array(B)
-    assert A.shape[0] == B.shape[0]
-    assert A.shape[1] == B.shape[1]
-    for i, j in zip(A, B):
-        for m, n in zip(i, j):
-            assert m == pytest.approx(n, 1e-6)
+def assert_2d_array(array_a, array_b):
+    assert np.allclose(array_a, array_b)
 
 
 # neigh
@@ -132,6 +126,7 @@ def test_main():
         modelname,
     )
     check_error(error, 'kimpy.model.create')
+
     if not requestedUnitsAccepted:
         report_error('requested units not accepted in kimpy.model.create')
 
@@ -140,7 +135,7 @@ def test_main():
     check_error(error, 'kim_model.compute_arguments_create')
 
     # register argument
-    argon = get_dimer()
+    argon = get_argon_dimer()
 
     coords = np.asarray(argon.get_positions(), dtype=np.double)
     N = coords.shape[0]
@@ -151,40 +146,40 @@ def test_main():
     particle_contributing = np.zeros(num_particles, dtype=np.intc)
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.numberOfParticles, num_particles
-    )
+        kimpy.compute_argument_name.numberOfParticles,
+        num_particles)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.particleSpeciesCodes, species_code
-    )
+        kimpy.compute_argument_name.particleSpeciesCodes,
+        species_code)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.particleContributing, particle_contributing
-    )
+        kimpy.compute_argument_name.particleContributing,
+        particle_contributing)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.coordinates, coords
-    )
+        kimpy.compute_argument_name.coordinates,
+        coords)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.partialEnergy, energy
-    )
+        kimpy.compute_argument_name.partialEnergy,
+        energy)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     error = compute_arguments.set_argument_pointer(
-        kimpy.compute_argument_name.partialForces, forces
-    )
+        kimpy.compute_argument_name.partialForces,
+        forces)
     check_error(error, 'kimpy.compute_argument.set_argument_pointer')
 
     # species support and code
-    species_support, code, error = kim_model.get_species_support_and_code(
-        kimpy.species_name.Ar
-    )
-    check_error(error or not species_support, 'kim_model.get_species_support_and_code')
+    species_support, code, error = \
+        kim_model.get_species_support_and_code(kimpy.species_name.Ar)
+    check_error(error or not species_support,
+                'kim_model.get_species_support_and_code')
 
     # setup particle species
     species_code[:] = code
@@ -194,18 +189,18 @@ def test_main():
 
     # register callbacks
     error = compute_arguments.set_callback(
-        kimpy.compute_callback_name.GetNeighborList, get_neigh, neigh_data
-    )
+        kimpy.compute_callback_name.GetNeighborList,
+        get_neigh, neigh_data)
     check_error(error, 'kimpy.compute_argument.set_callback')
 
     error = compute_arguments.set_callback(
-        kimpy.compute_callback_name.ProcessDEDrTerm, process_dEdr, dEdr_data
-    )
+        kimpy.compute_callback_name.ProcessDEDrTerm,
+        process_dEdr, dEdr_data)
     check_error(error, 'kimpy.compute_argument.set_callback')
 
     error = compute_arguments.set_callback(
-        kimpy.compute_callback_name.ProcessD2EDr2Term, process_d2Edr2, d2Edr2_data
-    )
+        kimpy.compute_callback_name.ProcessD2EDr2Term,
+        process_d2Edr2, d2Edr2_data)
     check_error(error, 'kimpy.compute_argument.set_callback')
 
     # 1st call of compute

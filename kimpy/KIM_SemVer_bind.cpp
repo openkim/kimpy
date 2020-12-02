@@ -1,6 +1,10 @@
-#include "KIM_SemVer.hpp"
-#include <iostream>
+
 #include <pybind11/pybind11.h>
+
+#include <iostream>
+#include <string>
+
+#include "KIM_SemVer.hpp"
 
 namespace py = pybind11;
 using namespace KIM;
@@ -28,7 +32,7 @@ PYBIND11_MODULE(sem_ver, module)
       },
       py::arg("versionA"),
       py::arg("versionB"),
-      "Return(IsLessThan, error)");
+      "Return(isLessThan, error)");
 
   module.def(
       "parse_sem_ver",

@@ -1,5 +1,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
+
+#include <string>
+
 #include "KIM_FieldName.hpp"
 
 namespace py = pybind11;
@@ -9,17 +12,17 @@ using namespace KIM;
 PYBIND11_MODULE(field_name, module) {
   module.doc() = "Python binding to KIM_FieldName.hpp";
 
-
   // classes
 
-  py::class_<FieldName> cl (module, "FieldName");
+  py::class_<FieldName> cl(module, "FieldName");
+  
   cl.def(py::init<>())
-  .def(py::init<int const>())
-  .def(py::init<std::string const>())
-  .def("known", &FieldName::Known)
-  .def(py::self == py::self)
-  .def(py::self != py::self)
-  .def("__repr__", &FieldName::ToString);
+    .def(py::init<int const>())
+    .def(py::init<std::string const>())
+    .def("known", &FieldName::Known)
+    .def(py::self == py::self)
+    .def(py::self != py::self)
+    .def("__repr__", &FieldName::ToString);
 
 
   // functions
@@ -49,6 +52,7 @@ PYBIND11_MODULE(field_name, module) {
 
 
   // attributes
+
 rpls_attributes
 
 }
