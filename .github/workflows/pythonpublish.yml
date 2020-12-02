@@ -9,8 +9,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Install gcc
+      run: |
+        sudo apt-get update
+        sudo apt-get install -yq gcc
+        sudo apt-get install -yq gfortran
+    - name: Install kim-api
+      run: |
+        export KIMPY_DIR=${PWD}
+        export KIM_API_VERSION="2.2.0"
+        cd $KIMPY_DIR && cd ..
+        wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
+        tar Jxvf kim-api-$KIM_API_VERSION.txz
+        cd kim-api-$KIM_API_VERSION
+        mkdir build && cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        make -j2
+        sudo make install
+        sudo ldconfig
+        cd $KIMPY_DIR
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: '3.x'
     - name: Install dependencies
