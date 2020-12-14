@@ -18,7 +18,7 @@ jobs:
     - name: Install kim-api
       run: |
         export KIMPY_DIR=${PWD}
-        export KIM_API_VERSION="2.2.0"
+        export KIM_API_VERSION="2.2.1"
         cd $KIMPY_DIR && cd ..
         wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
         tar Jxvf kim-api-$KIM_API_VERSION.txz
@@ -77,7 +77,7 @@ jobs:
     - name: Install kim-api
       run: |
         export KIMPY_DIR=${PWD}
-        export KIM_API_VERSION="2.2.0"
+        export KIM_API_VERSION="2.2.1"
         cd $KIMPY_DIR && cd ..
         mkdir -p KIM_API && cd KIM_API
         export KIM_API_DIR=$PWD
@@ -151,7 +151,7 @@ jobs:
     - name: Install KIM-API
       run: |
         export KIMPY_DIR=${PWD}
-        export KIM_API_VERSION="2.2.0"
+        export KIM_API_VERSION="2.2.1"
         cd $KIMPY_DIR && cd ..
         wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
         tar Jxvf kim-api-$KIM_API_VERSION.txz
