@@ -10,6 +10,11 @@
 namespace py = pybind11;
 using namespace KIM;
 
+struct PyCollectionsDestroy {
+  void operator()(Collections *collections) const {
+    Collections::Destroy(&collections);
+  }
+};
 
 PYBIND11_MODULE(collections, module)
 {
@@ -23,8 +28,8 @@ PYBIND11_MODULE(collections, module)
   // destroy function from the C++ side to avoid memory leaks. For more info,
   // see http://pybind11.readthedocs.io/en/stable/advanced/classes.html
 
-  py::class_<Collections, std::unique_ptr<Collections, py::nodelete> > cl(
-      module, "Collections");
+  py::class_<Collections, std::unique_ptr<Collections, PyCollectionsDestroy>>
+    cl(module, "Collections");
 
   // python constructor needs to return a pointer to the C++ instance
   cl.def(py::init([](py::array_t<int> error) {

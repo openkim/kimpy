@@ -11,6 +11,11 @@
 namespace py = pybind11;
 using namespace KIM;
 
+struct PyModelDestroy {
+  void operator()(Model *model) const {
+    Model::Destroy(&model);
+  }
+};
 
 PYBIND11_MODULE(model, module)
 {
@@ -24,7 +29,7 @@ PYBIND11_MODULE(model, module)
   // destroy function from the C++ side to avoid memory leaks. For more info,
   // see http://pybind11.readthedocs.io/en/stable/advanced/classes.html
 
-  py::class_<Model, std::unique_ptr<Model, py::nodelete> > cl(module, "Model");
+  py::class_<Model, std::unique_ptr<Model, PyModelDestroy>> cl(module, "Model");
 
   // python constructor needs to return a pointer to the C++ instance
   cl.def(py::init([](Numbering const numbering,
@@ -88,9 +93,9 @@ PYBIND11_MODULE(model, module)
                 &numberOfCutoffs, &cutoff_ptr, &paddingNoNeighborHints_ptr);
 
             py::array_t<double, py::array::c_style> cutoffs(numberOfCutoffs);
-            py::array_t<int, py::array::c_style> 
+            py::array_t<int, py::array::c_style>
               paddingNoNeighborHints(numberOfCutoffs);
-            
+
             auto cut = cutoffs.mutable_data(0);
             auto pnh = paddingNoNeighborHints.mutable_data(0);
             for (int i = 0; i < numberOfCutoffs; i++)
@@ -152,7 +157,7 @@ PYBIND11_MODULE(model, module)
             if (sim_buffer)
             {
               for (std::size_t i = 0; i < sim_buffer->callbacks.size(); i++)
-              { 
+              {
                 if (sim_buffer->callbacks[i]) delete sim_buffer->callbacks[i];
               }
               delete sim_buffer;

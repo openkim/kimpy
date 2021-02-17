@@ -1,7 +1,7 @@
 
 #include <pybind11/pybind11.h>
 
-#include <memory> 
+#include <memory>
 #include <string>
 
 #include "KIM_Log.hpp"
@@ -10,6 +10,11 @@
 namespace py = pybind11;
 using namespace KIM;
 
+struct PyLogDestroy {
+  void operator()(Log *log) const {
+    Log::Destroy(&log);
+  }
+};
 
 PYBIND11_MODULE(log, module)
 {
@@ -23,7 +28,7 @@ PYBIND11_MODULE(log, module)
   // destroy function from the C++ side to avoid memory leaks. For more info,
   // see http://pybind11.readthedocs.io/en/stable/advanced/classes.html
 
-  py::class_<Log, std::unique_ptr<Log, py::nodelete> > cl(module, "Log");
+  py::class_<Log, std::unique_ptr<Log, PyLogDestroy> > cl(module, "Log");
 
   // python constructor needs to return a pointer to the C++ instance
   cl.def(py::init([]() {
