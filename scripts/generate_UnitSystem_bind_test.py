@@ -3,7 +3,7 @@ from generate_bind_test_commons import generate_bind, generate_test
 length_unit = {
     'FIELD_NAME': 'LENGTH_UNIT',
     'FieldName': 'LengthUnit',
-    'filedName': 'lengthUnit',
+    'fieldName': 'lengthUnit',
     'field_name': 'length_unit',
 }
 
@@ -19,7 +19,7 @@ length_attributes = [
 energy_unit = {
     'FIELD_NAME': 'ENERGY_UNIT',
     'FieldName': 'EnergyUnit',
-    'filedName': 'energyUnit',
+    'fieldName': 'energyUnit',
     'field_name': 'energy_unit',
 }
 
@@ -36,7 +36,7 @@ energy_attributes = [
 charge_unit = {
     'FIELD_NAME': 'CHARGE_UNIT',
     'FieldName': 'ChargeUnit',
-    'filedName': 'chargeUnit',
+    'fieldName': 'chargeUnit',
     'field_name': 'charge_unit',
 }
 
@@ -50,7 +50,7 @@ charge_attributes = [
 temperature_unit = {
     'FIELD_NAME': 'TEMPERATURE_UNIT',
     'FieldName': 'TemperatureUnit',
-    'filedName': 'temperatureUnit',
+    'fieldName': 'temperatureUnit',
     'field_name': 'temperature_unit',
 }
 
@@ -62,7 +62,7 @@ temperature_attributes = [
 time_unit = {
     'FIELD_NAME': 'TIME_UNIT',
     'FieldName': 'TimeUnit',
-    'filedName': 'timeUnit',
+    'fieldName': 'timeUnit',
     'field_name': 'time_unit',
 }
 
@@ -73,7 +73,6 @@ time_attributes = [
     'ns',
     's'
 ]
-
 
 all_units = [
     length_unit,
