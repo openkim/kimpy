@@ -14,7 +14,7 @@ def generate_bind(fields, attributes):
       length_unit = {
         'FIELD_NAME': 'LENGTH_UNIT',
         'FieldName': 'LengthUnit',
-        'filedName': 'lengthUnit',
+        'fieldName': 'lengthUnit',
         'field_name': 'length_unit'}
 
     attributes: list of str
@@ -68,7 +68,7 @@ def generate_test(fields, attributes):
       length_unit = {
         'FIELD_NAME': 'LENGTH_UNIT',
         'FieldName': 'LengthUnit',
-        'filedName': 'lengthUnit',
+        'fieldName': 'lengthUnit',
         'field_name': 'length_unit'}
 
     attributes: list of str
