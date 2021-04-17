@@ -25,10 +25,6 @@ def generate_files():
     subprocess.call([sys.executable, generate_script])
 
 
-# Run scripts to generate files.
-generate_files()
-
-
 def inquire_kim_api(kim_api_key):
     """Get compile and link flags of kim-api package."""
     try:
@@ -84,11 +80,10 @@ def has_flag(compiler, flag_name):
     try:
         compiler.compile([tempfile_name], extra_postargs=[flag_name])
     except distutils.errors.CompileError:
-        print(
-            f"Checking whether the compiler supports flag: '{flag_name}'. You may see "
-            "compilation error (e.g. gcc: error: unrecognized command line option "
-            f"{flag_name}). Just ignore it; we are on the right track."
-        )
+        print(f"Checking whether the compiler supports flag: '{flag_name}'. "
+              "You may see compilation error (e.g. gcc: error: unrecognized "
+              f"command line option {flag_name}). Just ignore it; we are on "
+              "the right track.")
         return False
     finally:
         try:
@@ -111,10 +106,12 @@ def cpp_flag(compiler_type, compiler):
     for flag in flags:
         if has_flag(compiler, flag):
             return flag
+
     if compiler_type == "unix":
         msg = "Unsupported compiler -- at least C++11 support is needed!"
     else:
         msg = "Unsupported compiler -- at least C++17 support is needed!"
+
     raise Exception(msg)
 
 
@@ -182,7 +179,8 @@ def get_include_dirs():
     include_dirs = inquire_kim_api("--cflags-only-I")
     include_dirs.append(get_pybind_include())
     include_dirs.append(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "kimpy", "neighlist")
+        os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                     "kimpy", "neighlist")
     )
     return include_dirs
 
@@ -301,7 +299,9 @@ def chech_kim_api_compatibility():
         kim_api_version = modversion
 
     kimpy_version = get_kimpy_version()
-    kim_api_compatibility = check_kim_api_compatibility(kimpy_version, kim_api_version)
+    kim_api_compatibility = check_kim_api_compatibility(
+        kimpy_version, kim_api_version)
+
     if kim_api_compatibility is not None:
         raise Exception(kim_api_compatibility)
 
@@ -309,6 +309,8 @@ def chech_kim_api_compatibility():
 # Check kim-api compatibility
 chech_kim_api_compatibility()
 
+# Run scripts to generate files.
+generate_files()
 
 setup(
     name="kimpy",
@@ -318,8 +320,8 @@ setup(
     install_requires=["pybind11", "numpy", "pytest"],
     cmdclass={"build_ext": BuildExt},
     ext_modules=get_kimpy_ext_modules(),
-    author="Mingjian Wen",
-    author_email="wenxx151@gmail.com",
+    author="Mingjian Wen, Yaser Afshar",
+    author_email="wenxx151@gmail.com, yafshar@umn.edu",
     url="https://github.com/openkim/kimpy",
     description="Python interface to the KIM-API",
     long_description="Python interface to the KIM-API. For more "
