@@ -41,6 +41,7 @@ def remove_generated_files(path):
             "err.py",
             "neighlist",
             "sim_buffer.h",
+            "py_kim_wrapper.h"
         ],
         'scripts': [
             "KIM_FieldName_bind.cpp-template",
