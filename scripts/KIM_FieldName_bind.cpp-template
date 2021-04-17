@@ -8,52 +8,68 @@
 namespace py = pybind11;
 using namespace KIM;
 
-
 PYBIND11_MODULE(field_name, module) {
   module.doc() = "Python binding to KIM_FieldName.hpp";
 
   // classes
 
   py::class_<FieldName> cl(module, "FieldName");
-  
+
   cl.def(py::init<>())
     .def(py::init<int const>())
     .def(py::init<std::string const>())
     .def("known", &FieldName::Known)
     .def(py::self == py::self)
     .def(py::self != py::self)
-    .def("__repr__", &FieldName::ToString);
-
+    .def("__repr__", &FieldName::ToString)
+    .def(py::pickle(
+      // __getstate__
+      [](FieldName const &fieldName) {
+        // Return a tuple that fully encodes
+        // the state of the fieldName object
+        return py::make_tuple(fieldName.fieldNameID);
+      },
+      // __setstate__
+      [](py::tuple t) {
+        if (t.size() != 1) {
+          throw std::runtime_error("Invalid state!");
+        }
+        // Create a new instance
+        FieldName fieldName(t[0].cast<int>());
+        return fieldName;
+      }
+    ));
 
   // functions
 
-  module.def("get_field_name",
-    [](int const index) {
+  module.def("get_field_name", [](int const index) {
       FieldName fieldName;
-      int error = FIELD_NAME::GetFieldName(index, &fieldName);
 
-      py::tuple re(2);
-      re[0] = fieldName;
-      re[1] = error;
-      return re;
-    },
-    py::arg("index"),
-    "Return(FieldName, error)"
+      int error = FIELD_NAME::GetFieldName(
+        index, &fieldName);
+      if (error == 1) {
+        throw std::runtime_error(
+          "index < 0 or index >= numberOfFieldNames!");
+      }
+
+      return fieldName;
+    }, "Get the identity of each defined standard FieldName.",
+       py::arg("index"),
+       "Return fieldName"
   );
 
-  module.def("get_number_of_field_names",
-    []() {
+  module.def("get_number_of_field_names", []() {
       int numberOfFieldNames;
-      FIELD_NAME::GetNumberOfFieldNames(&numberOfFieldNames);
-      return numberOfFieldNames;
-    },
-    "Return numberOfFieldNames"
-  );
 
+      FIELD_NAME::GetNumberOfFieldNames(
+        &numberOfFieldNames);
+
+      return numberOfFieldNames;
+    }, "Get the number of standard FieldName.",
+       "Return numberOfFieldNames"
+  );
 
   // attributes
 
 rpls_attributes
-
 }
-
