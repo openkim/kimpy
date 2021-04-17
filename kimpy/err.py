@@ -4,8 +4,6 @@ import inspect
 
 __all__ = [
     'KimPyError',
-    'check_error',
-    'report_error'
 ]
 
 
@@ -32,25 +30,3 @@ class KimPyError(Exception):
     def __str__(self):
         """Message string representation."""
         return self.msg
-
-
-def check_error(error, message=None):
-    """Check KIM-API return error.
-
-    Args:
-        error (int): 0 indicate everything went well
-        message (str, optional): error message. Defaults to None.
-    """
-    if error != 0 and error is not None:
-        msg = 'KIM error. Calling "{}" failed.'.format(message)
-        raise KimPyError(msg)
-
-
-def report_error(message=None):
-    """Check KIM-API return error.
-
-    Args:
-        message (str, optional): error message. Defaults to None.
-    """
-    msg = 'KIM error. {}.'.format(message)
-    raise KimPyError(msg)
