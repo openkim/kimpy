@@ -142,13 +142,12 @@ For exampe:
     FUNCTIONS
         get_compute_argument_name(...)
         get_compute_argument_name(index: int) -> tuple
-        Return(ComputeArgumentName, error)
+        Return computeArgumentName
     ```
 
     shows that the function `get_compute_argument_name` takes an integer
-    `index` as input, and returns a tuple of two outputs: `ComputeArgumentName`
-    and `error`. You can refer to `KIM API` docs for the meaning of the input
-    and outputs.
+    `index` as input, and returns an output: `computeArgumentName`. You can
+    refer to `KIM API` docs for the meaning of the input and outputs.
 
     All the attributes of the module are listed under `DATA`. For example,
 
