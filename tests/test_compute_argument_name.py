@@ -43,16 +43,27 @@ def test_main():
 
     all_instances = []
     for i in range(N):
-        inst, error = kimpy.compute_argument_name.get_compute_argument_name(i)
-        assert not error
+        try:
+            inst = kimpy.compute_argument_name.get_compute_argument_name(i)
+        except RuntimeError:
+            msg = 'Calling "kimpy.compute_argument_name.'
+            msg += 'get_compute_argument_name" failed.'
+            raise kimpy.KimPyError(msg)
+
         assert inst == attributes[i]
         assert str(inst) == str_names[i]
 
         all_instances.append(inst)
 
-        dtype, error = \
-            kimpy.compute_argument_name.get_compute_argument_data_type(inst)
-        assert not error
+        try:
+            dtype = \
+                kimpy.compute_argument_name.get_compute_argument_data_type(
+                    inst)
+        except RuntimeError:
+            msg = 'Calling "kimpy.compute_argument_name.'
+            msg += 'get_compute_argument_data_type" failed.'
+            raise kimpy.KimPyError(msg)
+
         assert dtype == data_types[i]
 
     # test operator overloading
@@ -66,8 +77,14 @@ def test_main():
         assert inst.known()
 
     # test out of bound
-    inst, error = kimpy.compute_argument_name.get_compute_argument_name(N)
-    assert error
+    capture_out_of_bound_error = False
+
+    try:
+        inst = kimpy.compute_argument_name.get_compute_argument_name(N)
+    except RuntimeError:
+        capture_out_of_bound_error = True
+
+    assert capture_out_of_bound_error
 
 
 if __name__ == '__main__':
