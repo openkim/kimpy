@@ -85,6 +85,6 @@ PYBIND11_MODULE(log, module)
      Create a new KIM-API Log object.
 
      Returns:
-          log
+          Log: log
      )pbdoc");
 }

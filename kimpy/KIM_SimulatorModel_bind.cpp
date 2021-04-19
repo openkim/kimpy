@@ -273,6 +273,6 @@ PYBIND11_MODULE(simulator_model, module)
      Create a new KIM-API simulator_model object.
 
      Returns:
-         simulator_model
+         SimulatorModel: simulator_model
      )pbdoc");
 }

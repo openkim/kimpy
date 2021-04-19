@@ -55,7 +55,7 @@ PYBIND11_MODULE(collections, module)
        a specific name.
 
        Returns:
-           collection_item_type
+           CollectionItemType: collection_item_type
        )pbdoc",
        py::arg("item_name"))
     .def("get_item_library_file_name_and_collection",
@@ -82,7 +82,7 @@ PYBIND11_MODULE(collections, module)
        Get the item's library file name and its KIM::Collection.
 
        Returns:
-           str, collection: file_name, collection
+           str, Collection: file_name, collection
        )pbdoc",
        py::arg("item_type"),
        py::arg("item_name"))
@@ -138,7 +138,7 @@ PYBIND11_MODULE(collections, module)
        Get the name and content of one of an item's metadata files.
 
        Returns:
-           str, int, str, bool, str: file_name, file_length, file_raw_data,
+           str, int, str, int, str: file_name, file_length, file_raw_data,
                 available_as_string, file_string
        )pbdoc",
        py::arg("index"))
@@ -296,7 +296,7 @@ PYBIND11_MODULE(collections, module)
        Get the name and content of one of an item's metadata files.
 
        Returns:
-           str, int, str, bool, int: file_name, file_length, file_raw_data,
+           str, int, str, int, int: file_name, file_length, file_raw_data,
                 available_as_string, file_string
        )pbdoc",
        py::arg("index"))
@@ -432,6 +432,6 @@ PYBIND11_MODULE(collections, module)
        Create a new KIM-API collections object.
 
        Returns:
-           collections: collections
+           Collections: collections
        )pbdoc");
 }

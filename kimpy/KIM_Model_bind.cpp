@@ -143,7 +143,9 @@ PYBIND11_MODULE(model, module)
        Get the model's base unit values.
 
        Returns:
-           length_unit, energy_unit, charge_unit, temperature_unit, time_unit
+           LengthUnit, EnergyUnit, ChargeUnit, TemperatureUnit, TimeUnit:
+               length_unit, energy_unit, charge_unit, temperature_unit,
+               time_unit
        )pbdoc")
     .def("compute_arguments_create", [](std::shared_ptr<PyModel> self) {
       std::shared_ptr<PyComputeArguments>
@@ -162,7 +164,7 @@ PYBIND11_MODULE(model, module)
        Create a new compute_arguments object for the model object.
 
        Returns:
-           compute_arguments
+           ComputeArguments: compute_arguments
        )pbdoc")
     .def("compute",
          [](PyModel &self,
@@ -265,7 +267,7 @@ PYBIND11_MODULE(model, module)
        Get the metadata associated with one of the models's parameter arrays.
 
        Returns:
-           data_type, int, str, str: data_type, extent, name, description
+           DataType, int, str, str: data_type, extent, name, description
        )pbdoc",
        py::arg("parameterIndex"))
     .def("get_parameter_int",
@@ -410,7 +412,7 @@ PYBIND11_MODULE(model, module)
      Create a new KIM-API model object.
 
      Returns:
-         int, model: requested_units_accepted, model
+         int, Model: requested_units_accepted, model
      )pbdoc",
      py::arg("numbering"),
      py::arg("requested_length_unit"),

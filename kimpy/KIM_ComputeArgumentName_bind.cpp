@@ -65,7 +65,7 @@ PYBIND11_MODULE(compute_argument_name, module)
      Get the identity of each defined standard compute_argument_name.
 
      Returns:
-         compute_argument_name
+         ComputeArgumentName: compute_argument_name
      )pbdoc",
      py::arg("index"));
 

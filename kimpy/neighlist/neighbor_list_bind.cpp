@@ -38,7 +38,7 @@ PYBIND11_MODULE(neighlist, module)
        Create a new NeighList object.
 
        Returns:
-           neighList
+           NeighList: neighList
        )pbdoc");
 
   module.def("initialize", []() {
@@ -52,7 +52,7 @@ PYBIND11_MODULE(neighlist, module)
        Create a new NeighList object.
 
        Returns:
-           neighList
+           NeighList: neighList
        )pbdoc");
 
   module.def("build",
