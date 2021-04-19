@@ -121,8 +121,12 @@ For exampe:
     ```sh
     PACKAGE CONTENTS
         charge_unit
+        collection
+        collection_item_type
+        collections
         compute_argument_name
         ...
+        temperature_unit
         time_unit
     ```
 
@@ -137,17 +141,37 @@ For exampe:
     All the functions are listed under `FUNCTIONS`. For example,
 
     ```sh
-    get_compute_argument_name(...)
-
     FUNCTIONS
-        get_compute_argument_name(...)
-        get_compute_argument_name(index: int) -> tuple
-        Return computeArgumentName
+        get_compute_argument_data_type(...) method of builtins.PyCapsule instance
+            get_compute_argument_data_type(compute_argument_name: kimpy.compute_argument_name.ComputeArgumentName) -> KIM::DataType
+
+
+            Get the data_type of each defined standard compute_argument_name.
+
+            Returns:
+                DataType: data_type
+        get_compute_argument_name(...) method of builtins.PyCapsule instance
+            get_compute_argument_name(index: int) -> kimpy.compute_argument_name.ComputeArgumentName
+
+
+            Get the identity of each defined standard compute_argument_name.
+
+            Returns:
+                ComputeArgumentName: compute_argument_name
+
+        get_number_of_compute_argument_names(...) method of builtins.PyCapsule instance
+            get_number_of_compute_argument_names() -> int
+
+
+            Get the number of standard compute_argument_name's defined by the KIM-API.
+
+            Returns:
+                int: number_of_compute_arguments
     ```
 
     shows that the function `get_compute_argument_name` takes an integer
-    `index` as input, and returns an output: `computeArgumentName`. You can
-    refer to `KIM API` docs for the meaning of the input and outputs.
+    `index` as input, and returns an output: `compute_argument_name`. You can
+    refer to `KIM API` docs for further information on the input and outputs.
 
     All the attributes of the module are listed under `DATA`. For example,
 
@@ -161,7 +185,7 @@ For exampe:
 
 ## Copyright
 
-Copyright (c) 2017-2020, Regents of the University of Minnesota.\
+Copyright (c) 2017-2021, Regents of the University of Minnesota.\
 All Rights Reserved
 
 ## Contributing
