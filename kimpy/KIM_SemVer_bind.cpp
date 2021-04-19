@@ -18,8 +18,12 @@ PYBIND11_MODULE(sem_ver, module)
     std::string const &version = SEM_VER::GetSemVer();
 
     return version;
-  }, "Get the KIM-API complete Semantic Version string.",
-     "Return version");
+  }, R"pbdoc(
+     Get the KIM-API complete Semantic Version string.
+
+     Returns:
+         str: version
+     )pbdoc");
 
   module.def("is_less_than",
       [](std::string const &version_a, std::string const &version_b) {
@@ -32,10 +36,14 @@ PYBIND11_MODULE(sem_ver, module)
     }
 
     return is_less_than;
-  }, "Compare two Semantic Version strings.",
+  }, R"pbdoc(
+     Compare two Semantic Version strings.
+
+     Returns:
+         int: is_less_than
+     )pbdoc",
      py::arg("version_a"),
-     py::arg("version_b"),
-     "Return is_less_than");
+     py::arg("version_b"));
 
   module.def("parse_sem_ver", [](std::string const &version) {
     int major;
@@ -63,7 +71,12 @@ PYBIND11_MODULE(sem_ver, module)
     re[3] = prerelease;
     re[4] = build_metadata;
     return re;
-  }, "Parse Semantic Version string into its six components.",
-     py::arg("version"),
-     "Return(major, minor, patch, prerelease, build_metadata)");
+  }, R"pbdoc(
+     Parse Semantic Version string into its six components.
+
+     Returns:
+         int, int, int, str, str: major, minor, patch, prerelease,
+             build_metadata
+     )pbdoc",
+     py::arg("version"));
 }

@@ -61,9 +61,13 @@ PYBIND11_MODULE(compute_argument_name, module)
     }
 
     return compute_argument_name;
-  }, "Get the identity of each defined standard compute_argument_name.",
-     py::arg("index"),
-     "Return compute_argument_name");
+  }, R"pbdoc(
+     Get the identity of each defined standard compute_argument_name.
+
+     Returns:
+         compute_argument_name
+     )pbdoc",
+     py::arg("index"));
 
   module.def("get_number_of_compute_argument_names", []() {
     int number_of_compute_arguments;
@@ -72,9 +76,12 @@ PYBIND11_MODULE(compute_argument_name, module)
         &number_of_compute_arguments);
 
     return number_of_compute_arguments;
-  }, "Get the number of standard compute_argument_name's "
-     "defined by the KIM-API.",
-     "Return number_of_compute_arguments");
+  }, R"pbdoc(
+     Get the number of standard compute_argument_name's defined by the KIM-API.
+
+     Returns:
+         int: number_of_compute_arguments
+     )pbdoc");
 
   module.def("get_compute_argument_data_type",
       [](ComputeArgumentName const &compute_argument_name) {
@@ -87,9 +94,13 @@ PYBIND11_MODULE(compute_argument_name, module)
     }
 
     return data_type;
-  }, "Get the data_type of each defined standard compute_argument_name.",
-     py::arg("compute_argument_name"),
-     "Return data_type");
+  }, R"pbdoc(
+     Get the data_type of each defined standard compute_argument_name.
+
+     Returns:
+         DataType: data_type
+     )pbdoc",
+     py::arg("compute_argument_name"));
 
   // attrributes
 

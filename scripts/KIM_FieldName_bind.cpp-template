@@ -53,10 +53,13 @@ PYBIND11_MODULE(field_name, module) {
       }
 
       return fieldName;
-    }, "Get the identity of each defined standard FieldName.",
-       py::arg("index"),
-       "Return fieldName"
-  );
+    }, R"pbdoc(
+       Get the identity of each defined standard FieldName.
+
+       Returns:
+           FieldName: fieldName
+       )pbdoc",
+       py::arg("index"));
 
   module.def("get_number_of_field_names", []() {
       int numberOfFieldNames;
@@ -65,9 +68,12 @@ PYBIND11_MODULE(field_name, module) {
         &numberOfFieldNames);
 
       return numberOfFieldNames;
-    }, "Get the number of standard FieldName.",
-       "Return numberOfFieldNames"
-  );
+    }, R"pbdoc(
+       Get the number of standard FieldName.
+
+       Returns:
+           int: numberOfFieldNames
+       )pbdoc");
 
   // attributes
 

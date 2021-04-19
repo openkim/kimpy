@@ -34,8 +34,12 @@ PYBIND11_MODULE(neighlist, module)
 
       return std::unique_ptr<NeighList, PyNeighListDestroy>(
         std::move(neighList));
-    }, "Create a new NeighList object.",
-       "Return neighList");
+    }, R"pbdoc(
+       Create a new NeighList object.
+
+       Returns:
+           neighList
+       )pbdoc");
 
   module.def("initialize", []() {
       NeighList *neighList;
@@ -44,8 +48,12 @@ PYBIND11_MODULE(neighlist, module)
 
       return std::unique_ptr<NeighList, PyNeighListDestroy>(
         std::move(neighList));
-    }, "Create a new NeighList object.",
-       "Return neighList");
+    }, R"pbdoc(
+       Create a new NeighList object.
+
+       Returns:
+           neighList
+       )pbdoc");
 
   module.def("build",
              [](NeighList *const neighList,
@@ -130,12 +138,16 @@ PYBIND11_MODULE(neighlist, module)
     re[0] = numberOfNeighbors;
     re[1] = neighborsOfParticle;
     return re;
-  }, "Get the neighList's numberOfNeighbors and neighborsOfParticle.",
+  }, R"pbdoc(
+       Get the neighList's numberOfNeighbors and neighborsOfParticle.
+
+       Returns:
+           int, 1darray: numberOfNeighbors, neighborsOfParticle
+       )pbdoc",
      py::arg("neighList"),
      py::arg("cutoffs").noconvert(),
      py::arg("neighborListIndex"),
-     py::arg("particleNumber"),
-     "Return(numberOfNeighbors, neighborsOfParticle)");
+     py::arg("particleNumber"));
 
   // cannot bind `nbl_get_neigh_kim` directly, since it has pointer arguments
   // so we return a pointer to this function
@@ -219,12 +231,16 @@ PYBIND11_MODULE(neighlist, module)
     re[1] = species_code_of_paddings;
     re[2] = master_particle_of_paddings;
     return re;
-  }, "Create padding.",
+  }, R"pbdoc(
+     Create padding.
+
+     Returns:
+         2darray, 1darray, 1darray: coordinates_of_paddings,
+             species_code_of_paddings, master_particle_of_paddings
+     )pbdoc",
      py::arg("influenceDistance"),
      py::arg("cell").noconvert(),
      py::arg("PBC").noconvert(),
      py::arg("coords").noconvert(),
-     py::arg("species").noconvert(),
-     "Return(coordinates_of_paddings, species_code_of_paddings, "
-     "master_particle_of_paddings)");
+     py::arg("species").noconvert());
 }

@@ -50,9 +50,13 @@ PYBIND11_MODULE(compute_arguments, module)
       }
 
       return support_status;
-    }, "Get the support_status of a compute_argument_name.",
-       py::arg("compute_argument_name"),
-       "Return support_status")
+    }, R"pbdoc(
+       Get the support_status of a compute_argument_name.
+
+       Returns:
+           SupportStatus: support_status
+       )pbdoc",
+       py::arg("compute_argument_name"))
     .def("get_callback_support_status",
          [](PyComputeArguments &self,
             ComputeCallbackName const &compute_callback_name) {
@@ -66,9 +70,13 @@ PYBIND11_MODULE(compute_arguments, module)
       }
 
       return support_status;
-    }, "Get the support_status of a compute_callback_name.",
-       py::arg("compute_callback_name"),
-       "Return support_status")
+    }, R"pbdoc(
+       Get the support_status of a compute_callback_name.
+
+       Returns:
+           SupportStatus: support_status
+       )pbdoc",
+       py::arg("compute_callback_name"))
     .def("set_argument_pointer",
          [](PyComputeArguments &self,
             ComputeArgumentName const &compute_argument_name,
@@ -196,10 +204,14 @@ PYBIND11_MODULE(compute_arguments, module)
         &result);
 
       return result;
-    }, "Determine if non-NULL pointers have been set for all "
-       "compute_argument_name's and compute_callback_name's with "
-       "support_status values of requiredByAPI or required.",
-       "Return result")
+    }, R"pbdoc(
+       Determine if non-NULL pointers have been set for all
+       compute_argument_name's and compute_callback_name's with support_status
+       values of required By API.
+
+       Returns:
+           int: result
+       )pbdoc")
     .def("__repr__", [](PyComputeArguments &self) {
       return self._compute_arguments->ToString();
     }, "Get a string representing the internal state of the "

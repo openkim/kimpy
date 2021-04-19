@@ -52,16 +52,24 @@ PYBIND11_MODULE(simulator_model, module)
       re[0] = *simulator_name;
       re[1] = *simulator_version;
       return re;
-    }, "Get the simulator_model's simulator name and version.",
-       "Return(simulator_name, simulator_version)")
+    }, R"pbdoc(
+       Get the simulator_model's simulator name and version.
+
+       Returns:
+           str, str: simulator_name, simulator_version
+       )pbdoc")
     .def("get_number_of_supported_species", [](SimulatorModel &self) {
       int number_of_supported_species;
 
       self.GetNumberOfSupportedSpecies(&number_of_supported_species);
 
       return number_of_supported_species;
-    }, "Get the number of species supported by the simulator_model.",
-       "Return number_of_supported_species")
+    }, R"pbdoc(
+       Get the number of species supported by the simulator_model.
+
+       Returns:
+           int: number_of_supported_species
+       )pbdoc")
     .def("get_supported_species", [](SimulatorModel &self, int const index) {
       std::string const *species_name;
 
@@ -71,9 +79,13 @@ PYBIND11_MODULE(simulator_model, module)
       }
 
       return *species_name;
-    }, "Get a species name supported by the simulator_model.",
-       py::arg("index"),
-       "Return species_name")
+    }, R"pbdoc(
+       Get a species name supported by the simulator_model.
+
+       Returns:
+           str: species_name
+       )pbdoc",
+       py::arg("index"))
     .def("open_and_initialize_template_map",
          &SimulatorModel::OpenAndInitializeTemplateMap,
          "Open and initialize the template map for simulator field line "
@@ -101,8 +113,12 @@ PYBIND11_MODULE(simulator_model, module)
       self.GetNumberOfSimulatorFields(&number_of_simulator_fields);
 
       return number_of_simulator_fields;
-    }, "Get the number of simulator fields provided by the simulator_model.",
-       "Return number_of_simulator_fields")
+    }, R"pbdoc(
+       Get the number of simulator fields provided by the simulator_model.
+
+       Returns:
+           int: number_of_simulator_fields
+       )pbdoc")
     .def("get_simulator_field_metadata",
          [](SimulatorModel &self, int const field_index) {
       int extent;
@@ -118,9 +134,13 @@ PYBIND11_MODULE(simulator_model, module)
       re[0] = extent;
       re[1] = *field_name;
       return re;
-    }, "Get the metadata for the simulator field of interest.",
-       py::arg("field_index"),
-       "Return(extent, field_name)")
+    }, R"pbdoc(
+       Get the metadata for the simulator field of interest.
+
+       Returns:
+           int, str: extent, field_name
+       )pbdoc",
+       py::arg("field_index"))
     .def("get_simulator_field_line",
          [](SimulatorModel &self,
             int const field_index,
@@ -137,38 +157,54 @@ PYBIND11_MODULE(simulator_model, module)
       }
 
       return *line_value;
-    }, "Get a line for the simulator field of interest with all template "
-       "substitutions performed (Requires the template map is closed).",
+    }, R"pbdoc(
+       Get a line for the simulator field of interest with all template
+       substitutions performed (Requires the template map is closed).
+
+       Returns:
+           str: line_value
+       )pbdoc",
        py::arg("field_index"),
-       py::arg("line_index"),
-       "Return line_value")
+       py::arg("line_index"))
     .def("get_parameter_file_directory_name", [](SimulatorModel &self) {
       std::string const *directory_name;
 
       self.GetParameterFileDirectoryName(&directory_name);
 
       return *directory_name;
-    }, "Get absolute path name of the temporary directory where parameter "
-       "files provided by the simulator model are written.",
-       "Return directory_name")
+    }, R"pbdoc(
+       Get absolute path name of the temporary directory where parameter
+       files provided by the simulator model are written.
+
+       Returns:
+           str: directory_name
+       )pbdoc")
     .def("get_specification_file_name", [](SimulatorModel &self) {
       std::string const *specification_file_name;
 
       self.GetSpecificationFileName(&specification_file_name);
 
       return *specification_file_name;
-    }, "Get the simulator_model's specification file basename (file name "
-       "without path).  The file is located in the simulator_model's "
-       "parameter file directory.",
-       "Return specification_file_name")
+    }, R"pbdoc(
+       Get the simulator_model's specification file basename (file name without
+       path).  The file is located in the simulator_model's parameter file
+       directory.
+
+       Returns:
+           str: specification_file_name
+       )pbdoc")
     .def("get_number_of_parameter_files", [](SimulatorModel &self) {
       int number_of_parameter_files;
 
       self.GetNumberOfParameterFiles(&number_of_parameter_files);
 
       return number_of_parameter_files;
-    }, "Get the number of parameter files provided by the simulator_model.",
-       "Return number_of_parameter_files")
+    }, R"pbdoc(
+       Get the number of parameter files provided by the simulator_model.
+
+       Returns:
+           int: number_of_parameter_files
+       )pbdoc")
     .def("get_parameter_file_name",
          [](SimulatorModel &self, int const index) {
       std::string const *parameter_file_name;
@@ -179,11 +215,15 @@ PYBIND11_MODULE(simulator_model, module)
       }
 
       return *parameter_file_name;
-    }, "Get the basename (file name without path) of a particular "
-       "parameter file.  The file is located in the simulator_model's "
-       "parameter file directory.",
-       py::arg("index"),
-       "Return parameter_file_name")
+    }, R"pbdoc(
+       Get the basename (file name without path) of a particular parameter
+       file.  The file is located in the simulator_model's parameter file
+       directory.
+
+       Returns:
+           str: parameter_file_name
+       )pbdoc",
+       py::arg("index"))
     .def("get_parameter_file_base_name",
          [](SimulatorModel &self, int const index) {
       std::string const *param_file_base_name;
@@ -194,11 +234,15 @@ PYBIND11_MODULE(simulator_model, module)
       }
 
       return *param_file_base_name;
-    }, "Get the basename (file name without path) of a particular "
-       "parameter file.  The file is located in the simulator_model's "
-       "parameter file directory.",
-       py::arg("index"),
-       "Return param_file_base_name")
+    }, R"pbdoc(
+       Get the basename (file name without path) of a particular parameter
+       file.  The file is located in the simulator_model's parameter file
+       directory.
+
+       Returns:
+           str: param_file_base_name
+       )pbdoc",
+       py::arg("index"))
     .def("__repr__", &SimulatorModel::ToString)
     .def("set_log_id", &SimulatorModel::SetLogID,
          "Set the identity of the Log object associated with the "
@@ -225,6 +269,10 @@ PYBIND11_MODULE(simulator_model, module)
 
     return std::unique_ptr<SimulatorModel, PySimulatorModelDestroy>(
       std::move(simulator_model));
-  }, "Create a new KIM-API simulator_model object.",
-     "Return simulator_model");
+  }, R"pbdoc(
+     Create a new KIM-API simulator_model object.
+
+     Returns:
+         simulator_model
+     )pbdoc");
 }

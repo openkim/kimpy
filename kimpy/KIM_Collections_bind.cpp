@@ -41,19 +41,23 @@ PYBIND11_MODULE(collections, module)
     }))
     .def("get_item_type",
          [](Collections &self, std::string const &item_name) {
-      CollectionItemType item_type;
+      CollectionItemType collection_item_type;
 
-      int error = self.GetItemType(item_name, &item_type);
+      int error = self.GetItemType(item_name, &collection_item_type);
       if (error == 1) {
         throw std::runtime_error(
           "An item with the specificed name cannot be found!");
       }
 
-      return item_type;
-    }, "Get the collection_item_type of the item in the KIM-API "
-       "collections with a specific name.",
-       py::arg("item_name"),
-       "Return item_type")
+      return collection_item_type;
+    }, R"pbdoc(
+       Get the collection_item_type of the item in the KIM-API collections with
+       a specific name.
+
+       Returns:
+           collection_item_type
+       )pbdoc",
+       py::arg("item_name"))
     .def("get_item_library_file_name_and_collection",
          [](Collections &self,
             CollectionItemType const &item_type,
@@ -74,10 +78,14 @@ PYBIND11_MODULE(collections, module)
       re[0] = *file_name;
       re[1] = collection;
       return re;
-    }, "Get the item's library file name and its KIM::Collection.",
+    }, R"pbdoc(
+       Get the item's library file name and its KIM::Collection.
+
+       Returns:
+           str, collection: file_name, collection
+       )pbdoc",
        py::arg("item_type"),
-       py::arg("item_name"),
-       "Return(file_name, collection)")
+       py::arg("item_name"))
     .def("cache_list_of_item_metadata_files",
          [](Collections &self,
             CollectionItemType const &item_type,
@@ -93,10 +101,14 @@ PYBIND11_MODULE(collections, module)
       }
 
       return extent;
-    }, "Cache a list of an item's metadata files.",
+    }, R"pbdoc(
+       Cache a list of an item's metadata files.
+
+       Returns:
+           int: extent
+       )pbdoc",
        py::arg("item_type"),
-       py::arg("item_name"),
-       "Return extent")
+       py::arg("item_name"))
     .def("get_item_metadata_file",
          [](Collections &self, int const index) {
       std::string const *file_name;
@@ -122,10 +134,14 @@ PYBIND11_MODULE(collections, module)
       re[3] = available_as_string;
       re[4] = *file_string;
       return re;
-    }, "Get the name and content of one of an item's metadata files.",
-       py::arg("index"),
-       "Return(file_name, file_length, file_raw_data, "
-       "available_as_string, file_string)")
+    }, R"pbdoc(
+       Get the name and content of one of an item's metadata files.
+
+       Returns:
+           str, int, str, bool, str: file_name, file_length, file_raw_data,
+                available_as_string, file_string
+       )pbdoc",
+       py::arg("index"))
     .def("cache_list_of_item_names_by_type",
          [](Collections &self, CollectionItemType const &item_type) {
       int extent;
@@ -136,10 +152,14 @@ PYBIND11_MODULE(collections, module)
       }
 
       return extent;
-    }, "Cache a list of all item names of a specific type in the KIM-API "
-       "collections.",
-       py::arg("item_type"),
-       "Return extent")
+    }, R"pbdoc(
+       Cache a list of all item names of a specific type in the KIM-API
+       collections.
+
+       Returns:
+           int: extent
+       )pbdoc",
+       py::arg("item_type"))
     .def("get_item_name_by_type", [](Collections &self, int const index) {
       std::string const *item_name;
 
@@ -149,9 +169,13 @@ PYBIND11_MODULE(collections, module)
       }
 
       return *item_name;
-    }, "Get the name of an item from the cached list.",
-       py::arg("index"),
-       "Return item_name")
+    }, R"pbdoc(
+       Get the name of an item from the cached list.
+
+       Returns:
+           str: item_name
+       )pbdoc",
+       py::arg("index"))
     .def("cache_list_of_item_names_by_collection_and_type",
          [](Collections &self,
             Collection const &collection,
@@ -165,11 +189,15 @@ PYBIND11_MODULE(collections, module)
       }
 
       return extent;
-    }, "Cache a list of all item names of a specific type in a specific "
-       "collection.",
+    }, R"pbdoc(
+       Cache a list of all item names of a specific type in a specific
+       collection.
+
+       Returns:
+           int: extent
+       )pbdoc",
        py::arg("collection"),
-       py::arg("item_type"),
-       "Return extent")
+       py::arg("item_type"))
     .def("get_item_name_by_collection_and_type",
          [](Collections &self, int const index) {
       std::string const *item_name;
@@ -180,9 +208,13 @@ PYBIND11_MODULE(collections, module)
       }
 
       return *item_name;
-    }, "Get the name of an item from the cached list.",
-       py::arg("index"),
-       "Return item_name")
+    }, R"pbdoc(
+       Get the name of an item from the cached list.
+
+       Returns:
+           str: item_name
+       )pbdoc",
+       py::arg("index"))
     .def("get_item_library_file_name_by_collection_and_type",
          [](Collections &self,
             Collection const &collection,
@@ -200,11 +232,15 @@ PYBIND11_MODULE(collections, module)
       }
 
       return *file_name;
-    }, "Get the item's library file name.",
+    }, R"pbdoc(
+       Get the item's library file name.
+
+       Returns:
+           str: file_name
+       )pbdoc",
        py::arg("collection"),
        py::arg("item_type"),
-       py::arg("item_name"),
-       "Return file_name")
+       py::arg("item_name"))
     .def("cache_list_of_item_metadata_files_by_collection_and_type",
          [](Collections &self,
             Collection const &collection,
@@ -221,11 +257,15 @@ PYBIND11_MODULE(collections, module)
       }
 
       return extent;
-    }, "Cache a list of an item's metadata files.",
+    }, R"pbdoc(
+       Cache a list of an item's metadata files.
+
+       Returns:
+           int: extent
+       )pbdoc",
        py::arg("collection"),
        py::arg("item_type"),
-       py::arg("item_name"),
-       "Return extent")
+       py::arg("item_name"))
     .def("get_item_metadata_file_by_collection_and_type",
          [](Collections &self, int const index) {
       std::string const *file_name;
@@ -252,10 +292,14 @@ PYBIND11_MODULE(collections, module)
       re[3] = available_as_string;
       re[4] = *file_string;
       return re;
-    }, "Get the name and content of one of an item's metadata files.",
-       py::arg("index"),
-       "Return(file_name, file_length, file_raw_data, "
-       "available_as_string, file_string)")
+    }, R"pbdoc(
+       Get the name and content of one of an item's metadata files.
+
+       Returns:
+           str, int, str, bool, int: file_name, file_length, file_raw_data,
+                available_as_string, file_string
+       )pbdoc",
+       py::arg("index"))
     .def("get_project_name_and_sem_ver", [](Collections &self) {
       std::string const *project_name;
       std::string const *sem_ver;
@@ -266,8 +310,12 @@ PYBIND11_MODULE(collections, module)
       re[0] = *project_name;
       re[1] = *sem_ver;
       return re;
-    }, "Get the KIM-API project name and full Semantic Version string.",
-       "Return(project_name, sem_ver)")
+    }, R"pbdoc(
+       Get the KIM-API project name and full Semantic Version string.
+
+       Returns:
+           str, str: project_name, sem_ver
+       )pbdoc")
     .def("get_environment_variable_name",
          [](Collections &self, CollectionItemType const &item_type) {
       std::string const *name;
@@ -278,10 +326,14 @@ PYBIND11_MODULE(collections, module)
       }
 
       return *name;
-    }, "Get the names of environment variables that store configuration "
-       "settings for the KIM::COLLECTION::environmentVariable collection.",
-       py::arg("item_type"),
-       "Return name")
+    }, R"pbdoc(
+       Get the names of environment variables that store configuration
+       settings for the KIM::COLLECTION::environmentVariable collection.
+
+       Returns:
+           str: name
+       )pbdoc",
+       py::arg("item_type"))
     .def("get_configuration_file_environment_variable",
          [](Collections &self) {
       std::string const *name;
@@ -293,18 +345,26 @@ PYBIND11_MODULE(collections, module)
       re[0] = *name;
       re[1] = *value;
       return re;
-    }, "Get the name and value of the environment variable that stores the "
-       "name of the KIM-API user configuration file.",
-       "Return(name, value)")
+    }, R"pbdoc(
+       Get the name and value of the environment variable that stores the
+       name of the KIM-API user configuration file.
+
+       Returns:
+           str, str: name, value
+       )pbdoc")
     .def("get_configuration_file_name", [](Collections &self) {
       std::string const *file_name;
 
       self.GetConfigurationFileName(&file_name);
 
       return *file_name;
-    }, "Get the absolute file and path name of the KIM-API user "
-       "configuration file.",
-       "Return file_name")
+    }, R"pbdoc(
+       Get the absolute file and path name of the KIM-API user configuration
+       file.
+
+       Returns:
+           str: file_name
+       )pbdoc")
     .def("cache_list_of_directory_names",
          [](Collections &self,
             Collection const &collection,
@@ -320,11 +380,15 @@ PYBIND11_MODULE(collections, module)
       }
 
       return extent;
-    }, "Cache a list of directory names where a specific KIM-API "
-       "collection stores library files for a specific item type.",
+    }, R"pbdoc(
+       Cache a list of directory names where a specific KIM-API
+       collection stores library files for a specific item type.
+
+       Returns:
+           int: extent
+       )pbdoc",
        py::arg("collection"),
-       py::arg("item_type"),
-       "Return extent")
+       py::arg("item_type"))
     .def("get_directory_name", [](Collections &self, int const index) {
       std::string const *directory_name;
 
@@ -334,9 +398,13 @@ PYBIND11_MODULE(collections, module)
       }
 
       return *directory_name;
-    }, "Get the name of a directory from the cached list.",
-       py::arg("index"),
-       "Return directory_name")
+    }, R"pbdoc(
+       Get the name of a directory from the cached list.
+
+       Returns:
+           str: directory_name
+       )pbdoc",
+       py::arg("index"))
     .def("set_log_id", &Collections::SetLogID,
          "Set the identity of the Log object associated with the "
          "collections object.",
@@ -360,6 +428,10 @@ PYBIND11_MODULE(collections, module)
 
     return std::unique_ptr<Collections, PyCollectionsDestroy>(
       std::move(collections));
-  }, "Create a new KIM-API collections object.",
-     "Return collections");
+  }, R"pbdoc(
+       Create a new KIM-API collections object.
+
+       Returns:
+           collections: collections
+       )pbdoc");
 }

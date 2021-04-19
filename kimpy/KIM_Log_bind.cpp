@@ -81,6 +81,10 @@ PYBIND11_MODULE(log, module)
     Log *log;
     Log::Create(&log);
     return std::unique_ptr<Log, PyLogDestroy>(std::move(log));
-  }, "Create a new KIM-API Log object."
-     "Return log");
+  }, R"pbdoc(
+     Create a new KIM-API Log object.
+
+     Returns:
+          log
+     )pbdoc");
 }

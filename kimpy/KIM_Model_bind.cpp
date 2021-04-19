@@ -63,18 +63,25 @@ PYBIND11_MODULE(model, module)
       re[0] = present;
       re[1] = required;
       return re;
-    }, "Determine presence and required status of the given "
-       "model_routine_name.",
-       py::arg("model_routine_name"),
-       "Return(present, required)")
+    }, R"pbdoc(
+       Determine presence and required status of the given model_routine_name.
+
+       Returns:
+           int, int: present, required
+       )pbdoc",
+       py::arg("model_routine_name"))
     .def("get_influence_distance", [](PyModel &self) {
       double influence_distance;
 
       self._model->GetInfluenceDistance(&influence_distance);
 
       return influence_distance;
-    }, "Get the model's influence distance.",
-       "Return influence_distance")
+    }, R"pbdoc(
+       Get the model's influence distance.
+
+       Returns:
+           float: influence_distance
+       )pbdoc")
     .def("get_neighbor_list_cutoffs_and_hints", [](PyModel &self) {
       int number_of_cutoffs;
       double const *cutoff_ptr;
@@ -105,9 +112,13 @@ PYBIND11_MODULE(model, module)
       re[0] = cutoffs;
       re[1] = model_not_request_neighbors_of_noncontributing_particles;
       return re;
-    }, "Get the model's neighbor list information.",
-       "Return(cutoffs, "
-       "model_not_request_neighbors_of_noncontributing_particles)")
+    }, R"pbdoc(
+       Get the model's neighbor list information.
+
+       Returns:
+           1darray, 1darray: cutoffs,
+               model_not_request_neighbors_of_noncontributing_particles
+       )pbdoc")
     .def("get_units", [](PyModel &self) {
       LengthUnit length_unit;
       EnergyUnit energy_unit;
@@ -128,9 +139,12 @@ PYBIND11_MODULE(model, module)
       re[3] = temperature_unit;
       re[4] = time_unit;
       return re;
-    }, "Get the model's base unit values.",
-       "Return(length_unit, energy_unit, charge_unit, "
-       "temperature_unit, time_unit)")
+    }, R"pbdoc(
+       Get the model's base unit values.
+
+       Returns:
+           length_unit, energy_unit, charge_unit, temperature_unit, time_unit
+       )pbdoc")
     .def("compute_arguments_create", [](std::shared_ptr<PyModel> self) {
       std::shared_ptr<PyComputeArguments>
         py_compute_arguments(new PyComputeArguments(self));
@@ -144,8 +158,12 @@ PYBIND11_MODULE(model, module)
       }
 
       return py_compute_arguments;
-    }, "Create a new compute_arguments object for the model object.",
-       "Return compute_arguments")
+    }, R"pbdoc(
+       Create a new compute_arguments object for the model object.
+
+       Returns:
+           compute_arguments
+       )pbdoc")
     .def("compute",
          [](PyModel &self,
             std::shared_ptr<PyComputeArguments> compute_arguments,
@@ -205,17 +223,25 @@ PYBIND11_MODULE(model, module)
       re[0] = species_is_supported;
       re[1] = code;
       return re;
-    }, "Get the model's support and code for the requested species_name.",
-       py::arg("species_name"),
-       "Return(species_is_supported, code)")
+    }, R"pbdoc(
+       Get the model's support and code for the requested species_name.
+
+       Returns:
+           int, int: species_is_supported, code
+       )pbdoc",
+       py::arg("species_name"))
     .def("get_number_of_parameters", [](PyModel &self) {
       int number_pf_parameters;
 
       self._model->GetNumberOfParameters(&number_pf_parameters);
 
       return number_pf_parameters;
-    }, "Get the number of parameter arrays provided by the model.",
-       "Return number_pf_parameters")
+    }, R"pbdoc(
+       Get the number of parameter arrays provided by the model.
+
+       Returns:
+           int: number_pf_parameters
+       )pbdoc")
     .def("get_parameter_metadata",
          [](PyModel &self, int const parameter_index) {
       DataType data_type;
@@ -235,10 +261,13 @@ PYBIND11_MODULE(model, module)
       re[2] = *name;
       re[3] = *description;
       return re;
-    }, "Get the metadata associated with one of the "
-       "models's parameter arrays.",
-       py::arg("parameterIndex"),
-       "Return(data_type, extent, name, description)")
+    }, R"pbdoc(
+       Get the metadata associated with one of the models's parameter arrays.
+
+       Returns:
+           data_type, int, str, str: data_type, extent, name, description
+       )pbdoc",
+       py::arg("parameterIndex"))
     .def("get_parameter_int",
          [](PyModel &self, int const parameter_index, int const array_index) {
       int parameter_value;
@@ -255,10 +284,14 @@ PYBIND11_MODULE(model, module)
       }
 
       return parameter_value;
-    }, "Get an int parameter value from the Model.",
+    }, R"pbdoc(
+       Get an int parameter value from the Model.
+
+       Returns:
+           int: parameter_value
+       )pbdoc",
        py::arg("parameter_index"),
-       py::arg("array_index"),
-       "Return parameter_value")
+       py::arg("array_index"))
     .def("get_parameter_double",
          [](PyModel &self, int const parameter_index, int const array_index) {
       double parameter_value;
@@ -275,10 +308,14 @@ PYBIND11_MODULE(model, module)
       }
 
       return parameter_value;
-    }, "Get a double parameter value from the Model.",
+    }, R"pbdoc(
+       Get a double parameter value from the Model.
+
+       Returns:
+           float: parameter_value
+       )pbdoc",
        py::arg("parameter_index"),
-       py::arg("array_index"),
-       "Return parameter_value")
+       py::arg("array_index"))
     // overloaded function
     .def("set_parameter",
           [](PyModel &self,
@@ -369,13 +406,17 @@ PYBIND11_MODULE(model, module)
     re[0] = requested_units_accepted;
     re[1] = model;
     return re;
-  }, "Create a new KIM-API model object.",
+  }, R"pbdoc(
+     Create a new KIM-API model object.
+
+     Returns:
+         int, model: requested_units_accepted, model
+     )pbdoc",
      py::arg("numbering"),
      py::arg("requested_length_unit"),
      py::arg("requested_energy_unit"),
      py::arg("requested_charge_unit"),
      py::arg("requested_temperature_unit"),
      py::arg("requested_time_unit"),
-     py::arg("model_name"),
-     "Return(requested_units_accepted, model)");
+     py::arg("model_name"));
 }
