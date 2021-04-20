@@ -22,21 +22,7 @@ PYBIND11_MODULE(field_name, module)
       .def("known", &FieldName::Known)
       .def(py::self == py::self)
       .def(py::self != py::self)
-      .def("__repr__", &FieldName::ToString)
-      .def(py::pickle(
-          // __getstate__
-          [](FieldName const & fieldName) {
-            // Return a tuple that fully encodes
-            // the state of the fieldName object
-            return py::make_tuple(fieldName.fieldNameID);
-          },
-          // __setstate__
-          [](py::tuple t) {
-            if (t.size() != 1) { throw std::runtime_error("Invalid state!"); }
-            // Create a new instance
-            FieldName fieldName(t[0].cast<int>());
-            return fieldName;
-          }));
+      .def("__repr__", &FieldName::ToString);
 
   // functions
 

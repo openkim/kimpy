@@ -30,21 +30,7 @@ PYBIND11_MODULE(compute_argument_name, module)
            "Determines if the object is a quantity known to the KIM-API.")
       .def(py::self == py::self)
       .def(py::self != py::self)
-      .def("__repr__", &ComputeArgumentName::ToString)
-      .def(py::pickle(
-          // __getstate__
-          [](ComputeArgumentName const & compute_argument_name) {
-            // Return a tuple that fully encodes
-            // the state of the compute_argument_name object
-            return py::make_tuple(compute_argument_name.computeArgumentNameID);
-          },
-          // __setstate__
-          [](py::tuple t) {
-            if (t.size() != 1) { throw std::runtime_error("Invalid state!"); }
-            // Create a new instance
-            ComputeArgumentName compute_argument_name(t[0].cast<int>());
-            return compute_argument_name;
-          }));
+      .def("__repr__", &ComputeArgumentName::ToString);
 
   // functions
 
