@@ -152,7 +152,7 @@ int nbl_build(NeighList * const nl,
   }
 
   // temporary neigh container
-  std::vector<int> * tmp_neigh = new std::vector<int>[numberOfCutoffs];
+  std::vector<std::vector<int> > tmp_neigh(numberOfCutoffs);
   std::vector<int> total(numberOfCutoffs, 0);
   std::vector<int> num_neigh(numberOfCutoffs);
 
@@ -236,8 +236,6 @@ int nbl_build(NeighList * const nl,
     std::memcpy(
         nl->lists[k].neighborList, tmp_neigh[k].data(), sizeof(int) * total[k]);
   }
-
-  delete[] tmp_neigh;
 
   return 0;
 }
