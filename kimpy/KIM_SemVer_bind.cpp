@@ -15,7 +15,7 @@ PYBIND11_MODULE(sem_ver, module)
   module.doc() = "Python binding to KIM_SymVer.hpp";
 
   module.def("get_sem_ver", []() {
-    std::string const &version = SEM_VER::GetSemVer();
+    std::string const & version = SEM_VER::GetSemVer();
 
     return version;
   }, R"pbdoc(
@@ -30,9 +30,10 @@ PYBIND11_MODULE(sem_ver, module)
     int is_less_than;
 
     int error = SEM_VER::IsLessThan(version_a, version_b, &is_less_than);
-    if (error == 1) {
+    if (error == 1)
+    {
       throw std::runtime_error(
-        "ParseSemVer (Parse Semantic Version) returns error for lhs or rhs!");
+          "ParseSemVer (Parse Semantic Version) returns error for lhs or rhs!");
     }
 
     return is_less_than;
@@ -53,15 +54,16 @@ PYBIND11_MODULE(sem_ver, module)
     std::string build_metadata;
 
     int error = SEM_VER::ParseSemVer(
-      version, &major, &minor, &patch, &prerelease, &build_metadata);
-    if (error == 1) {
+        version, &major, &minor, &patch, &prerelease, &build_metadata);
+    if (error == 1)
+    {
       throw std::runtime_error(
-        "minor and/or patch are missing!  or\n"
-        "major number has a leading zero or is not a valid integer!  or\n"
-        "minor number has a leading zero or is not a valid integer!  or\n"
-        "patch number has a leading zero or is not a valid integer!  or\n"
-        "the prerelease string is invalid!  or\n"
-        "the build metadata string is invalid!");
+          "minor and/or patch are missing!  or\n"
+          "major number has a leading zero or is not a valid integer!  or\n"
+          "minor number has a leading zero or is not a valid integer!  or\n"
+          "patch number has a leading zero or is not a valid integer!  or\n"
+          "the prerelease string is invalid!  or\n"
+          "the build metadata string is invalid!");
     }
 
     py::tuple re(5);

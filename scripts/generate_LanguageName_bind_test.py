@@ -7,11 +7,7 @@ fields = {
     'field_name': 'language_name',
 }
 
-attributes = [
-    'cpp',
-    'c',
-    'fortran'
-]
+attributes = ['cpp', 'c', 'fortran']
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)

@@ -16,21 +16,21 @@
   }
 
 // norm of a 3-element vector
-inline double norm(double const *a)
+inline double norm(double const * a)
 {
   return std::sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
 }
 
 
 // dot product of two 3-element vectors
-inline double dot(double const *a, double const *b)
+inline double dot(double const * a, double const * b)
 {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
 
 // cross product of two 3-element vectors
-inline void cross(double const *a, double const *b, double *const axb)
+inline void cross(double const * a, double const * b, double * const axb)
 {
   axb[0] = a[1] * b[2] - a[2] * b[1];
   axb[1] = a[2] * b[0] - a[0] * b[2];
@@ -39,7 +39,7 @@ inline void cross(double const *a, double const *b, double *const axb)
 
 
 // determinant of a 3 by 3 matrix
-inline double det(double const *mat)
+inline double det(double const * mat)
 {
   return mat[0] * mat[4] * mat[8] - mat[0] * mat[5] * mat[7]
          - mat[1] * mat[3] * mat[8] + mat[1] * mat[5] * mat[6]
@@ -55,7 +55,7 @@ inline double det2(double a11, double a12, double a21, double a22)
 
 
 // transpose of a 3 by 3 matrix
-inline void transpose(double const *mat, double *const trans)
+inline void transpose(double const * mat, double * const trans)
 {
   trans[0] = mat[0];
   trans[1] = mat[3];
@@ -70,7 +70,7 @@ inline void transpose(double const *mat, double *const trans)
 
 
 // inverse of a 3 by 3 matrix
-inline int inverse(double const *mat, double *const inv)
+inline int inverse(double const * mat, double * const inv)
 {
   inv[0] = det2(mat[4], mat[5], mat[7], mat[8]);
   inv[1] = det2(mat[2], mat[1], mat[8], mat[7]);
@@ -93,18 +93,18 @@ inline int inverse(double const *mat, double *const inv)
 }
 
 
-inline void coords_to_index(double const *x,
-                            int const *size,
-                            double const *max,
-                            double const *min,
-                            int *const index)
+inline void coords_to_index(double const * x,
+                            int const * size,
+                            double const * max,
+                            double const * min,
+                            int * const index)
 {
   index[0] = static_cast<int>(((x[0] - min[0]) / (max[0] - min[0])) * size[0]);
-  index[0] = std::min(index[0], size[0] - 1); // edge case when x[0] = max[0]
+  index[0] = std::min(index[0], size[0] - 1);  // edge case when x[0] = max[0]
   index[1] = static_cast<int>(((x[1] - min[1]) / (max[1] - min[1])) * size[1]);
-  index[1] = std::min(index[1], size[1] - 1); // edge case when x[1] = max[1]
+  index[1] = std::min(index[1], size[1] - 1);  // edge case when x[1] = max[1]
   index[2] = static_cast<int>(((x[2] - min[2]) / (max[2] - min[2])) * size[2]);
-  index[2] = std::min(index[2], size[2] - 1); // edge case when x[2] = max[2]
+  index[2] = std::min(index[2], size[2] - 1);  // edge case when x[2] = max[2]
 }
 
-#endif // HELPER_HPP_
+#endif  // HELPER_HPP_

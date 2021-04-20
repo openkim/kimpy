@@ -12,7 +12,7 @@
 #define TOL 1.0e-10
 
 
-void nbl_clean_content(NeighList *const nl)
+void nbl_clean_content(NeighList * const nl)
 {
   if (nl)
   {
@@ -20,7 +20,7 @@ void nbl_clean_content(NeighList *const nl)
     {
       for (int i = 0; i < nl->numberOfNeighborLists; i++)
       {
-        NeighListOne *cnl = &(nl->lists[i]);
+        NeighListOne * cnl = &(nl->lists[i]);
         if (cnl->Nneighbors) delete[] cnl->Nneighbors;
         if (cnl->neighborList) delete[] cnl->neighborList;
         if (cnl->beginIndex) delete[] cnl->beginIndex;
@@ -38,7 +38,7 @@ void nbl_clean_content(NeighList *const nl)
 }
 
 
-void nbl_allocate_memory(NeighList *const nl,
+void nbl_allocate_memory(NeighList * const nl,
                          int const numberOfCutoffs,
                          int const numberOfParticles)
 {
@@ -48,7 +48,7 @@ void nbl_allocate_memory(NeighList *const nl,
     nl->numberOfNeighborLists = numberOfCutoffs;
     for (int i = 0; i < numberOfCutoffs; i++)
     {
-      NeighListOne *cnl = &(nl->lists[i]);
+      NeighListOne * cnl = &(nl->lists[i]);
       cnl->Nneighbors = new int[numberOfParticles];
       cnl->beginIndex = new int[numberOfParticles];
     }
@@ -56,13 +56,10 @@ void nbl_allocate_memory(NeighList *const nl,
 }
 
 
-void nbl_initialize(NeighList **const nl)
-{
-  *nl = new NeighList;
-}
+void nbl_initialize(NeighList ** const nl) { *nl = new NeighList; }
 
 
-void nbl_clean(NeighList **const nl)
+void nbl_clean(NeighList ** const nl)
 {
   if (*nl)
   {
@@ -76,13 +73,13 @@ void nbl_clean(NeighList **const nl)
 }
 
 
-int nbl_build(NeighList *const nl,
+int nbl_build(NeighList * const nl,
               int const numberOfParticles,
-              double const *coordinates,
+              double const * coordinates,
               double const influenceDistance,
               int const numberOfCutoffs,
-              double const *cutoffs,
-              int const *needNeighbors)
+              double const * cutoffs,
+              int const * needNeighbors)
 {
   // find max and min extend of coordinates
   double min[3];
@@ -99,14 +96,14 @@ int nbl_build(NeighList *const nl,
 
   for (int i = 0, l = 0; i < numberOfParticles; i++)
   {
-    if (max[0] < coordinates[l]) {max[0] = coordinates[l]; }
-    if (min[0] > coordinates[l]) {min[0] = coordinates[l]; }
+    if (max[0] < coordinates[l]) { max[0] = coordinates[l]; }
+    if (min[0] > coordinates[l]) { min[0] = coordinates[l]; }
     ++l;
-    if (max[1] < coordinates[l]) {max[1] = coordinates[l]; }
-    if (min[1] > coordinates[l]) {min[1] = coordinates[l]; }
+    if (max[1] < coordinates[l]) { max[1] = coordinates[l]; }
+    if (min[1] > coordinates[l]) { min[1] = coordinates[l]; }
     ++l;
-    if (max[2] < coordinates[l]) {max[2] = coordinates[l]; }
-    if (min[2] > coordinates[l]) {min[2] = coordinates[l]; }
+    if (max[2] < coordinates[l]) { max[2] = coordinates[l]; }
+    if (min[2] > coordinates[l]) { min[2] = coordinates[l]; }
     ++l;
   }
 
@@ -129,15 +126,15 @@ int nbl_build(NeighList *const nl,
   }
 
   // assign atoms into cells
-  std::vector<std::vector<int>> cells(size_total);
+  std::vector<std::vector<int> > cells(size_total);
   for (int i = 0; i < numberOfParticles; i++)
   {
     int index[3];
 
     coords_to_index(&coordinates[3 * i], size, max, min, index);
 
-    int const idx =
-      index[0] + index[1] * size[0] + index[2] * size[0] * size[1];
+    int const idx
+        = index[0] + index[1] * size[0] + index[2] * size[0] * size[1];
 
     cells[idx].push_back(i);
   }
@@ -155,7 +152,7 @@ int nbl_build(NeighList *const nl,
   }
 
   // temporary neigh container
-  std::vector<int> *tmp_neigh = new std::vector<int>[numberOfCutoffs];
+  std::vector<int> * tmp_neigh = new std::vector<int>[numberOfCutoffs];
   std::vector<int> total(numberOfCutoffs, 0);
   std::vector<int> num_neigh(numberOfCutoffs);
 
@@ -237,8 +234,7 @@ int nbl_build(NeighList *const nl,
     nl->lists[k].cutoff = cutoffs[k];
     nl->lists[k].neighborList = new int[total[k]];
     std::memcpy(
-        nl->lists[k].neighborList,
-        tmp_neigh[k].data(), sizeof(int) * total[k]);
+        nl->lists[k].neighborList, tmp_neigh[k].data(), sizeof(int) * total[k]);
   }
 
   delete[] tmp_neigh;
@@ -247,19 +243,19 @@ int nbl_build(NeighList *const nl,
 }
 
 
-int nbl_get_neigh(void const *const dataObject,
+int nbl_get_neigh(void const * const dataObject,
                   int const numberOfCutoffs,
-                  double const *const cutoffs,
+                  double const * const cutoffs,
                   int const neighborListIndex,
                   int const particleNumber,
-                  int *const numberOfNeighbors,
-                  int const **const neighborsOfParticle)
+                  int * const numberOfNeighbors,
+                  int const ** const neighborsOfParticle)
 {
-  NeighList *nl = (NeighList *) dataObject;
+  NeighList * nl = (NeighList *) dataObject;
 
   if (neighborListIndex >= nl->numberOfNeighborLists) { return 1; }
 
-  NeighListOne *cnl = &(nl->lists[neighborListIndex]);
+  NeighListOne * cnl = &(nl->lists[neighborListIndex]);
 
   if (cutoffs[neighborListIndex] > cnl->cutoff + TOL) { return 1; }
 
@@ -286,14 +282,14 @@ int nbl_get_neigh(void const *const dataObject,
 
 int nbl_create_paddings(int const numberOfParticles,
                         double const cutoff,
-                        double const *cell,
-                        int const *PBC,
-                        double const *coordinates,
-                        int const *speciesCode,
-                        int &numberOfPaddings,
-                        std::vector<double> &coordinatesOfPaddings,
-                        std::vector<int> &speciesCodeOfPaddings,
-                        std::vector<int> &masterOfPaddings)
+                        double const * cell,
+                        int const * PBC,
+                        double const * coordinates,
+                        int const * speciesCode,
+                        int & numberOfPaddings,
+                        std::vector<double> & coordinatesOfPaddings,
+                        std::vector<int> & speciesCodeOfPaddings,
+                        std::vector<int> & masterOfPaddings)
 {
   // transform coordinates into fractional coordinates
   double tcell[9];
@@ -311,7 +307,7 @@ int nbl_create_paddings(int const numberOfParticles,
 
   for (int i = 0; i < numberOfParticles; i++)
   {
-    const double *atom_coords = coordinates + (3 * i);
+    const double * atom_coords = coordinates + (3 * i);
 
     double x = dot(fcell, atom_coords);
     double y = dot(fcell + 3, atom_coords);
@@ -357,20 +353,16 @@ int nbl_create_paddings(int const numberOfParticles,
   dist[2] = volume / norm(xprod);
 
   // number of cells in each direction
-  double const ratio[3] = {cutoff / dist[0],
-                           cutoff / dist[1],
-                           cutoff / dist[2]};
+  double const ratio[3]
+      = {cutoff / dist[0], cutoff / dist[1], cutoff / dist[2]};
 
   int const size[3] = {static_cast<int>(std::ceil(ratio[0])),
                        static_cast<int>(std::ceil(ratio[1])),
                        static_cast<int>(std::ceil(ratio[2]))};
 
-  double const size_ratio_diff_x =
-    static_cast<double>(size[0]) - ratio[0];
-  double const size_ratio_diff_y =
-    static_cast<double>(size[1]) - ratio[1];
-  double const size_ratio_diff_z =
-    static_cast<double>(size[2]) - ratio[2];
+  double const size_ratio_diff_x = static_cast<double>(size[0]) - ratio[0];
+  double const size_ratio_diff_y = static_cast<double>(size[1]) - ratio[1];
+  double const size_ratio_diff_z = static_cast<double>(size[2]) - ratio[2];
 
 
   // creating padding atoms

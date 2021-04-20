@@ -7,14 +7,7 @@ length_unit = {
     'field_name': 'length_unit',
 }
 
-length_attributes = [
-    'unused',
-    'A',
-    'Bohr',
-    'cm',
-    'm',
-    'nm'
-]
+length_attributes = ['unused', 'A', 'Bohr', 'cm', 'm', 'nm']
 
 energy_unit = {
     'FIELD_NAME': 'ENERGY_UNIT',
@@ -23,15 +16,7 @@ energy_unit = {
     'field_name': 'energy_unit',
 }
 
-energy_attributes = [
-    'unused',
-    'amu_A2_per_ps2',
-    'erg',
-    'eV',
-    'Hartree',
-    'J',
-    'kcal_mol'
-]
+energy_attributes = ['unused', 'amu_A2_per_ps2', 'erg', 'eV', 'Hartree', 'J', 'kcal_mol']
 
 charge_unit = {
     'FIELD_NAME': 'CHARGE_UNIT',
@@ -40,12 +25,7 @@ charge_unit = {
     'field_name': 'charge_unit',
 }
 
-charge_attributes = [
-    'unused',
-    'C',
-    'e',
-    'statC'
-]
+charge_attributes = ['unused', 'C', 'e', 'statC']
 
 temperature_unit = {
     'FIELD_NAME': 'TEMPERATURE_UNIT',
@@ -54,10 +34,7 @@ temperature_unit = {
     'field_name': 'temperature_unit',
 }
 
-temperature_attributes = [
-    'unused',
-    'K'
-]
+temperature_attributes = ['unused', 'K']
 
 time_unit = {
     'FIELD_NAME': 'TIME_UNIT',
@@ -66,21 +43,9 @@ time_unit = {
     'field_name': 'time_unit',
 }
 
-time_attributes = [
-    'unused',
-    'fs',
-    'ps',
-    'ns',
-    's'
-]
+time_attributes = ['unused', 'fs', 'ps', 'ns', 's']
 
-all_units = [
-    length_unit,
-    energy_unit,
-    charge_unit,
-    temperature_unit,
-    time_unit
-]
+all_units = [length_unit, energy_unit, charge_unit, temperature_unit, time_unit]
 
 all_attributes = [
     length_attributes,

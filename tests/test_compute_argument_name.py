@@ -56,9 +56,7 @@ def test_main():
         all_instances.append(inst)
 
         try:
-            dtype = \
-                kimpy.compute_argument_name.get_compute_argument_data_type(
-                    inst)
+            dtype = kimpy.compute_argument_name.get_compute_argument_data_type(inst)
         except RuntimeError:
             msg = 'Calling "kimpy.compute_argument_name.'
             msg += 'get_compute_argument_data_type" failed.'

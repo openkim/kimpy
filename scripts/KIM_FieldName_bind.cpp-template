@@ -1,5 +1,5 @@
-#include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
+#include <pybind11/pybind11.h>
 
 #include <string>
 
@@ -8,7 +8,8 @@
 namespace py = pybind11;
 using namespace KIM;
 
-PYBIND11_MODULE(field_name, module) {
+PYBIND11_MODULE(field_name, module)
+{
   module.doc() = "Python binding to KIM_FieldName.hpp";
 
   // classes
@@ -16,43 +17,39 @@ PYBIND11_MODULE(field_name, module) {
   py::class_<FieldName> cl(module, "FieldName");
 
   cl.def(py::init<>())
-    .def(py::init<int const>())
-    .def(py::init<std::string const>())
-    .def("known", &FieldName::Known)
-    .def(py::self == py::self)
-    .def(py::self != py::self)
-    .def("__repr__", &FieldName::ToString)
-    .def(py::pickle(
-      // __getstate__
-      [](FieldName const &fieldName) {
-        // Return a tuple that fully encodes
-        // the state of the fieldName object
-        return py::make_tuple(fieldName.fieldNameID);
-      },
-      // __setstate__
-      [](py::tuple t) {
-        if (t.size() != 1) {
-          throw std::runtime_error("Invalid state!");
-        }
-        // Create a new instance
-        FieldName fieldName(t[0].cast<int>());
-        return fieldName;
-      }
-    ));
+      .def(py::init<int const>())
+      .def(py::init<std::string const>())
+      .def("known", &FieldName::Known)
+      .def(py::self == py::self)
+      .def(py::self != py::self)
+      .def("__repr__", &FieldName::ToString)
+      .def(py::pickle(
+          // __getstate__
+          [](FieldName const & fieldName) {
+            // Return a tuple that fully encodes
+            // the state of the fieldName object
+            return py::make_tuple(fieldName.fieldNameID);
+          },
+          // __setstate__
+          [](py::tuple t) {
+            if (t.size() != 1) { throw std::runtime_error("Invalid state!"); }
+            // Create a new instance
+            FieldName fieldName(t[0].cast<int>());
+            return fieldName;
+          }));
 
   // functions
 
   module.def("get_field_name", [](int const index) {
-      FieldName fieldName;
+    FieldName fieldName;
 
-      int error = FIELD_NAME::GetFieldName(
-        index, &fieldName);
-      if (error == 1) {
-        throw std::runtime_error(
-          "index < 0 or index >= numberOfFieldNames!");
-      }
+    int error = FIELD_NAME::GetFieldName(index, &fieldName);
+    if (error == 1)
+    {
+      throw std::runtime_error("index < 0 or index >= numberOfFieldNames!");
+    }
 
-      return fieldName;
+    return fieldName;
     }, R"pbdoc(
        Get the identity of each defined standard FieldName.
 
@@ -62,20 +59,20 @@ PYBIND11_MODULE(field_name, module) {
        py::arg("index"));
 
   module.def("get_number_of_field_names", []() {
-      int numberOfFieldNames;
+    int numberOfFieldNames;
 
-      FIELD_NAME::GetNumberOfFieldNames(
-        &numberOfFieldNames);
+    FIELD_NAME::GetNumberOfFieldNames(&numberOfFieldNames);
 
-      return numberOfFieldNames;
+    return numberOfFieldNames;
     }, R"pbdoc(
        Get the number of standard FieldName.
 
        Returns:
            int: numberOfFieldNames
-       )pbdoc");
+       )pbdoc"
+    );
 
   // attributes
 
-rpls_attributes
+  rpls_attributes
 }

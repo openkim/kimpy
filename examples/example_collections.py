@@ -2,9 +2,12 @@ import kimpy
 
 
 def dirs_for_collection(collection, collections):
-    for it in (kimpy.collection_item_type.modelDriver,
-               kimpy.collection_item_type.portableModel,
-               kimpy.collection_item_type.simulatorModel):
+
+    for it in (
+        kimpy.collection_item_type.modelDriver,
+        kimpy.collection_item_type.portableModel,
+        kimpy.collection_item_type.simulatorModel,
+    ):
         try:
             extent = collections.cache_list_of_directory_names(collection, it)
         except RuntimeError:
@@ -25,13 +28,16 @@ def dirs_for_collection(collection, collections):
 
 
 def names_for_collection(collection, collections):
-    for it in (kimpy.collection_item_type.modelDriver,
-               kimpy.collection_item_type.portableModel,
-               kimpy.collection_item_type.simulatorModel):
+
+    for it in (
+        kimpy.collection_item_type.modelDriver,
+        kimpy.collection_item_type.portableModel,
+        kimpy.collection_item_type.simulatorModel,
+    ):
         try:
-            extent = \
-                collections.cache_list_of_item_names_by_collection_and_type(
-                    collection, it)
+            extent = collections.cache_list_of_item_names_by_collection_and_type(
+                collection, it
+            )
         except RuntimeError:
             msg = 'Calling "collections.'
             msg += 'cache_list_of_item_names_by_collection_and_type" failed.'
@@ -52,6 +58,7 @@ def names_for_collection(collection, collections):
 
 
 def example_main():
+
     try:
         collections = kimpy.collections.create()
     except RuntimeError:
@@ -63,9 +70,11 @@ def example_main():
     print('Project: {}'.format(project))
     print('semVer: {}'.format(semver))
 
-    for it in (kimpy.collection_item_type.modelDriver,
-               kimpy.collection_item_type.portableModel,
-               kimpy.collection_item_type.simulatorModel):
+    for it in (
+        kimpy.collection_item_type.modelDriver,
+        kimpy.collection_item_type.portableModel,
+        kimpy.collection_item_type.simulatorModel,
+    ):
         try:
             name = collections.get_environment_variable_name(it)
         except RuntimeError:
@@ -83,21 +92,27 @@ def example_main():
 
     print('config file name: {}'.format(filename))
 
-    for kc in (kimpy.collection.system,
-               kimpy.collection.user,
-               kimpy.collection.environmentVariable,
-               kimpy.collection.currentWorkingDirectory):
+    for kc in (
+        kimpy.collection.system,
+        kimpy.collection.user,
+        kimpy.collection.environmentVariable,
+        kimpy.collection.currentWorkingDirectory,
+    ):
         dirs_for_collection(kc, collections)
 
-    for kc in (kimpy.collection.system,
-               kimpy.collection.user,
-               kimpy.collection.environmentVariable,
-               kimpy.collection.currentWorkingDirectory):
+    for kc in (
+        kimpy.collection.system,
+        kimpy.collection.user,
+        kimpy.collection.environmentVariable,
+        kimpy.collection.currentWorkingDirectory,
+    ):
         names_for_collection(kc, collections)
 
-    for it in (kimpy.collection_item_type.modelDriver,
-               kimpy.collection_item_type.portableModel,
-               kimpy.collection_item_type.simulatorModel):
+    for it in (
+        kimpy.collection_item_type.modelDriver,
+        kimpy.collection_item_type.portableModel,
+        kimpy.collection_item_type.simulatorModel,
+    ):
         try:
             extent = collections.cache_list_of_item_names_by_type(it)
         except RuntimeError:
@@ -118,10 +133,10 @@ def example_main():
             print('    {}'.format(name))
 
     try:
-        filename, collection = \
-            collections.get_item_library_file_name_and_collection(
-                kimpy.collection_item_type.simulatorModel,
-                'Sim_LAMMPS_LJcut_AkersonElliott_Alchemy_PbAu',)
+        filename, collection = collections.get_item_library_file_name_and_collection(
+            kimpy.collection_item_type.simulatorModel,
+            'Sim_LAMMPS_LJcut_AkersonElliott_Alchemy_PbAu',
+        )
     except RuntimeError:
         msg = 'Calling "collections.'
         msg += 'get_item_library_file_name_and_collection" failed.'
@@ -135,7 +150,8 @@ def example_main():
     try:
         extent = collections.cache_list_of_item_metadata_files(
             kimpy.collection_item_type.simulatorModel,
-            "Sim_LAMMPS_LJcut_AkersonElliott_Alchemy_PbAu")
+            "Sim_LAMMPS_LJcut_AkersonElliott_Alchemy_PbAu",
+        )
     except RuntimeError:
         msg = 'Calling "collections.'
         msg += 'cache_list_of_item_metadata_files" failed.'
@@ -143,8 +159,13 @@ def example_main():
 
     for i in range(extent):
         try:
-            file_name, file_length, file_raw_data, \
-                avail_as_str, file_str = collections.get_item_metadata_file(i)
+            (
+                file_name,
+                file_length,
+                file_raw_data,
+                avail_as_str,
+                file_str,
+            ) = collections.get_item_metadata_file(i)
         except RuntimeError:
             msg = 'Calling "collections.get_item_metadata_file" '
             msg += 'for index = {} failed.'.format(i)

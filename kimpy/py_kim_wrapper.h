@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include "KIM_Model.hpp"
 #include "KIM_ComputeArguments.hpp"
+#include "KIM_Model.hpp"
 #include "sim_buffer.h"
 
 /**
@@ -29,29 +29,27 @@
 
 class PyModel : public std::enable_shared_from_this<PyModel>
 {
-  public:
-  KIM::Model *_model{nullptr};
+ public:
+  KIM::Model * _model {nullptr};
 
   PyModel() = default;
-  ~PyModel() {
-    if (_model) {
-      KIM::Model::Destroy(&_model);
-    }
+  ~PyModel()
+  {
+    if (_model) { KIM::Model::Destroy(&_model); }
   }
 };
 
 
-class PyComputeArguments : public
-  std::enable_shared_from_this<PyComputeArguments>
+class PyComputeArguments :
+    public std::enable_shared_from_this<PyComputeArguments>
 {
-  public:
-  KIM::ComputeArguments *_compute_arguments{nullptr};
+ public:
+  KIM::ComputeArguments * _compute_arguments {nullptr};
 
-  std::shared_ptr<PyModel> _py_model{nullptr};
+  std::shared_ptr<PyModel> _py_model {nullptr};
 
   PyComputeArguments() = default;
-  PyComputeArguments(
-    std::shared_ptr<PyModel> py_model) : _py_model(py_model) {}
+  PyComputeArguments(std::shared_ptr<PyModel> py_model) : _py_model(py_model) {}
 
   ~PyComputeArguments()
   {
@@ -59,7 +57,7 @@ class PyComputeArguments : public
     {
       if (_compute_arguments)
       {
-        SimBuffer *sim_buffer;
+        SimBuffer * sim_buffer;
 
         _compute_arguments->GetSimulatorBufferPointer((void **) &sim_buffer);
 
@@ -85,4 +83,4 @@ class PyComputeArguments : public
   }
 };
 
-#endif // PY_KIM_WRAPPER_H_
+#endif  // PY_KIM_WRAPPER_H_

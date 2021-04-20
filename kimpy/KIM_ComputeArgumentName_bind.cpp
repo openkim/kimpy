@@ -23,30 +23,28 @@ PYBIND11_MODULE(compute_argument_name, module)
   py::class_<ComputeArgumentName> cl(module, "ComputeArgumentName");
 
   cl.def(py::init<>())
-    .def(py::init<int const>())
-    .def(py::init<std::string const>())
-    .def("known", &ComputeArgumentName::Known,
-         "Determines if the object is a quantity known to the KIM-API.")
-    .def(py::self == py::self)
-    .def(py::self != py::self)
-    .def("__repr__", &ComputeArgumentName::ToString)
-    .def(py::pickle(
-      // __getstate__
-      [](ComputeArgumentName const &compute_argument_name) {
-        // Return a tuple that fully encodes
-        // the state of the compute_argument_name object
-        return py::make_tuple(compute_argument_name.computeArgumentNameID);
-      },
-      // __setstate__
-      [](py::tuple t) {
-        if (t.size() != 1) {
-          throw std::runtime_error("Invalid state!");
-        }
-        // Create a new instance
-        ComputeArgumentName compute_argument_name(t[0].cast<int>());
-        return compute_argument_name;
-      }
-    ));
+      .def(py::init<int const>())
+      .def(py::init<std::string const>())
+      .def("known",
+           &ComputeArgumentName::Known,
+           "Determines if the object is a quantity known to the KIM-API.")
+      .def(py::self == py::self)
+      .def(py::self != py::self)
+      .def("__repr__", &ComputeArgumentName::ToString)
+      .def(py::pickle(
+          // __getstate__
+          [](ComputeArgumentName const & compute_argument_name) {
+            // Return a tuple that fully encodes
+            // the state of the compute_argument_name object
+            return py::make_tuple(compute_argument_name.computeArgumentNameID);
+          },
+          // __setstate__
+          [](py::tuple t) {
+            if (t.size() != 1) { throw std::runtime_error("Invalid state!"); }
+            // Create a new instance
+            ComputeArgumentName compute_argument_name(t[0].cast<int>());
+            return compute_argument_name;
+          }));
 
   // functions
 
@@ -54,10 +52,11 @@ PYBIND11_MODULE(compute_argument_name, module)
     ComputeArgumentName compute_argument_name;
 
     int error = COMPUTE_ARGUMENT_NAME::GetComputeArgumentName(
-      index, &compute_argument_name);
-    if (error == 1) {
+        index, &compute_argument_name);
+    if (error == 1)
+    {
       throw std::runtime_error(
-        "index < 0 or index >= number_of_compute_argument_names!");
+          "index < 0 or index >= number_of_compute_argument_names!");
     }
 
     return compute_argument_name;
@@ -88,8 +87,9 @@ PYBIND11_MODULE(compute_argument_name, module)
     DataType data_type;
 
     int error = COMPUTE_ARGUMENT_NAME::GetComputeArgumentDataType(
-      compute_argument_name, &data_type);
-    if (error == 1) {
+        compute_argument_name, &data_type);
+    if (error == 1)
+    {
       throw std::runtime_error("compute_argument_name is unknown!");
     }
 
@@ -105,16 +105,16 @@ PYBIND11_MODULE(compute_argument_name, module)
   // attrributes
 
   module.attr("numberOfParticles") = COMPUTE_ARGUMENT_NAME::numberOfParticles;
-  module.attr("particleSpeciesCodes") =
-    COMPUTE_ARGUMENT_NAME::particleSpeciesCodes;
-  module.attr("particleContributing") =
-    COMPUTE_ARGUMENT_NAME::particleContributing;
+  module.attr("particleSpeciesCodes")
+      = COMPUTE_ARGUMENT_NAME::particleSpeciesCodes;
+  module.attr("particleContributing")
+      = COMPUTE_ARGUMENT_NAME::particleContributing;
   module.attr("coordinates") = COMPUTE_ARGUMENT_NAME::coordinates;
   module.attr("partialEnergy") = COMPUTE_ARGUMENT_NAME::partialEnergy;
   module.attr("partialForces") = COMPUTE_ARGUMENT_NAME::partialForces;
-  module.attr("partialParticleEnergy") =
-    COMPUTE_ARGUMENT_NAME::partialParticleEnergy;
+  module.attr("partialParticleEnergy")
+      = COMPUTE_ARGUMENT_NAME::partialParticleEnergy;
   module.attr("partialVirial") = COMPUTE_ARGUMENT_NAME::partialVirial;
-  module.attr("partialParticleVirial") =
-    COMPUTE_ARGUMENT_NAME::partialParticleVirial;
+  module.attr("partialParticleVirial")
+      = COMPUTE_ARGUMENT_NAME::partialParticleVirial;
 }

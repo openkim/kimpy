@@ -22,10 +22,9 @@ import pytest
 
 # create a dimer of two atoms
 def get_argon_dimer():
-    argon = Atoms('ArAr',
-                  positions=[(0, 0, 0), (0.1, 0.2, 0.2)],
-                  cell=(10, 10, 10),
-                  pbc=(0, 0, 0))
+    argon = Atoms(
+        'ArAr', positions=[(0, 0, 0), (0.1, 0.2, 0.2)], cell=(10, 10, 10), pbc=(0, 0, 0)
+    )
     return argon
 
 
@@ -147,7 +146,8 @@ def test_main():
             kimpy.charge_unit.e,
             kimpy.temperature_unit.K,
             kimpy.time_unit.ps,
-            model_name)
+            model_name,
+        )
     except RuntimeError:
         raise kimpy.KimPyError('Calling "kimpy.model.create" failed.')
 
@@ -175,51 +175,57 @@ def test_main():
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.numberOfParticles, num_particles)
+            kimpy.compute_argument_name.numberOfParticles, num_particles
+        )
     except RuntimeError:
         msg = 'Calling "compute_argument.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.particleSpeciesCodes, species_code)
+            kimpy.compute_argument_name.particleSpeciesCodes, species_code
+        )
     except RuntimeError:
         msg = 'Calling "compute_argument.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.particleContributing,
-            particle_contributing)
+            kimpy.compute_argument_name.particleContributing, particle_contributing
+        )
     except RuntimeError:
         msg = 'Calling "compute_argument.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.coordinates, coords)
+            kimpy.compute_argument_name.coordinates, coords
+        )
     except RuntimeError:
         msg = 'Calling "compute_argument.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.partialEnergy, energy)
+            kimpy.compute_argument_name.partialEnergy, energy
+        )
     except RuntimeError:
         msg = 'Calling "compute_argument.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.partialForces, forces)
+            kimpy.compute_argument_name.partialForces, forces
+        )
     except RuntimeError:
         msg = 'Calling "compute_argument.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     # species support and code
     try:
-        species_support, code = \
-            kim_model.get_species_support_and_code(kimpy.species_name.Ar)
+        species_support, code = kim_model.get_species_support_and_code(
+            kimpy.species_name.Ar
+        )
     except RuntimeError:
         msg = 'Calling "kim_model.get_species_support_and_code" failed.'
         raise kimpy.KimPyError(msg)
@@ -237,24 +243,24 @@ def test_main():
     # register callbacks
     try:
         compute_arguments.set_callback(
-            kimpy.compute_callback_name.GetNeighborList,
-            get_neigh, neigh_data)
+            kimpy.compute_callback_name.GetNeighborList, get_neigh, neigh_data
+        )
     except RuntimeError:
         msg = 'Calling "compute_arguments.set_callback" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_callback(
-            kimpy.compute_callback_name.ProcessDEDrTerm,
-            process_dEdr, dEdr_data)
+            kimpy.compute_callback_name.ProcessDEDrTerm, process_dEdr, dEdr_data
+        )
     except RuntimeError:
         msg = 'Calling "compute_arguments.set_callback" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_callback(
-            kimpy.compute_callback_name.ProcessD2EDr2Term,
-            process_d2Edr2, d2Edr2_data)
+            kimpy.compute_callback_name.ProcessD2EDr2Term, process_d2Edr2, d2Edr2_data
+        )
     except RuntimeError:
         msg = 'Calling "compute_arguments.set_callback" failed.'
         raise kimpy.KimPyError(msg)

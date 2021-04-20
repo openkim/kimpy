@@ -7,11 +7,7 @@ fields = {
     'field_name': 'compute_callback_name',
 }
 
-attributes = [
-    'GetNeighborList',
-    'ProcessDEDrTerm',
-    'ProcessD2EDr2Term'
-]
+attributes = ['GetNeighborList', 'ProcessDEDrTerm', 'ProcessD2EDr2Term']
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)

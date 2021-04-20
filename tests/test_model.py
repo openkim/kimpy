@@ -81,7 +81,8 @@ def test_main():
             kimpy.charge_unit.e,
             kimpy.temperature_unit.K,
             kimpy.time_unit.ps,
-            modelname)
+            modelname,
+        )
     except RuntimeError:
         raise kimpy.KimPyError('Calling "kimpy.model.create" failed.')
 
@@ -107,8 +108,9 @@ def test_main():
         raise kimpy.KimPyError(msg)
 
     # check compute arguments
-    num_compute_arguments = \
+    num_compute_arguments = (
         kimpy.compute_argument_name.get_number_of_compute_argument_names()
+    )
     print('Number of compute_arguments:', num_compute_arguments)
 
     for i in range(num_compute_arguments):
@@ -121,9 +123,7 @@ def test_main():
             raise kimpy.KimPyError(msg)
 
         try:
-            dtype = \
-                kimpy.compute_argument_name.get_compute_argument_data_type(
-                    name)
+            dtype = kimpy.compute_argument_name.get_compute_argument_data_type(name)
         except RuntimeError:
             msg = 'Calling "kimpy.compute_argument_name.'
             msg += 'get_compute_argument_data_type" for computeArgumentName = '
@@ -131,8 +131,7 @@ def test_main():
             raise kimpy.KimPyError(msg)
 
         try:
-            support_status = \
-                compute_arguments.get_argument_support_status(name)
+            support_status = compute_arguments.get_argument_support_status(name)
         except RuntimeError:
             msg = 'Calling "compute_arguments.get_argument_support_status" '
             msg += 'for computeArgumentName = {} failed.'.format(name)
@@ -151,24 +150,29 @@ def test_main():
 
         # can only handle energy and force as a required arg
         if support_status == kimpy.support_status.required:
-            if name not in (kimpy.compute_argument_name.partialEnergy,
-                            kimpy.compute_argument_name.partialForces):
+            if name not in (
+                kimpy.compute_argument_name.partialEnergy,
+                kimpy.compute_argument_name.partialForces,
+            ):
                 msg = 'Unsupported required ComputeArgumentName = '
                 msg += '{}'.format(name)
                 raise kimpy.KimPyError(msg)
 
         # must have energy and forces
-        if name in (kimpy.compute_argument_name.partialEnergy,
-                    kimpy.compute_argument_name.partialForces):
-            if support_status not in (kimpy.support_status.required,
-                                      kimpy.support_status.optional):
+        if name in (
+            kimpy.compute_argument_name.partialEnergy,
+            kimpy.compute_argument_name.partialForces,
+        ):
+            if support_status not in (
+                kimpy.support_status.required,
+                kimpy.support_status.optional,
+            ):
                 raise kimpy.KimPyError('Energy or forces not available')
 
     print()
 
     # check compute callbacks
-    num_callbacks = \
-        kimpy.compute_callback_name.get_number_of_compute_callback_names()
+    num_callbacks = kimpy.compute_callback_name.get_number_of_compute_callback_names()
 
     print('Number of callbacks:', num_callbacks)
 
@@ -182,8 +186,7 @@ def test_main():
             raise kimpy.KimPyError(msg)
 
         try:
-            support_status = \
-                compute_arguments.get_callback_support_status(name)
+            support_status = compute_arguments.get_callback_support_status(name)
         except RuntimeError:
             msg = 'Calling "compute_arguments.get_callback_support_status" '
             msg += 'for computeArgumentName = {} failed.'.format(name)
@@ -212,8 +215,7 @@ def test_main():
 
     for i in range(num_params):
         try:
-            dtype, extent, name, description = \
-                kim_model.get_parameter_metadata(i)
+            dtype, extent, name, description = kim_model.get_parameter_metadata(i)
         except RuntimeError:
             msg = 'Calling "kim_model.get_parameter_metadata" '
             msg += 'for parameterIndex = {} failed.'.format(i)
@@ -241,43 +243,48 @@ def test_main():
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.numberOfParticles, num_particles)
+            kimpy.compute_argument_name.numberOfParticles, num_particles
+        )
     except RuntimeError:
         msg = 'Calling "compute_arguments.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.particleSpeciesCodes, species_code)
+            kimpy.compute_argument_name.particleSpeciesCodes, species_code
+        )
     except RuntimeError:
         msg = 'Calling "compute_arguments.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.particleContributing,
-            particle_contributing)
+            kimpy.compute_argument_name.particleContributing, particle_contributing
+        )
     except RuntimeError:
         msg = 'Calling "compute_arguments.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.coordinates, coords)
+            kimpy.compute_argument_name.coordinates, coords
+        )
     except RuntimeError:
         msg = 'Calling "compute_arguments.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.partialEnergy, energy)
+            kimpy.compute_argument_name.partialEnergy, energy
+        )
     except RuntimeError:
         msg = 'Calling "compute_arguments.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
 
     try:
         compute_arguments.set_argument_pointer(
-            kimpy.compute_argument_name.partialForces, forces)
+            kimpy.compute_argument_name.partialForces, forces
+        )
     except RuntimeError:
         msg = 'Calling "compute_arguments.set_argument_pointer" failed.'
         raise kimpy.KimPyError(msg)
@@ -288,7 +295,8 @@ def test_main():
     # register get neigh callback
     try:
         compute_arguments.set_callback(
-            kimpy.compute_callback_name.GetNeighborList, get_neigh, neigh)
+            kimpy.compute_callback_name.GetNeighborList, get_neigh, neigh
+        )
     except RuntimeError:
         msg = 'Calling "compute_arguments.set_callback" failed.'
         raise kimpy.KimPyError(msg)
@@ -297,16 +305,19 @@ def test_main():
     model_influence_dist = kim_model.get_influence_distance()
     print('Model influence distance:', model_influence_dist)
 
-    model_cutoffs, padding_not_require_neigh_hints = \
-        kim_model.get_neighbor_list_cutoffs_and_hints()
+    (
+        model_cutoffs,
+        padding_not_require_neigh_hints,
+    ) = kim_model.get_neighbor_list_cutoffs_and_hints()
     print('Model cutoffs:', model_cutoffs)
     print('Model padding neighbors hints:', padding_not_require_neigh_hints)
     print()
 
     # species support and code
     try:
-        species_support, code = \
-            kim_model.get_species_support_and_code(kimpy.species_name.Ar)
+        species_support, code = kim_model.get_species_support_and_code(
+            kimpy.species_name.Ar
+        )
     except RuntimeError:
         msg = 'Calling "kim_model.get_species_support_and_code" failed.'
         raise kimpy.KimPyError(msg)
@@ -351,12 +362,14 @@ def test_main():
         except RuntimeError:
             raise kimpy.KimPyError('Calling "kim_model.compute" failed.')
 
-        print('{:18.10e} {:18.10e} {:18.10e}'.format(
-            energy[0], np.linalg.norm(forces), a))
+        print(
+            '{:18.10e} {:18.10e} {:18.10e}'.format(energy[0], np.linalg.norm(forces), a)
+        )
 
     try:
         present, required = kim_model.is_routine_present(
-            kimpy.model_routine_name.WriteParameterizedModel)
+            kimpy.model_routine_name.WriteParameterizedModel
+        )
     except RuntimeError:
         msg = 'Calling "kim_model.is_routine_present" failed.'
         raise kimpy.KimPyError(msg)

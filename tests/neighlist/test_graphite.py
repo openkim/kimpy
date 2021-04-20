@@ -72,12 +72,9 @@ def test_main():
     pbc = np.array([1, 1, 1], dtype=np.intc)
 
     try:
-        pad_coords, pad_species, _ = \
-            nl.create_paddings(influence_dist,
-                               cell,
-                               pbc,
-                               contrib_coords,
-                               contrib_species)
+        pad_coords, pad_species, _ = nl.create_paddings(
+            influence_dist, cell, pbc, contrib_coords, contrib_species
+        )
     except RuntimeError:
         msg = 'Calling "neighlist.create_paddings" failed.'
         raise KimPyError(msg)
@@ -121,8 +118,7 @@ def test_main():
     particle = 1
 
     try:
-        num_neigh, _ = \
-            nl.get_neigh(neigh, cutoffs, neigh_list_index, particle)
+        num_neigh, _ = nl.get_neigh(neigh, cutoffs, neigh_list_index, particle)
     except RuntimeError:
         msg = 'KIM error. Calling "neighlist.get_neigh" failed.'
         raise KimPyError(msg)

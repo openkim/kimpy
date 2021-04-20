@@ -3,6 +3,7 @@ import kimpy
 
 
 def example_main():
+
     modelname = 'Sim_LAMMPS_LJcut_AkersonElliott_Alchemy_PbAu'
 
     try:

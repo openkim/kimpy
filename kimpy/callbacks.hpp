@@ -24,13 +24,13 @@ namespace py = pybind11;
 //  error: int
 //    error code
 //
-int get_neigh(void const *const data_object,
+int get_neigh(void const * const data_object,
               int const number_of_cutoffs,
-              double const *const cutoffs,
+              double const * const cutoffs,
               int const neighbor_list_index,
               int const particle_number,
-              int *const number_of_neighbors,
-              int const **const neighbors_of_particle)
+              int * const number_of_neighbors,
+              int const ** const neighbors_of_particle)
 {
   // get python callback function and data
   auto d1 = const_cast<void *>(data_object);
@@ -41,15 +41,12 @@ int get_neigh(void const *const data_object,
   // pack cutoffs as py::array
   py::array_t<double, py::array::c_style> pycutoffs(number_of_cutoffs);
   auto p_pycutoffs = pycutoffs.mutable_data(0);
-  for (int i = 0; i < number_of_cutoffs; i++)
-  {
-    p_pycutoffs[i] = cutoffs[i];
-  }
+  for (int i = 0; i < number_of_cutoffs; i++) { p_pycutoffs[i] = cutoffs[i]; }
 
   // call python get_neigh function
-  py::tuple out =
-    pyfunc(pydata, pycutoffs, neighbor_list_index, particle_number);
-  auto neigh = static_cast<py::array_t<int>>(out[0]);
+  py::tuple out
+      = pyfunc(pydata, pycutoffs, neighbor_list_index, particle_number);
+  auto neigh = static_cast<py::array_t<int> >(out[0]);
   auto error = out[1].cast<int>();
   *neighbors_of_particle = neigh.data();
   *number_of_neighbors = static_cast<int>(neigh.size());
@@ -78,10 +75,10 @@ int get_neigh(void const *const data_object,
 //  error: int
 //    error code
 //
-int process_dEdr(void const *const data_object,
+int process_dEdr(void const * const data_object,
                  double const de,
                  double const r,
-                 double const *const dx,
+                 double const * const dx,
                  int const i,
                  int const j)
 {
@@ -124,12 +121,12 @@ int process_dEdr(void const *const data_object,
 //  error: int
 //    error code
 //
-int process_d2Edr2(void const *const data_object,
+int process_d2Edr2(void const * const data_object,
                    double const de,
-                   double const *const r,
-                   double const *const dx,
-                   int const *const i,
-                   int const *const j)
+                   double const * const r,
+                   double const * const dx,
+                   int const * const i,
+                   int const * const j)
 {
   // get python callback function and data
   auto d1 = const_cast<void *>(data_object);

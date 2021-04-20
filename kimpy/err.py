@@ -18,8 +18,7 @@ class KimPyError(Exception):
 
     def __init__(self, msg):
         """Constuctor."""
-        _msg = '\nERROR(@' + \
-            inspect.currentframe().f_back.f_code.co_name + '): ' + msg
+        _msg = '\nERROR(@' + inspect.currentframe().f_back.f_code.co_name + '): ' + msg
         Exception.__init__(self, _msg)
         self.msg = _msg
 

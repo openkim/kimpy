@@ -4,6 +4,7 @@ rpls_attributes
 
 rpls_str_names
 
+
 def test_main():
     """Main test function."""
     N = kimpy.field_name.get_number_of_field_names()
