@@ -23,11 +23,7 @@ def remove_generated_files(path):
     ]
 
     dir_list_files = {
-        'examples': [
-            "error.py",
-            "example_collections.py",
-            "example_simulator_model.py"
-        ],
+        'examples': ["error.py", "example_collections.py", "example_simulator_model.py"],
         'kimpy': [
             "KIM_Collections_bind.cpp",
             "KIM_ComputeArgumentName_bind.cpp",
@@ -41,7 +37,7 @@ def remove_generated_files(path):
             "err.py",
             "neighlist",
             "sim_buffer.h",
-            "py_kim_wrapper.h"
+            "py_kim_wrapper.h",
         ],
         'scripts': [
             "KIM_FieldName_bind.cpp-template",
@@ -72,7 +68,7 @@ def remove_generated_files(path):
         join('tests', 'neighlist'): [
             'cpp_example',
             'test_graphite.py',
-        ]
+        ],
     }
 
     for dir_name in dir_list:

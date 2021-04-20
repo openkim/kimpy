@@ -3,6 +3,7 @@
 from os.path import dirname, abspath, join, isfile
 from collections import OrderedDict
 import sys
+
 sys.path.insert(0, abspath('kimpy'))
 
 from err import KimPyError
@@ -33,8 +34,7 @@ def read_compatible_table():
             if not line or line[0] == '#':
                 continue
 
-            kimpy_version, kim_api_target_version, \
-                kim_api_backward_version = line.split()
+            kimpy_version, kim_api_target_version, kim_api_backward_version = line.split()
 
             compatible_table[kimpy_version] = {
                 'target': kim_api_target_version,
@@ -45,7 +45,7 @@ def read_compatible_table():
 
 
 def compare_version(x, y):
-    """"Check the version relation of x and y in the format a.b.c.
+    """Check the version relation of x and y in the format a.b.c.
 
     Return:
         str: the version relation of x and y

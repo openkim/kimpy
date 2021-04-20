@@ -54,7 +54,6 @@ def format_cpp_code(path, exclude=['KIM_ComputeArguments_bind.cpp']):
 
 
 if __name__ == '__main__':
-    kimpy_root_dir = \
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+    kimpy_root_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
     format_py_code(kimpy_root_dir)
     format_cpp_code(kimpy_root_dir)

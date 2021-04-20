@@ -80,10 +80,12 @@ def has_flag(compiler, flag_name):
     try:
         compiler.compile([tempfile_name], extra_postargs=[flag_name])
     except distutils.errors.CompileError:
-        print(f"Checking whether the compiler supports flag: '{flag_name}'. "
-              "You may see compilation error (e.g. gcc: error: unrecognized "
-              f"command line option {flag_name}). Just ignore it; we are on "
-              "the right track.")
+        print(
+            f"Checking whether the compiler supports flag: '{flag_name}'. "
+            "You may see compilation error (e.g. gcc: error: unrecognized "
+            f"command line option {flag_name}). Just ignore it; we are on "
+            "the right track."
+        )
         return False
     finally:
         try:
@@ -179,8 +181,7 @@ def get_include_dirs():
     include_dirs = inquire_kim_api("--cflags-only-I")
     include_dirs.append(get_pybind_include())
     include_dirs.append(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                     "kimpy", "neighlist")
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "kimpy", "neighlist")
     )
     return include_dirs
 
@@ -299,8 +300,7 @@ def chech_kim_api_compatibility():
         kim_api_version = modversion
 
     kimpy_version = get_kimpy_version()
-    kim_api_compatibility = check_kim_api_compatibility(
-        kimpy_version, kim_api_version)
+    kim_api_compatibility = check_kim_api_compatibility(kimpy_version, kim_api_version)
 
     if kim_api_compatibility is not None:
         raise Exception(kim_api_compatibility)
