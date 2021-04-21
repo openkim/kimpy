@@ -101,14 +101,14 @@ def test_main():
     neigh = nl.create()
 
     try:
-        nl.build(neigh, coords, influence_dist, cutoffs, need_neigh)
+        neigh.build(coords, influence_dist, cutoffs, need_neigh)
     except RuntimeError:
         msg = 'Calling "neighlist.build" failed.'
         raise KimPyError(msg)
 
     # build again (it will automatically empty previous neigh list)
     try:
-        nl.build(neigh, coords, influence_dist, cutoffs, need_neigh)
+        neigh.build(coords, influence_dist, cutoffs, need_neigh)
     except RuntimeError:
         msg = 'Calling "neighlist.build" failed.'
         raise KimPyError(msg)
@@ -118,7 +118,7 @@ def test_main():
     particle = 1
 
     try:
-        num_neigh, _ = nl.get_neigh(neigh, cutoffs, neigh_list_index, particle)
+        num_neigh, _ = neigh.get_neigh(cutoffs, neigh_list_index, particle)
     except RuntimeError:
         msg = 'KIM error. Calling "neighlist.get_neigh" failed.'
         raise KimPyError(msg)
@@ -129,7 +129,7 @@ def test_main():
     particle = 4
 
     try:
-        num_neigh, _ = nl.get_neigh(neigh, cutoffs, neigh_list_index, particle)
+        num_neigh, _ = neigh.get_neigh(cutoffs, neigh_list_index, particle)
     except RuntimeError:
         msg = 'KIM error. Calling "neighlist.get_neigh" failed.'
         raise KimPyError(msg)

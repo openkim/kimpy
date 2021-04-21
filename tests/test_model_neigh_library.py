@@ -308,7 +308,7 @@ def test_main():
         np.copyto(coords, argon.get_positions())
 
         try:
-            nl.build(neigh, coords, model_influence_dist, model_cutoffs, need_neigh)
+            neigh.build(coords, model_influence_dist, model_cutoffs, need_neigh)
         except RuntimeError:
             raise kimpy.KimPyError('Calling "neighlist.build" failed.')
 
