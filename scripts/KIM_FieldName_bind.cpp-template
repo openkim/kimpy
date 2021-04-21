@@ -27,38 +27,38 @@ PYBIND11_MODULE(field_name, module)
   // functions
 
   module.def("get_field_name", [](int const index) {
-    FieldName fieldName;
+    FieldName field_name;
 
-    int error = FIELD_NAME::GetFieldName(index, &fieldName);
+    int error = FIELD_NAME::GetFieldName(index, &field_name);
     if (error == 1)
     {
       throw std::runtime_error("index < 0 or index >= numberOfFieldNames!");
     }
 
-    return fieldName;
+    return field_name;
     }, R"pbdoc(
        Get the identity of each defined standard FieldName.
 
        Returns:
-           FieldName: fieldName
+           FieldName: field_name
        )pbdoc",
        py::arg("index"));
 
   module.def("get_number_of_field_names", []() {
-    int numberOfFieldNames;
+    int number_of_field_names;
 
-    FIELD_NAME::GetNumberOfFieldNames(&numberOfFieldNames);
+    FIELD_NAME::GetNumberOfFieldNames(&number_of_field_names);
 
-    return numberOfFieldNames;
+    return number_of_field_names;
     }, R"pbdoc(
        Get the number of standard FieldName.
 
        Returns:
-           int: numberOfFieldNames
+           int: number_of_field_names
        )pbdoc"
     );
 
   // attributes
 
-  rpls_attributes
+rpls_attributes
 }
