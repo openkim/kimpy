@@ -1,5 +1,3 @@
-#include "neighbor_list.h"
-
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
@@ -7,6 +5,8 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+
+#include "neighbor_list.h"
 
 #define MY_WARNING(message)                                           \
   {                                                                   \
@@ -153,127 +153,6 @@ PYBIND11_MODULE(neighlist, module)
          NeighList: neighList
      )pbdoc"
   );
-
-  module.def("initialize", []() {
-    NeighList * neighList = new NeighList;
-    return std::unique_ptr<NeighList, PyNeighListDestroy>(std::move(neighList));
-  }, R"pbdoc(
-     Create a new NeighList object.
-
-     Returns:
-         NeighList: neighList
-     )pbdoc"
-  );
-
-  module.def(
-      "build",
-      [](NeighList * const neighList,
-         py::array_t<double> coords,
-         double const influence_distance,
-         py::array_t<double> cutoffs,
-         py::array_t<int> need_neigh) {
-        int const natoms_1 = static_cast<int>(coords.size() / 3);
-        int const natoms_2 = static_cast<int>(need_neigh.size());
-
-        if (natoms_1 != natoms_2)
-        {
-          MY_WARNING("\"coords\" size and \"need_neigh\" size do not match!");
-        }
-
-        int const natoms = natoms_1 <= natoms_2 ? natoms_1 : natoms_2;
-        double const * coords_data = coords.data();
-        int const number_of_cutoffs = static_cast<int>(cutoffs.size());
-        double const * cutoffs_data = cutoffs.data();
-        int const * need_neigh_data = need_neigh.data();
-
-        int error = nbl_build(neighList,
-                              natoms,
-                              coords_data,
-                              influence_distance,
-                              number_of_cutoffs,
-                              cutoffs_data,
-                              need_neigh_data);
-        if (error == 1)
-        {
-          throw std::runtime_error(
-              "Cell size too large! (partilces fly away) or\n"
-              "Collision of atoms happened!");
-        }
-      },
-      "Build neighList.",
-      py::arg("neighList"),
-      py::arg("coords").noconvert(),
-      py::arg("influence_distance"),
-      py::arg("cutoffs").noconvert(),
-      py::arg("need_neigh").noconvert());
-
-  module.def("get_neigh",
-             [](NeighList const *const neighList,
-                py::array_t<double> cutoffs,
-                int const neighbor_list_index,
-                int const particle_number) {
-    int const number_of_cutoffs = static_cast<int>(cutoffs.size());
-    double const * cutoffs_data = cutoffs.data();
-    int number_of_neighbors = 0;
-    int const * neigh_of_atom;
-
-    int error = nbl_get_neigh(neighList,
-                              number_of_cutoffs,
-                              cutoffs_data,
-                              neighbor_list_index,
-                              particle_number,
-                              &number_of_neighbors,
-                              &neigh_of_atom);
-    if (error == 1)
-    {
-      if (neighbor_list_index >= neighList->numberOfNeighborLists)
-      {
-        throw std::runtime_error(
-            "neighbor_list_index = " + std::to_string(neighbor_list_index)
-            + " >= neighList->numberOfNeighborLists = "
-            + std::to_string(neighList->numberOfNeighborLists));
-      }
-      else if (cutoffs_data[neighbor_list_index]
-               > neighList->lists[neighbor_list_index].cutoff)
-      {
-        throw std::runtime_error(
-            "cutoffs_data[neighbor_list_index] = "
-            + std::to_string(cutoffs_data[neighbor_list_index])
-            + " > neighList->lists[neighbor_list_index].cutoff = "
-            + std::to_string(neighList->lists[neighbor_list_index].cutoff));
-      }
-      else
-      {
-        throw std::runtime_error(
-            "particle_number = " + std::to_string(particle_number) + " < 0!");
-      }
-    }
-
-    // pack as a numpy array
-    auto neighbors_of_particle = py::array(py::buffer_info(
-        const_cast<int *>(neigh_of_atom),  // data pointer
-        sizeof(int),  // size of one element
-        py::format_descriptor<int>::format(),  // Python struct-style
-                                               // format descriptor
-        1,  // dimension
-        {number_of_neighbors},  // size of each dimension
-        {sizeof(int)}  // stride of each dimension
-        ));
-
-    py::tuple re(2);
-    re[0] = number_of_neighbors;
-    re[1] = neighbors_of_particle;
-    return re;
-  }, R"pbdoc(
-     Get the neighList's number of neighbors and neighbors of particle.
-
-     Returns:
-         int, 1darray: number_of_neighbors, neighbors_of_particle
-     )pbdoc",
-     py::arg("neighList"),
-     py::arg("cutoffs").noconvert(),
-     py::arg("neighbor_list_index"),
-     py::arg("particle_number"));
 
   // cannot bind `nbl_get_neigh_kim` directly, since it has pointer arguments
   // so we return a pointer to this function
