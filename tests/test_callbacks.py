@@ -28,16 +28,6 @@ def get_argon_dimer():
     return argon
 
 
-def assert_1d_array(array_a, array_b):
-    assert len(array_a) == len(array_b)
-    for i, j in zip(array_a, array_b):
-        assert i == pytest.approx(j, 1e-6)
-
-
-def assert_2d_array(array_a, array_b):
-    assert np.allclose(array_a, array_b)
-
-
 # neigh
 neigh_data = dict()
 neigh_data['cutoff'] = 1.0
@@ -52,13 +42,13 @@ def get_neigh(data, cutoffs, neighbor_list_index, particle_number):
     if data['num_called'] < 2:
         assert data['cutoff'] == pytest.approx(1.0, 1e-6)
         assert data['num_particles'] == 2
-        assert_2d_array(data['neighbors'], [[1], [0]])
+        assert np.allclose(data['neighbors'], [[1], [0]])
         assert data['key'] == 1
     # 2nd call of kim_model.compute
     else:
         assert data['cutoff'] == pytest.approx(1.0, 1e-6)
         assert data['num_particles'] == 2
-        assert_2d_array(data['neighbors'], [[1], [0]])
+        assert np.allclose(data['neighbors'], [[1], [0]])
         assert data['key'] == 2
 
     # last call of this function
@@ -85,7 +75,7 @@ n_dEdr_called = 0
 def process_dEdr(data, de, r, dx, i, j):
     assert r == pytest.approx(0.3, 1e-6)
 
-    assert_1d_array(abs(dx), [0.1, 0.2, 0.2])
+    assert np.allclose(abs(dx), [0.1, 0.2, 0.2])
 
     # 1st call of kim_model.compute
     if data['num_called'] < 1:
@@ -111,9 +101,10 @@ d2Edr2_data['num_called'] = 0
 
 
 def process_d2Edr2(data, de, r, dx, i, j):
-    assert_1d_array(r, [0.3, 0.3])
 
-    assert_1d_array(abs(dx), [0.1, 0.2, 0.2, 0.1, 0.2, 0.2])
+    assert np.allclose(r, [0.3, 0.3])
+
+    assert np.allclose(abs(dx), [0.1, 0.2, 0.2, 0.1, 0.2, 0.2])
 
     # 1st call of kim_model.compute
     if data['num_called'] < 1:
