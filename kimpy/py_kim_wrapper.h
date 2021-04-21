@@ -22,7 +22,7 @@
  * lead to memory leaks/use-after-free (segmentation fault) errors.
  *
  * By using the current wrapper class we remove the need for user requirement
- * to explicitely edetrsoy the object. Also provide a information that allows
+ * to explicitly destroy the object. Also provide information that allows
  * the Python garbage collection to take care of the objects memory management.
  */
 
