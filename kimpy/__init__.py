@@ -26,7 +26,7 @@ from . import simulator_model
 
 from . import neighlist
 
-from .err import KimPyError, check_error, report_error
+from .err import KimPyError
 
 # needed by `from kimpy import *`
 __all__ = [
@@ -54,6 +54,4 @@ __all__ = [
     'simulator_model',
     'neighlist',
     'KimPyError',
-    'check_error',
-    'report_error',
 ]

@@ -6,6 +6,7 @@
 
 #include "KIM_SimulatorHeaders.hpp"
 #include "callbacks.hpp"
+#include "py_kim_wrapper.h"
 #include "sim_buffer.h"
 
 namespace py = pybind11;
@@ -17,174 +18,218 @@ PYBIND11_MODULE(compute_arguments, module)
 {
   module.doc() = "Python binding to KIM_ComputeArguments.hpp";
 
-  // C++ class constructor and destructor are private, which can not be wrapped
-  // directly.
-  // So we need to call the C++ class factory function in py::init, and use
-  // `py::nodelete` to avoid calling the destructor when python instance is
-  // destroyed. It is crucial that the instance is deallocated by calling the
-  // destroy function from the C++ side to avoid memory leaks. For more info,
-  // see http://pybind11.readthedocs.io/en/stable/advanced/classes.html
-
-  py::class_<ComputeArguments, std::unique_ptr<ComputeArguments, py::nodelete> >
-      cl(module, "ComputeArguments", py::dynamic_attr());
+  py::class_<PyComputeArguments, std::shared_ptr<PyComputeArguments> > cl(
+      module, "PyComputeArguments", py::dynamic_attr());
 
   // python constructor needs to return a pointer to the C++ instance
-  cl.def(py::init([](Model & mo, py::array_t<int> error) {
-      ComputeArguments * ca;
-      auto e = error.mutable_data(0);
-      e[0] = mo.ComputeArgumentsCreate(&ca);
-      return ca;
+  cl.def(py::init([](std::shared_ptr<PyModel> model) {
+    std::shared_ptr<PyComputeArguments> compute_arguments(
+        new PyComputeArguments(model));
+
+    int error = model->_model->ComputeArgumentsCreate(
+        &compute_arguments->_compute_arguments);
+    if (error == 1)
+    {
+      throw std::runtime_error(
+          "Unable to create a new ComputeArguments object "
+          "for the model object!");
+    }
+
+    return compute_arguments;
     }))
+    .def("get_argument_support_status",
+         [](PyComputeArguments &self,
+            ComputeArgumentName const &compute_argument_name) {
+    SupportStatus support_status;
 
-      .def(
-          "get_argument_support_status",
-          [](ComputeArguments & self,
-             ComputeArgumentName const computeArgumentName) {
-            SupportStatus supportStatus;
-            int error = self.GetArgumentSupportStatus(computeArgumentName,
-                                                      &supportStatus);
+    int error = self._compute_arguments->GetArgumentSupportStatus(
+        compute_argument_name, &support_status);
+    if (error == 1)
+    {
+      throw std::runtime_error("compute_argument_name is unknown!");
+    }
 
-            py::tuple re(2);
-            re[0] = supportStatus;
-            re[1] = error;
-            return re;
-          },
-          py::arg("ComputeArgumentName"),
-          "Return(SupportStatus, error)")
+    return support_status;
+    }, R"pbdoc(
+       Get the support_status of a compute_argument_name.
 
-      .def(
-          "get_callback_support_status",
-          [](ComputeArguments & self,
-             ComputeCallbackName const computeCallbackName) {
-            SupportStatus supportStatus;
-            int error = self.GetCallbackSupportStatus(computeCallbackName,
-                                                      &supportStatus);
+       Returns:
+           SupportStatus: support_status
+       )pbdoc",
+       py::arg("compute_argument_name"))
+    .def("get_callback_support_status",
+         [](PyComputeArguments &self,
+            ComputeCallbackName const &compute_callback_name) {
+    SupportStatus support_status;
 
-            py::tuple re(2);
-            re[0] = supportStatus;
-            re[1] = error;
-            return re;
-          },
-          py::arg("ComputeCallbackName"),
-          "Return(SupportStatus, error)")
+    int error = self._compute_arguments->GetCallbackSupportStatus(
+        compute_callback_name, &support_status);
+    if (error == 1)
+    {
+      throw std::runtime_error("compute_callback_name is unknown!");
+    }
 
-      .def(
-          "set_argument_pointer",
-          [](ComputeArguments & self,
-             ComputeArgumentName const computeArgumentName,
-             py::array_t<int> ptr) {
-            int * data = ptr.mutable_data(0);
-            int error = self.SetArgumentPointer(computeArgumentName, data);
-            return error;
-          },
-          py::arg("ComputeArgumentName"),
-          py::arg("ptr").noconvert())
+    return support_status;
+    }, R"pbdoc(
+       Get the support_status of a compute_callback_name.
 
-      .def(
-          "set_argument_pointer",
-          [](ComputeArguments & self,
-             ComputeArgumentName const computeArgumentName,
-             py::array_t<double> ptr) {
-            double * data = ptr.mutable_data(0);
-            int error = self.SetArgumentPointer(computeArgumentName, data);
-            return error;
-          },
-          py::arg("ComputeArgumentName"),
-          py::arg("ptr").noconvert())
+       Returns:
+           SupportStatus: support_status
+       )pbdoc",
+       py::arg("compute_callback_name"))
+    .def("set_argument_pointer",
+         [](PyComputeArguments &self,
+            ComputeArgumentName const &compute_argument_name,
+            py::array_t<int> ptr) {
+    int * data = ptr.mutable_data(0);
 
-      .def(
-          "set_argument_null_pointer",
-          [](ComputeArguments & self,
-             ComputeArgumentName const computeArgumentName) {
-            int error = self.SetArgumentPointer(
-                computeArgumentName, static_cast<double *>(nullptr));
-            return error;
-          },
-          py::arg("ComputeArgumentName"))
+    int error = self._compute_arguments->SetArgumentPointer(
+        compute_argument_name, data);
+    if (error == 1)
+    {
+      throw std::runtime_error("compute_argument_name is unknown!");
+    }
+    }, "Set the data pointer for a compute_argument_name.",
+       py::arg("compute_argument_name"),
+       py::arg("ptr").noconvert())
+    .def("set_argument_pointer",
+         [](PyComputeArguments &self,
+            ComputeArgumentName const &compute_argument_name,
+            py::array_t<double> ptr) {
+    double * data = ptr.mutable_data(0);
 
-      .def(
-          "set_callback_pointer",
-          [](ComputeArguments & self,
-             ComputeCallbackName const computeCallbackName,
-             void const * const
-                 fptr,  // cannot use: KIM::Function * const fptr
-                        // the argument passed in is of type: void const *
-                        // we cast type explicitly in the funciton body
-             void * const dataObject) {
-            KIM::Function * new_fptr = (KIM::Function *) fptr;
-            int error = self.SetCallbackPointer(
-                computeCallbackName, LANGUAGE_NAME::cpp, new_fptr, dataObject);
-            return error;
-          },
-          py::arg("ComputeCallbackName"),
-          py::arg("callback_fn"),
-          py::arg("dataObject"))
+    int error = self._compute_arguments->SetArgumentPointer(
+        compute_argument_name, data);
+    if (error == 1)
+    {
+      throw std::runtime_error("compute_argument_name is unknown!");
+    }
+    }, "Set the data pointer for a compute_argument_name.",
+       py::arg("compute_argument_name"),
+       py::arg("ptr").noconvert())
+    .def("set_argument_null_pointer",
+         [](PyComputeArguments &self,
+            ComputeArgumentName const &compute_argument_name) {
+    int error = self._compute_arguments->SetArgumentPointer(
+        compute_argument_name, static_cast<double *>(nullptr));
+    if (error == 1)
+    {
+      throw std::runtime_error("compute_argument_name is unknown!");
+    }
+    }, "Set a null data pointer for a compute_argument_name.",
+       py::arg("compute_argument_name"))
+    .def("set_callback_pointer",
+         [](PyComputeArguments &self,
+            ComputeCallbackName const &compute_callback_name,
+            void const *const fptr, // cannot use: KIM::Function *const fptr
+            void *const data_object) {
+    // the argument passed in is of type: void const *
+    // we cast type explicitly here
+    KIM::Function * new_fptr = (KIM::Function *) fptr;
 
-      .def(
-          "set_callback",
-          [](ComputeArguments & self,
-             ComputeCallbackName const computeCallbackName,
-             py::object & pyfunc,
-             py::dict & dataObject) {
-            // pack python callback function and dataObject into a new dict
-            py::dict * d
-                = new py::dict("pyfunc"_a = pyfunc, "pydata"_a = dataObject);
+    int error = self._compute_arguments->SetCallbackPointer(
+        compute_callback_name, LANGUAGE_NAME::cpp, new_fptr, data_object);
+    if (error == 1)
+    {
+      throw std::runtime_error(
+          "compute_callback_name is unknown!  or\n fptr is not NULL "
+          "and compute_callback_name is notSupported!");
+    }
+    }, "Set the function pointer for a compute_callback_name.",
+       py::arg("compute_callback_name"),
+       py::arg("callback_fn"),
+       py::arg("data_object"))
+    .def("set_callback",
+         [](PyComputeArguments &self,
+            ComputeCallbackName const &compute_callback_name,
+            py::object &pyfunc,
+            py::dict &data_object) {
+    // pack python callback function and dataObject into a new dict
+    py::dict * pydict
+        = new py::dict("pyfunc"_a = pyfunc, "pydata"_a = data_object);
 
-            SimBuffer * sim_buffer;
-            self.GetSimulatorBufferPointer((void **) &sim_buffer);
-            if (!sim_buffer)
-            {
-              sim_buffer = new SimBuffer;
-              self.SetSimulatorBufferPointer((void *) sim_buffer);
-            }
-            sim_buffer->callbacks.push_back(d);
+    SimBuffer * sim_buffer;
 
-            // select wrapper callback function
-            KIM::Function * wrap_fptr;
-            int error = false;
-            if (computeCallbackName == COMPUTE_CALLBACK_NAME::GetNeighborList)
-            { wrap_fptr = reinterpret_cast<KIM::Function *>(&get_neigh); }
-            else if (computeCallbackName
-                     == COMPUTE_CALLBACK_NAME::ProcessDEDrTerm)
-            {
-              wrap_fptr = reinterpret_cast<KIM::Function *>(&process_dEdr);
-            }
-            else if (computeCallbackName
-                     == COMPUTE_CALLBACK_NAME::ProcessD2EDr2Term)
-            {
-              wrap_fptr = reinterpret_cast<KIM::Function *>(&process_d2Edr2);
-            }
-            else
-            {
-              error = true;
-            }
+    self._compute_arguments->GetSimulatorBufferPointer((void **) &sim_buffer);
 
-            // register callback to kim api
-            error = error || 
-              self.SetCallbackPointer(computeCallbackName,
-                                      LANGUAGE_NAME::cpp,
-                                      wrap_fptr,
-                                      reinterpret_cast<void * const>(d));
+    if (!sim_buffer)
+    {
+      sim_buffer = new SimBuffer;
 
-            return error;
-          },
-          py::arg("ComputeCallbackName"),
-          py::arg("callback_fn"),
-          py::arg("dataObject"))
+      self._compute_arguments->SetSimulatorBufferPointer((void *) sim_buffer);
+    }
 
+    sim_buffer->callbacks.push_back(pydict);
 
-      .def("are_all_required_arguments_and_callbacks_present",
-           [](ComputeArguments & self) {
-             int result;
-             self.AreAllRequiredArgumentsAndCallbacksPresent(&result);
-             return result;
-           })
+    // select wrapper callback function
+    KIM::Function * wrap_fptr;
 
-      .def("__repr__", &ComputeArguments::ToString)
+    if (compute_callback_name == COMPUTE_CALLBACK_NAME::GetNeighborList)
+    {
+      wrap_fptr = reinterpret_cast<KIM::Function *>(&get_neigh);
+    }
+    else if (compute_callback_name == COMPUTE_CALLBACK_NAME::ProcessDEDrTerm)
+    {
+      wrap_fptr = reinterpret_cast<KIM::Function *>(&process_dEdr);
+    }
+    else if (compute_callback_name == COMPUTE_CALLBACK_NAME::ProcessD2EDr2Term)
+    {
+      wrap_fptr = reinterpret_cast<KIM::Function *>(&process_d2Edr2);
+    }
+    else
+    {
+      throw std::runtime_error("compute_callback_name is unknown!");
+    }
 
-      .def("set_log_id", &ComputeArguments::SetLogID)
+    // register callback to kim api
+    int error = self._compute_arguments->SetCallbackPointer(
+        compute_callback_name,
+        LANGUAGE_NAME::cpp,
+        wrap_fptr,
+        reinterpret_cast<void * const>(pydict));
+    if (error == 1)
+    {
+      throw std::runtime_error(
+          "fptr is not NULL and compute_callback_name is not Supported!");
+    }
+    }, "Set the function pointer for a compute_callback_name.",
+       py::arg("compute_callback_name"),
+       py::arg("callback_fn"),
+       py::arg("data_object"))
+    .def("are_all_required_arguments_and_callbacks_present",
+         [](PyComputeArguments &self) {
+    int result;
 
-      .def("push_log_verbosity", &ComputeArguments::PushLogVerbosity)
+    self._compute_arguments->AreAllRequiredArgumentsAndCallbacksPresent(
+        &result);
 
-      .def("pop_log_verbosity", &ComputeArguments::PopLogVerbosity);
+    return result;
+    }, R"pbdoc(
+       Determine if non-NULL pointers have been set for all
+       compute_argument_name's and compute_callback_name's with support_status
+       values of required By API.
+
+       Returns:
+           int: result
+       )pbdoc")
+    .def("__repr__", [](PyComputeArguments &self) {
+    return self._compute_arguments->ToString();
+    }, "Get a string representing the internal state of the "
+       "ComputeArguments object")
+    .def("set_log_id",
+         [](PyComputeArguments &self, std::string const &log_id) {
+    self._compute_arguments->SetLogID(log_id);
+    }, "Set the identity of the Log object associated with the "
+       "ComputeArguments object.",
+       py::arg("log_id"))
+    .def("push_log_verbosity",
+         [](PyComputeArguments &self, LogVerbosity const &log_verbosity) {
+    self._compute_arguments->PushLogVerbosity(log_verbosity);
+    }, "Push a new log_verbosity onto the ComputeArguments object's Log "
+       "object verbosity stack.",
+       py::arg("log_verbosity"))
+    .def("pop_log_verbosity", [](PyComputeArguments &self) {
+    self._compute_arguments->PopLogVerbosity();
+    }, "Pop a log_verbosity from the ComputeArguments object's Log object "
+       "verbosity stack.");
 }

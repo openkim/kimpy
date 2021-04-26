@@ -7,10 +7,7 @@ fields = {
     'field_name': 'data_type',
 }
 
-attributes = [
-    'Integer',
-    'Double'
-]
+attributes = ['Integer', 'Double']
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)

@@ -3,6 +3,7 @@
 from os.path import dirname, abspath, join, isfile
 from collections import OrderedDict
 import sys
+
 sys.path.insert(0, abspath('kimpy'))
 
 from err import KimPyError
@@ -33,8 +34,7 @@ def read_compatible_table():
             if not line or line[0] == '#':
                 continue
 
-            kimpy_version, kim_api_target_version, \
-                kim_api_backward_version = line.split()
+            kimpy_version, kim_api_target_version, kim_api_backward_version = line.split()
 
             compatible_table[kimpy_version] = {
                 'target': kim_api_target_version,
@@ -45,7 +45,7 @@ def read_compatible_table():
 
 
 def compare_version(x, y):
-    """"Check the version relation of x and y in the format a.b.c.
+    """Check the version relation of x and y in the format a.b.c.
 
     Return:
         str: the version relation of x and y
@@ -155,27 +155,30 @@ def check_kim_api_compatibility(kimpy_version, kim_api_version):
             cmp_2 = False
 
     if not cmp_1 or not cmp_2:
-        msg1 = 'KIM-API version = "{}" detected, '.format(kim_api_version)
-        msg1 += 'which is incompatible with the current kimpy version = '
-        msg1 += '"{}".\nTry one of the below:\n'.format(kimpy_version)
+        msg0 = "\n\n\n{}\n".format("=" * 80)
 
-        msg2 = '  (1) Update KIM-API. The current kimpy is compatible with '
-        msg2 += 'KIM-API versions "{}" ~ '.format(backward)
-        msg2 += '"{}" (including).\n'.format(target)
+        msg1 = 'KIM-API version = "{}" is detected, '.format(kim_api_version)
+        msg1 += 'which is incompatible with the current\n  kimpy version = '
+        msg1 += '"{}".\n\nTry one of these options:\n\n'.format(kimpy_version)
+
+        msg2 = '  (1) Update KIM-API.\n      The current kimpy is '
+        msg2 += 'compatible with KIM-API versions:\n '
+        msg2 += '     ["{}" - "{}"] (inclusive).\n'.format(backward, target)
 
         if not cmp_1:
-            msg3 = '  (2) Use the latest kimpy. If you are using the latest '
-            msg3 += 'kimpy, it seems there is not a kimpy compatible with '
-            msg3 += 'this KIM-API version "{}" yet.\n'.format(kim_api_version)
-            msg3 += 'Please contact Mingjian Wen (wenxx151@umn.edu) or raise '
-            msg3 += 'an issue on github so we update the kimpy.\n'
+            msg3 = '  (2) Use the latest kimpy.\n      If you are using the '
+            msg3 += 'latest kimpy, which is not compatible '
+            msg3 += 'with this\n      KIM-API version '
+            msg3 += '"{}" yet. Please contact\n      '.format(kim_api_version)
+            msg3 += 'Mingjian Wen (wenxx151@umn.edu)  or\n      '
+            msg3 += 'raise an issue on github so we update the kimpy.\n'
         else:
             compatible_kimpy = suggest_kimpy(kim_api_version, compatible_table)
-            msg3 = '  (2) Switch kimpy version. The detected KIM-API is '
-            msg3 += 'compatible with kimpy version '
+            msg3 = '  (2) Switch kimpy version.\n      The detected KIM-API '
+            msg3 += 'is compatible with kimpy version '
             msg3 += '"{}".\n'.format(compatible_kimpy)
 
-        msg = msg1 + msg2 + msg3
+        msg = msg0 + msg1 + msg2 + msg3
     else:
         msg = None
 

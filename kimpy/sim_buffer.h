@@ -7,7 +7,9 @@
 
 namespace py = pybind11;
 
-struct SimBuffer {
+
+struct SimBuffer
+{
   std::vector<py::dict *> callbacks;
 };
 

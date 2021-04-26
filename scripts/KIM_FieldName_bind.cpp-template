@@ -1,5 +1,5 @@
-#include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
+#include <pybind11/pybind11.h>
 
 #include <string>
 
@@ -8,52 +8,57 @@
 namespace py = pybind11;
 using namespace KIM;
 
-
-PYBIND11_MODULE(field_name, module) {
+PYBIND11_MODULE(field_name, module)
+{
   module.doc() = "Python binding to KIM_FieldName.hpp";
 
   // classes
 
   py::class_<FieldName> cl(module, "FieldName");
-  
-  cl.def(py::init<>())
-    .def(py::init<int const>())
-    .def(py::init<std::string const>())
-    .def("known", &FieldName::Known)
-    .def(py::self == py::self)
-    .def(py::self != py::self)
-    .def("__repr__", &FieldName::ToString);
 
+  cl.def(py::init<>())
+      .def(py::init<int const>())
+      .def(py::init<std::string const>())
+      .def("known", &FieldName::Known)
+      .def(py::self == py::self)
+      .def(py::self != py::self)
+      .def("__repr__", &FieldName::ToString);
 
   // functions
 
-  module.def("get_field_name",
-    [](int const index) {
-      FieldName fieldName;
-      int error = FIELD_NAME::GetFieldName(index, &fieldName);
+  module.def("get_field_name", [](int const index) {
+    FieldName field_name;
 
-      py::tuple re(2);
-      re[0] = fieldName;
-      re[1] = error;
-      return re;
-    },
-    py::arg("index"),
-    "Return(FieldName, error)"
-  );
+    int error = FIELD_NAME::GetFieldName(index, &field_name);
+    if (error == 1)
+    {
+      throw std::runtime_error("index < 0 or index >= numberOfFieldNames!");
+    }
 
-  module.def("get_number_of_field_names",
-    []() {
-      int numberOfFieldNames;
-      FIELD_NAME::GetNumberOfFieldNames(&numberOfFieldNames);
-      return numberOfFieldNames;
-    },
-    "Return numberOfFieldNames"
-  );
+    return field_name;
+    }, R"pbdoc(
+       Get the identity of each defined standard FieldName.
 
+       Returns:
+           FieldName: field_name
+       )pbdoc",
+       py::arg("index"));
+
+  module.def("get_number_of_field_names", []() {
+    int number_of_field_names;
+
+    FIELD_NAME::GetNumberOfFieldNames(&number_of_field_names);
+
+    return number_of_field_names;
+    }, R"pbdoc(
+       Get the number of standard FieldName.
+
+       Returns:
+           int: number_of_field_names
+       )pbdoc"
+    );
 
   // attributes
 
 rpls_attributes
-
 }
-

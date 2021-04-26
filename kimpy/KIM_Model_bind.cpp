@@ -1,11 +1,11 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include <cstddef>
 #include <memory>
 #include <string>
 
 #include "KIM_SimulatorHeaders.hpp"
+#include "py_kim_wrapper.h"
 #include "sim_buffer.h"
 
 namespace py = pybind11;
@@ -16,325 +16,416 @@ PYBIND11_MODULE(model, module)
 {
   module.doc() = "Python binding to KIM_Model.hpp";
 
-  // C++ class constructor and destructor are private, which can not be wrapped
-  // directly.
-  // So we need to call the C++ class factory function in py::init, and use
-  // `py::nodelete` to avoid calling the destructor when python instance is
-  // destroyed. It is crucial that the instance is deallocated by calling the
-  // destroy function from the C++ side to avoid memory leaks. For more info,
-  // see http://pybind11.readthedocs.io/en/stable/advanced/classes.html
-
-  py::class_<Model, std::unique_ptr<Model, py::nodelete> > cl(module, "Model");
+  py::class_<PyModel, std::shared_ptr<PyModel> > cl(module, "PyModel");
 
   // python constructor needs to return a pointer to the C++ instance
-  cl.def(py::init([](Numbering const numbering,
-                     LengthUnit const requestedLengthUnit,
-                     EnergyUnit const requestedEnergyUnit,
-                     ChargeUnit const requestedChargeUnit,
-                     TemperatureUnit const requestedTemperatureUnit,
-                     TimeUnit const requestedTimeUnit,
-                     std::string const & modelName,
-                     py::array_t<int> requestedUnitsAccepted,
-                     py::array_t<int> error) {
-      Model * mo;
-      int * e = error.mutable_data(0);
-      int * r = requestedUnitsAccepted.mutable_data(0);
-      e[0] = Model::Create(numbering,
-                           requestedLengthUnit,
-                           requestedEnergyUnit,
-                           requestedChargeUnit,
-                           requestedTemperatureUnit,
-                           requestedTimeUnit,
-                           modelName,
-                           r,
-                           &mo);
-      return mo;
+  cl.def(py::init([](Numbering const &numbering,
+                     LengthUnit const &requested_length_unit,
+                     EnergyUnit const &requested_energy_unit,
+                     ChargeUnit const &requested_charge_unit,
+                     TemperatureUnit const &requested_temperature_unit,
+                     TimeUnit const &requested_time_unit,
+                     std::string const &model_name,
+                     py::array_t<int> requested_units_accepted) {
+    int * kim_requested_units_accepted
+        = requested_units_accepted.mutable_data(0);
+
+    std::shared_ptr<PyModel> model(new PyModel());
+
+    int error = Model::Create(numbering,
+                              requested_length_unit,
+                              requested_energy_unit,
+                              requested_charge_unit,
+                              requested_temperature_unit,
+                              requested_time_unit,
+                              model_name,
+                              kim_requested_units_accepted,
+                              &model->_model);
+    if (error == 1)
+    {
+      throw std::runtime_error("Unable to create a new KIM-API Model object!");
+    }
+
+    return model;
     }))
+    .def("is_routine_present",
+         [](PyModel &self, ModelRoutineName const &model_routine_name) {
+    int present;
+    int required;
 
-      .def(
-          "is_routine_present",
-          [](Model & self, ModelRoutineName const modelRoutineName) {
-            int present;
-            int required;
-            int error
-                = self.IsRoutinePresent(modelRoutineName, &present, &required);
+    int error = self._model->IsRoutinePresent(
+        model_routine_name, &present, &required);
+    if (error == 1)
+    {
+      throw std::runtime_error("model_routine_name = "
+                               + model_routine_name.ToString() + "is unknown!");
+    }
 
-            py::tuple re(3);
-            re[0] = present;
-            re[1] = required;
-            re[2] = error;
-            return re;
-          },
-          py::arg("ModelRoutineName"),
-          "Return(present, required, error)")
+    py::tuple re(2);
+    re[0] = present;
+    re[1] = required;
+    return re;
+    }, R"pbdoc(
+       Determine presence and required status of the given model_routine_name.
 
-      .def(
-          "get_influence_distance",
-          [](Model & self) {
-            double influenceDistance;
-            self.GetInfluenceDistance(&influenceDistance);
+       Returns:
+           int, int: present, required
+       )pbdoc",
+       py::arg("model_routine_name"))
+    .def("get_influence_distance", [](PyModel &self) {
+    double influence_distance;
 
-            return influenceDistance;
-          },
-          "Return influenceDistance")
+    self._model->GetInfluenceDistance(&influence_distance);
 
-      .def(
-          "get_neighbor_list_cutoffs_and_hints",
-          [](Model & self) {
-            int numberOfCutoffs;
-            double const * cutoff_ptr;
-            int const * paddingNoNeighborHints_ptr;
-            self.GetNeighborListPointers(
-                &numberOfCutoffs, &cutoff_ptr, &paddingNoNeighborHints_ptr);
+    return influence_distance;
+    }, R"pbdoc(
+       Get the model's influence distance.
 
-            py::array_t<double, py::array::c_style> cutoffs(numberOfCutoffs);
-            py::array_t<int, py::array::c_style> 
-              paddingNoNeighborHints(numberOfCutoffs);
-            
-            auto cut = cutoffs.mutable_data(0);
-            auto pnh = paddingNoNeighborHints.mutable_data(0);
-            for (int i = 0; i < numberOfCutoffs; i++)
-            {
-              cut[i] = cutoff_ptr[i];
-              pnh[i] = paddingNoNeighborHints_ptr[i];
-            }
+       Returns:
+           float: influence_distance
+       )pbdoc")
+    .def("get_neighbor_list_cutoffs_and_hints", [](PyModel &self) {
+    int number_of_cutoffs;
+    double const * cutoff_ptr;
+    int const * kim_model_not_request_neighbors_of_noncontributing_particles;
 
-            py::tuple re(2);
-            re[0] = cutoffs;
-            re[1] = paddingNoNeighborHints;
-            return re;
-          },
-          "Return(cutoffs, "
-          "model_not_request_neighbors_of_noncontributing_particles)")
+    self._model->GetNeighborListPointers(
+        &number_of_cutoffs,
+        &cutoff_ptr,
+        &kim_model_not_request_neighbors_of_noncontributing_particles);
 
-      .def(
-          "get_units",
-          [](Model & self) {
-            LengthUnit lengthUnit;
-            EnergyUnit energyUnit;
-            ChargeUnit chargeUnit;
-            TemperatureUnit temperatureUnit;
-            TimeUnit timeUnit;
-            self.GetUnits(&lengthUnit,
-                          &energyUnit,
-                          &chargeUnit,
-                          &temperatureUnit,
-                          &timeUnit);
+    py::array_t<double, py::array::c_style> cutoffs(number_of_cutoffs);
+    py::array_t<int, py::array::c_style>
+        model_not_request_neighbors_of_noncontributing_particles(
+            number_of_cutoffs);
 
-            py::tuple re(5);
-            re[0] = lengthUnit;
-            re[1] = energyUnit;
-            re[2] = chargeUnit;
-            re[3] = temperatureUnit;
-            re[4] = timeUnit;
-            return re;
-          },
-          "Return(LengthUnit, EnergyUnit, ChargeUnit, TemperatureUnit, "
-          "TimeUnit)")
+    auto cut = cutoffs.mutable_data(0);
+    auto pnh
+        = model_not_request_neighbors_of_noncontributing_particles.mutable_data(
+            0);
 
-      .def(
-          "compute_arguments_create",
-          [](Model & self) {
-            ComputeArguments * computeArguments;
-            int error = self.ComputeArgumentsCreate(&computeArguments);
-            py::tuple re(2);
-            re[0] = computeArguments;
-            re[1] = error;
-            return re;
-          },
-          "Return(ComputeArguments, error)")
+    for (int i = 0; i < number_of_cutoffs; i++)
+    {
+      cut[i] = cutoff_ptr[i];
+      pnh[i] = kim_model_not_request_neighbors_of_noncontributing_particles[i];
+    }
 
-      .def(
-          "compute_arguments_destroy",
-          [](Model & self, ComputeArguments * computeArguments) {
-            SimBuffer * sim_buffer;
-            computeArguments->GetSimulatorBufferPointer((void **) &sim_buffer);
-            if (sim_buffer)
-            {
-              for (std::size_t i = 0; i < sim_buffer->callbacks.size(); i++)
-              { 
-                if (sim_buffer->callbacks[i]) delete sim_buffer->callbacks[i];
-              }
-              delete sim_buffer;
-              sim_buffer = nullptr;
-            }
+    py::tuple re(2);
+    re[0] = cutoffs;
+    re[1] = model_not_request_neighbors_of_noncontributing_particles;
+    return re;
+    }, R"pbdoc(
+       Get the model's neighbor list information.
 
-            int error = self.ComputeArgumentsDestroy(&computeArguments);
-            return error;
-          },
-          py::arg("ComputeArguments"),
-          "Return error")
+       Returns:
+           1darray, 1darray: cutoffs,
+               model_not_request_neighbors_of_noncontributing_particles
+       )pbdoc")
+    .def("get_units", [](PyModel &self) {
+    LengthUnit length_unit;
+    EnergyUnit energy_unit;
+    ChargeUnit charge_unit;
+    TemperatureUnit temperature_unit;
+    TimeUnit time_unit;
 
-      .def(
-          "compute",
-          [](Model & self,
-             ComputeArguments const * const computeArguments,
-             bool release_GIL) {
-            if (release_GIL)
-            {
-              py::gil_scoped_release release;
-              int error = self.Compute(computeArguments);
-              return error;
-            }
-            else
-            {
-              int error = self.Compute(computeArguments);
-              return error;
-            }
-          },
-          py::arg("ComputeArguments"),
-          py::arg("release_GIL") = false,
-          "Return error")
+    self._model->GetUnits(&length_unit,
+                          &energy_unit,
+                          &charge_unit,
+                          &temperature_unit,
+                          &time_unit);
 
-      .def("clear_then_refresh", &Model::ClearThenRefresh)
+    py::tuple re(5);
+    re[0] = length_unit;
+    re[1] = energy_unit;
+    re[2] = charge_unit;
+    re[3] = temperature_unit;
+    re[4] = time_unit;
+    return re;
+    }, R"pbdoc(
+       Get the model's base unit values.
 
-      .def(
-          "write_parameterized_model",
-          [](Model & self,
-             std::string const & path,
-             std::string const & modelName) {
-            int error = self.WriteParameterizedModel(path, modelName);
+       Returns:
+           LengthUnit, EnergyUnit, ChargeUnit, TemperatureUnit, TimeUnit:
+               length_unit, energy_unit, charge_unit, temperature_unit,
+               time_unit
+       )pbdoc")
+    .def("compute_arguments_create", [](std::shared_ptr<PyModel> self) {
+    std::shared_ptr<PyComputeArguments> py_compute_arguments(
+        new PyComputeArguments(self));
 
-            return error;
-          },
-          py::arg("path"),
-          py::arg("modelName"),
-          "Return error")
+    int error = self->_model->ComputeArgumentsCreate(
+        &py_compute_arguments->_compute_arguments);
+    if (error == 1)
+    {
+      throw std::runtime_error("Unable to create a new compute_arguments "
+                               "object for the model object!");
+    }
 
-      .def(
-          "get_species_support_and_code",
-          [](Model & self, SpeciesName const speciesName) {
-            int speciesIsSupported;
-            int code = -1;
-            int error = self.GetSpeciesSupportAndCode(
-                speciesName, &speciesIsSupported, &code);
+    return py_compute_arguments;
+    }, R"pbdoc(
+       Create a new compute_arguments object for the model object.
 
-            py::tuple re(3);
-            re[0] = speciesIsSupported;
-            re[1] = code;
-            re[2] = error;
-            return re;
-          },
-          py::arg("SpeciesName"),
-          "Return(speciesIsSupported, code, error)")
+       Returns:
+           ComputeArguments: compute_arguments
+       )pbdoc")
+    .def("compute",
+         [](PyModel &self,
+            std::shared_ptr<PyComputeArguments> compute_arguments,
+            bool release_GIL) {
+    ComputeArguments const * const kim_compute_arguments
+        = compute_arguments->_compute_arguments;
 
-      .def(
-          "get_number_of_parameters",
-          [](Model & self) {
-            int numberOfParameters;
-            self.GetNumberOfParameters(&numberOfParameters);
-            return numberOfParameters;
-          },
-          "Return numberOfParameters")
+    int error;
+    if (release_GIL)
+    {
+      py::gil_scoped_release release;
+      error = self._model->Compute(kim_compute_arguments);
+    }
+    else
+    {
+      error = self._model->Compute(kim_compute_arguments);
+    }
+    if (error == 1)
+    {
+      throw std::runtime_error(
+          "the model does not provide an Extension routine!  or\n"
+          "the model's Extension routine returns error!");
+    }
+    }, "Call the model's Compute routine.",
+       py::arg("compute_arguments"),
+       py::arg("release_GIL") = false)
+    .def("clear_then_refresh", [](PyModel &self) {
+    self._model->ClearThenRefresh();
+    }, "Clear influence distance and neighbor list pointers and refresh "
+       "model object after parameter changes.")
+    .def("write_parameterized_model",
+         [](PyModel &self,
+            std::string const &path,
+            std::string const &model_name) {
+    int error = self._model->WriteParameterizedModel(path, model_name);
+    if (error == 1)
+    {
+      throw std::runtime_error(
+          "the model object is not a parameterized model!  or\n"
+          "the model_name is not a valid C identifier!  or\n"
+          "the model's WriteParameterizedModel routine returns error!");
+    }
+    }, "Call the model's WriteParameterizedModel routine.",
+       py::arg("path"),
+       py::arg("model_name"))
+    .def("get_species_support_and_code",
+         [](PyModel &self, SpeciesName const &species_name) {
+    int species_is_supported;
+    int code = -1;
 
-      .def(
-          "get_parameter_metadata",
-          [](Model & self, int const index) {
-            DataType dataType;
-            int extent;
-            std::string const * name;
-            std::string const * description;
+    int error = self._model->GetSpeciesSupportAndCode(
+        species_name, &species_is_supported, &code);
+    if (error == 1)
+    {
+      throw std::runtime_error("species_name = " + species_name.ToString()
+                               + " is unknown!");
+    }
 
-            int error = self.GetParameterMetadata(
-                index, &dataType, &extent, &name, &description);
-            py::tuple re(5);
-            re[0] = dataType;
-            re[1] = extent;
-            re[2] = *name;
-            re[3] = *description;
-            re[4] = error;
-            return re;
-          },
-          py::arg("index"),
-          "Return(DataType, extent, description, error)")
+    py::tuple re(2);
+    re[0] = species_is_supported;
+    re[1] = code;
+    return re;
+    }, R"pbdoc(
+       Get the model's support and code for the requested species_name.
 
-      .def(
-          "get_parameter_int",
-          [](Model & self, int const parameterIndex, int const arrayIndex) {
-            int parameterValue;
-            int error = self.GetParameter(
-                parameterIndex, arrayIndex, &parameterValue);
+       Returns:
+           int, int: species_is_supported, code
+       )pbdoc",
+       py::arg("species_name"))
+    .def("get_number_of_parameters", [](PyModel &self) {
+    int number_pf_parameters;
 
-            py::tuple re(2);
-            re[0] = parameterValue;
-            re[1] = error;
-            return re;
-          },
-          py::arg("parameterIndex"),
-          py::arg("arrayIndex"),
-          "Return(parameterValue, error)")
+    self._model->GetNumberOfParameters(&number_pf_parameters);
 
-      .def(
-          "get_parameter_double",
-          [](Model & self, int const parameterIndex, int const arrayIndex) {
-            double parameterValue;
-            int error = self.GetParameter(
-                parameterIndex, arrayIndex, &parameterValue);
+    return number_pf_parameters;
+    }, R"pbdoc(
+       Get the number of parameter arrays provided by the model.
 
-            py::tuple re(2);
-            re[0] = parameterValue;
-            re[1] = error;
-            return re;
-          },
-          py::arg("parameterIndex"),
-          py::arg("arrayIndex"),
-          "Return(parameterValue, error)")
+       Returns:
+           int: number_pf_parameters
+       )pbdoc")
+    .def("get_parameter_metadata",
+         [](PyModel &self, int const parameter_index) {
+    DataType data_type;
+    int extent;
+    std::string const * name;
+    std::string const * description;
 
-      // overloaded function
-      .def("set_parameter",
-           (int (Model::*)(int const, int const, int const))
-               & Model::SetParameter)
+    int error = self._model->GetParameterMetadata(
+        parameter_index, &data_type, &extent, &name, &description);
+    if (error == 1) { throw std::runtime_error("parameter_index is invalid!"); }
 
-      .def("set_parameter",
-           (int (Model::*)(int const, int const, double const))
-               & Model::SetParameter)
+    py::tuple re(4);
+    re[0] = data_type;
+    re[1] = extent;
+    re[2] = *name;
+    re[3] = *description;
+    return re;
+    }, R"pbdoc(
+       Get the metadata associated with one of the models's parameter arrays.
 
-      .def("__repr__", &Model::ToString)
+       Returns:
+           DataType, int, str, str: data_type, extent, name, description
+       )pbdoc",
+       py::arg("parameterIndex"))
+    .def("get_parameter_int",
+         [](PyModel &self, int const parameter_index, int const array_index) {
+    int parameter_value;
 
-      .def("set_log_id", &Model::SetLogID)
+    int error = self._model->GetParameter(
+        parameter_index, array_index, &parameter_value);
+    if (error == 1)
+    {
+      throw std::runtime_error(
+          "parameter_index = " + std::to_string(parameter_index)
+          + " is invalid!  or\nthe specified parameter "
+            "and parameter_value are of different data types!  or\n"
+            "array_index = "
+          + std::to_string(array_index) + "is invalid!");
+    }
 
-      .def("push_log_verbosity", &Model::PushLogVerbosity)
+    return parameter_value;
+    }, R"pbdoc(
+       Get an int parameter value from the Model.
 
-      .def("pop_log_verbosity", &Model::PopLogVerbosity);
+       Returns:
+           int: parameter_value
+       )pbdoc",
+       py::arg("parameter_index"),
+       py::arg("array_index"))
+    .def("get_parameter_double",
+         [](PyModel &self, int const parameter_index, int const array_index) {
+    double parameter_value;
 
+    int error = self._model->GetParameter(
+        parameter_index, array_index, &parameter_value);
+    if (error == 1)
+    {
+      throw std::runtime_error(
+          "parameter_index = " + std::to_string(parameter_index)
+          + " is invalid!  or\nthe specified parameter "
+            "and parameter_value are of different data types!  or\n"
+            "array_index = "
+          + std::to_string(array_index) + " is invalid!");
+    }
+
+    return parameter_value;
+    }, R"pbdoc(
+       Get a double parameter value from the Model.
+
+       Returns:
+           float: parameter_value
+       )pbdoc",
+       py::arg("parameter_index"),
+       py::arg("array_index"))
+    // overloaded function
+    .def("set_parameter",
+          [](PyModel &self,
+             int const parameter_index,
+             int const array_index,
+             int const parameter_value) {
+    int error = self._model->SetParameter(
+        parameter_index, array_index, parameter_value);
+    if (error == 1)
+    {
+      throw std::runtime_error(
+          "parameter_index = " + std::to_string(parameter_index)
+          + " is invalid!  or\nthe specified parameter "
+            "and parameter_value are of different data types!  or\n"
+            "array_index = "
+          + std::to_string(array_index) + " is invalid!");
+    }
+    }, "Set an int parameter value for the Model.",
+       py::arg("parameter_index"),
+       py::arg("array_index"),
+       py::arg("parameter_value"))
+    .def("set_parameter",
+          [](PyModel &self,
+             int const parameter_index,
+             int const array_index,
+             double const parameter_value) {
+    int error = self._model->SetParameter(
+        parameter_index, array_index, parameter_value);
+    if (error == 1)
+    {
+      throw std::runtime_error(
+          "parameter_index = " + std::to_string(parameter_index)
+          + " is invalid!  or\nthe specified parameter "
+            "and parameter_value are of different data types!  or\n"
+            "array_index = "
+          + std::to_string(array_index) + " is invalid!");
+    }
+    }, "Set an int parameter value for the Model.",
+       py::arg("parameter_index"),
+       py::arg("array_index"),
+       py::arg("parameter_value"))
+    .def("__repr__", [](PyModel &self) {
+    return self._model->ToString();
+    },"A string representing the internal state of the model object.")
+    .def("set_log_id", [](PyModel &self, std::string const &log_id) {
+    self._model->SetLogID(log_id);
+    }, "Set the identity of the Log object associated "
+       "with the model object.",
+       py::arg("log_id"))
+    .def("push_log_verbosity",
+         [](PyModel &self, LogVerbosity const &log_verbosity) {
+    self._model->PushLogVerbosity(log_verbosity);
+    }, "Push a new LogVerbosity onto the Model object's Log object "
+       "verbosity stack.",
+       py::arg("log_verbosity"))
+    .def("pop_log_verbosity", [](PyModel &self) {
+    self._model->PopLogVerbosity();
+    }, "Pop a LogVerbosity from the Model object's Log object "
+       "verbosity stack.");
 
   // module functions
 
-  module.def(
-      "create",
-      [](Numbering const numbering,
-         LengthUnit const requestedLengthUnit,
-         EnergyUnit const requestedEnergyUnit,
-         ChargeUnit const requestedChargeUnit,
-         TemperatureUnit const requestedTemperatureUnit,
-         TimeUnit const requestedTimeUnit,
-         std::string const & modelName) {
-        Model * mo;
-        int requestedUnitsAccepted;
-        int error = Model::Create(numbering,
-                                  requestedLengthUnit,
-                                  requestedEnergyUnit,
-                                  requestedChargeUnit,
-                                  requestedTemperatureUnit,
-                                  requestedTimeUnit,
-                                  modelName,
-                                  &requestedUnitsAccepted,
-                                  &mo);
+  module.def("create",
+             [](Numbering const &numbering,
+                LengthUnit const &requested_length_unit,
+                EnergyUnit const &requested_energy_unit,
+                ChargeUnit const &requested_charge_unit,
+                TemperatureUnit const &requested_temperature_unit,
+                TimeUnit const &requested_time_unit,
+                std::string const &model_name) {
+    int requested_units_accepted;
 
-        py::tuple re(3);
-        re[0] = requestedUnitsAccepted;
-        re[1] = mo;
-        re[2] = error;
-        return re;
-      },
-      py::arg("Numbering"),
-      py::arg("LengthUnit"),
-      py::arg("EnergyUnit"),
-      py::arg("ChargeUnit"),
-      py::arg("TemperatureUnit"),
-      py::arg("TimeUnit"),
-      py::arg("modelName"),
-      "Return(requestedUnitsAccepted, Model, error)");
+    std::shared_ptr<PyModel> model(new PyModel());
 
-  module.def("destroy", [](Model * self) { Model::Destroy(&self); });
+    int error = Model::Create(numbering,
+                              requested_length_unit,
+                              requested_energy_unit,
+                              requested_charge_unit,
+                              requested_temperature_unit,
+                              requested_time_unit,
+                              model_name,
+                              &requested_units_accepted,
+                              &model->_model);
+    if (error == 1)
+    {
+      throw std::runtime_error("Unable to create a new KIM-API Model object!");
+    }
+
+    py::tuple re(2);
+    re[0] = requested_units_accepted;
+    re[1] = model;
+    return re;
+  }, R"pbdoc(
+     Create a new KIM-API Model object.
+
+     Returns:
+         int, Model: requested_units_accepted, model
+     )pbdoc",
+     py::arg("numbering"),
+     py::arg("requested_length_unit"),
+     py::arg("requested_energy_unit"),
+     py::arg("requested_charge_unit"),
+     py::arg("requested_temperature_unit"),
+     py::arg("requested_time_unit"),
+     py::arg("model_name"));
 }

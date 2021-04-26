@@ -11,199 +11,266 @@ namespace py = pybind11;
 using namespace KIM;
 
 
+namespace
+{
+struct PySimulatorModelDestroy
+{
+  void operator()(SimulatorModel * simulator_model) const
+  {
+    SimulatorModel::Destroy(&simulator_model);
+  }
+};
+}  // namespace
+
+
 PYBIND11_MODULE(simulator_model, module)
 {
   module.doc() = "Python binding to KIM_SimulatorModel.hpp";
 
-  // C++ class constructor and destructor are private, which can not be wrapped
-  // directly.
-  // So we need to call the C++ class factory function in py::init, and use
-  // `py::nodelete` to avoid calling the destructor when python instance is
-  // destroyed. It is crucial that the instance is deallocated by calling the
-  // destroy function from the C++ side to avoid memory leaks. For more info,
-  // see http://pybind11.readthedocs.io/en/stable/advanced/classes.html
-
-  py::class_<SimulatorModel, std::unique_ptr<SimulatorModel, py::nodelete> > 
-    cl(module, "SimulatorModel");
+  py::class_<SimulatorModel,
+             std::unique_ptr<SimulatorModel, PySimulatorModelDestroy> >
+      cl(module, "SimulatorModel");
 
   // python constructor needs to return a pointer to the C++ instance
-  cl.def(py::init([](std::string const & simulatorModelName,
-                     py::array_t<int> error) {
-      SimulatorModel * mo;
-      int * e = error.mutable_data(0);
-      e[0] = SimulatorModel::Create(simulatorModelName, &mo);
-      return mo;
+  cl.def(py::init([](std::string const &simulator_model_name) {
+    SimulatorModel * simulator_model;
+
+    int error = SimulatorModel::Create(simulator_model_name, &simulator_model);
+    if (error == 1)
+    {
+      throw std::runtime_error("Unable to create a new KIM-API Model object!");
+    }
+
+    return std::unique_ptr<SimulatorModel, PySimulatorModelDestroy>(
+        std::move(simulator_model));
     }))
-      .def(
-          "get_simulator_name_and_version",
-          [](SimulatorModel & self) {
-            std::string const * simulatorName;
-            std::string const * simulatorVersion;
-            self.GetSimulatorNameAndVersion(&simulatorName, &simulatorVersion);
-            py::tuple re(2);
-            re[0] = *simulatorName;
-            re[1] = *simulatorVersion;
-            return re;
-          },
-          "Return(simulatorName, simulatorVersion)")
+    .def("get_simulator_name_and_version", [](SimulatorModel &self) {
+    std::string const * simulator_name;
+    std::string const * simulator_version;
 
-      .def(
-          "get_number_of_supported_species",
-          [](SimulatorModel & self) {
-            int numberOfSupportedSpecies;
-            self.GetNumberOfSupportedSpecies(&numberOfSupportedSpecies);
-            return numberOfSupportedSpecies;
-          },
-          "Return numberOfSupportedSpecies")
+    self.GetSimulatorNameAndVersion(&simulator_name, &simulator_version);
 
-      .def(
-          "get_supported_species",
-          [](SimulatorModel & self, int const index) {
-            std::string const * speciesName;
-            int error = self.GetSupportedSpecies(index, &speciesName);
+    py::tuple re(2);
+    re[0] = *simulator_name;
+    re[1] = *simulator_version;
+    return re;
+    }, R"pbdoc(
+       Get the SimulatorModel's simulator name and version.
 
-            py::tuple re(2);
-            re[0] = *speciesName;
-            re[1] = error;
-            return re;
-          },
-          py::arg("index"),
-          "Return(speciesName, error)")
+       Returns:
+           str, str: simulator_name, simulator_version
+       )pbdoc")
+    .def("get_number_of_supported_species", [](SimulatorModel &self) {
+    int number_of_supported_species;
 
-      .def("open_and_initialize_template_map",
-           &SimulatorModel::OpenAndInitializeTemplateMap)
+    self.GetNumberOfSupportedSpecies(&number_of_supported_species);
 
-      .def("template_map_is_open", &SimulatorModel::TemplateMapIsOpen)
+    return number_of_supported_species;
+    }, R"pbdoc(
+       Get the number of species supported by the SimulatorModel.
 
-      .def("add_template_map", &SimulatorModel::AddTemplateMap)
+       Returns:
+           int: number_of_supported_species
+       )pbdoc")
+    .def("get_supported_species", [](SimulatorModel &self, int const index) {
+    std::string const * species_name;
 
-      .def("close_template_map", &SimulatorModel::CloseTemplateMap)
+    int error = self.GetSupportedSpecies(index, &species_name);
+    if (error == 1) { throw std::runtime_error("index is invalid!"); }
 
-      .def(
-          "get_number_of_simulator_fields",
-          [](SimulatorModel & self) {
-            int numberOfSimulatorFields;
-            self.GetNumberOfSimulatorFields(&numberOfSimulatorFields);
+    return *species_name;
+    }, R"pbdoc(
+       Get a species name supported by the SimulatorModel.
 
-            return numberOfSimulatorFields;
-          },
-          "Return numberOfSimulatorFields")
+       Returns:
+           str: species_name
+       )pbdoc",
+       py::arg("index"))
+    .def("open_and_initialize_template_map",
+         &SimulatorModel::OpenAndInitializeTemplateMap,
+         "Open and initialize the template map for simulator field line "
+         "substitutions.")
+    .def("template_map_is_open", &SimulatorModel::TemplateMapIsOpen,
+         "Determine if the template map is open.")
+    .def("add_template_map",
+         [](SimulatorModel &self,
+            std::string const &key,
+            std::string const &value) {
+    int error = self.AddTemplateMap(key, value);
+    if (error == 1)
+    {
+      throw std::runtime_error(
+          "the template map has been closed by a call to "
+          "close_template_map!  or\nkey contains invalid characters!");
+    }
+    }, "Add a new key-value entry to the template map.",
+       py::arg("key"),
+       py::arg("value"))
+    .def("close_template_map", &SimulatorModel::CloseTemplateMap,
+         "Close the template map and perform template substitutions.")
+    .def("get_number_of_simulator_fields", [](SimulatorModel &self) {
+    int number_of_simulator_fields;
 
-      .def(
-          "get_simulator_field_metadata",
-          [](SimulatorModel & self, int const fieldIndex) {
-            int extent;
-            std::string const * fieldName;
-            int error = self.GetSimulatorFieldMetadata(
-                fieldIndex, &extent, &fieldName);
+    self.GetNumberOfSimulatorFields(&number_of_simulator_fields);
 
-            py::tuple re(3);
-            re[0] = extent;
-            re[1] = *fieldName;
-            re[2] = error;
-            return re;
-          },
-          py::arg("fieldIndex"),
-          "Return(extent, fieldName, error)")
+    return number_of_simulator_fields;
+    }, R"pbdoc(
+       Get the number of simulator fields provided by the SimulatorModel.
 
-      .def(
-          "get_simulator_field_line",
-          [](SimulatorModel & self, int const fieldIndex, int const lineIndex) {
-            std::string const * lineValue;
-            int error
-                = self.GetSimulatorFieldLine(fieldIndex, lineIndex, &lineValue);
+       Returns:
+           int: number_of_simulator_fields
+       )pbdoc")
+    .def("get_simulator_field_metadata",
+         [](SimulatorModel &self, int const field_index) {
+    int extent;
+    std::string const * field_name;
 
-            py::tuple re(2);
-            re[0] = *lineValue;
-            re[1] = error;
-            return re;
-          },
-          py::arg("fieldIndex"),
-          py::arg("lineIndex"),
-          "Return(lineValue, error)")
+    int error
+        = self.GetSimulatorFieldMetadata(field_index, &extent, &field_name);
+    if (error == 1) { throw std::runtime_error("field_index is invalid!"); }
 
-      .def(
-          "get_parameter_file_directory_name",
-          [](SimulatorModel & self) {
-            std::string const * directoryName;
-            self.GetParameterFileDirectoryName(&directoryName);
+    py::tuple re(2);
+    re[0] = extent;
+    re[1] = *field_name;
+    return re;
+    }, R"pbdoc(
+       Get the metadata for the simulator field of interest.
 
-            return *directoryName;
-          },
-          "Return directoryName")
+       Returns:
+           int, str: extent, field_name
+       )pbdoc",
+       py::arg("field_index"))
+    .def("get_simulator_field_line",
+         [](SimulatorModel &self,
+            int const field_index,
+            int const line_index) {
+    std::string const * line_value;
 
-      .def(
-          "get_specification_file_name",
-          [](SimulatorModel & self) {
-            std::string const * specificationFileName;
-            self.GetSpecificationFileName(&specificationFileName);
+    int error
+        = self.GetSimulatorFieldLine(field_index, line_index, &line_value);
+    if (error == 1)
+    {
+      throw std::runtime_error("the template map is open!  or\n"
+                               "field_index is invalid!    or\n"
+                               "line_index is invalid!");
+    }
 
-            return *specificationFileName;
-          },
-          "Return specificationFileName")
+    return *line_value;
+    }, R"pbdoc(
+       Get a line for the simulator field of interest with all template
+       substitutions performed (Requires the template map is closed).
 
-      .def(
-          "get_number_of_parameter_files",
-          [](SimulatorModel & self) {
-            int numberOfParameterFiles;
-            self.GetNumberOfParameterFiles(&numberOfParameterFiles);
+       Returns:
+           str: line_value
+       )pbdoc",
+       py::arg("field_index"),
+       py::arg("line_index"))
+    .def("get_parameter_file_directory_name", [](SimulatorModel &self) {
+    std::string const * directory_name;
 
-            return numberOfParameterFiles;
-          },
-          "Return numberOfParameterFiles")
+    self.GetParameterFileDirectoryName(&directory_name);
 
-      .def(
-          "get_parameter_file_name",
-          [](SimulatorModel & self, int const index) {
-            std::string const * paramFileName;
-            int error = self.GetParameterFileName(index, &paramFileName);
+    return *directory_name;
+    }, R"pbdoc(
+       Get absolute path name of the temporary directory where parameter
+       files provided by the SimulatorModel are written.
 
-            py::tuple re(2);
-            re[0] = *paramFileName;
-            re[1] = error;
-            return re;
-          },
-          py::arg("index"),
-          "Return(paramFileName, error)")
+       Returns:
+           str: directory_name
+       )pbdoc")
+    .def("get_specification_file_name", [](SimulatorModel &self) {
+    std::string const * specification_file_name;
 
-      .def(
-          "get_parameter_file_base_name",
-          [](SimulatorModel & self, int const index) {
-            std::string const * paramFileBaseName;
-            int error = self.GetParameterFileBasename(index, &paramFileBaseName);
+    self.GetSpecificationFileName(&specification_file_name);
 
-            py::tuple re(2);
-            re[0] = *paramFileBaseName;
-            re[1] = error;
-            return re;
-          },
-          py::arg("index"),
-          "Return(paramFileBaseName, error)")
+    return *specification_file_name;
+    }, R"pbdoc(
+       Get the SimulatorModel's specification file basename (file name without
+       path).  The file is located in the SimulatorModel's parameter file
+       directory.
 
-      .def("__repr__", &SimulatorModel::ToString)
+       Returns:
+           str: specification_file_name
+       )pbdoc")
+    .def("get_number_of_parameter_files", [](SimulatorModel &self) {
+    int number_of_parameter_files;
 
-      .def("set_log_id", &SimulatorModel::SetLogID)
+    self.GetNumberOfParameterFiles(&number_of_parameter_files);
 
-      .def("push_log_verbosity", &SimulatorModel::PushLogVerbosity)
+    return number_of_parameter_files;
+    }, R"pbdoc(
+       Get the number of parameter files provided by the SimulatorModel.
 
-      .def("pop_log_verbosity", &SimulatorModel::PopLogVerbosity);
+       Returns:
+           int: number_of_parameter_files
+       )pbdoc")
+    .def("get_parameter_file_name",
+         [](SimulatorModel &self, int const index) {
+    std::string const * parameter_file_name;
 
+    int error = self.GetParameterFileName(index, &parameter_file_name);
+    if (error == 1) { throw std::runtime_error("index is invalid!"); }
+
+    return *parameter_file_name;
+    }, R"pbdoc(
+       Get the basename (file name without path) of a particular parameter
+       file.  The file is located in the SimulatorModel's parameter file
+       directory.
+
+       Returns:
+           str: parameter_file_name
+       )pbdoc",
+       py::arg("index"))
+    .def("get_parameter_file_base_name",
+         [](SimulatorModel &self, int const index) {
+    std::string const * param_file_base_name;
+
+    int error = self.GetParameterFileBasename(index, &param_file_base_name);
+    if (error == 1) { throw std::runtime_error("index is invalid!"); }
+
+    return *param_file_base_name;
+    }, R"pbdoc(
+       Get the basename (file name without path) of a particular parameter
+       file.  The file is located in the SimulatorModel's parameter file
+       directory.
+
+       Returns:
+           str: param_file_base_name
+       )pbdoc",
+       py::arg("index"))
+    .def("__repr__", &SimulatorModel::ToString)
+    .def("set_log_id", &SimulatorModel::SetLogID,
+         "Set the identity of the Log object associated with the "
+         "SimulatorModel object.",
+         py::arg("log_id"))
+    .def("push_log_verbosity", &SimulatorModel::PushLogVerbosity,
+         "Push a new log_verbosity onto the SimulatorModel object's Log "
+         "object verbosity stack.",
+         py::arg("log_verbosity"))
+    .def("pop_log_verbosity", &SimulatorModel::PopLogVerbosity,
+         "Pop a log_verbosity from the SimulatorModel object's Log object "
+         "verbosity stack.");
 
   // module functions
 
   module.def(
       "create",
-      [](std::string const & simulatorModelName) {
-        SimulatorModel * mo;
-        int error = SimulatorModel::Create(simulatorModelName, &mo);
+      [](std::string const & simulator_model_name) {
+    SimulatorModel * simulator_model;
 
-        py::tuple re(2);
-        re[0] = mo;
-        re[1] = error;
-        return re;
-      },
-      "Return(SimulatorModel, error)");
+    int error = SimulatorModel::Create(simulator_model_name, &simulator_model);
+    if (error == 1)
+    {
+      throw std::runtime_error("Unable to create a new KIM-API Model object!");
+    }
 
-  module.def("destroy",
-             [](SimulatorModel * self) { SimulatorModel::Destroy(&self); });
+    return std::unique_ptr<SimulatorModel, PySimulatorModelDestroy>(
+        std::move(simulator_model));
+      }, R"pbdoc(
+         Create a new KIM-API SimulatorModel object.
+
+         Returns:
+             SimulatorModel: simulator_model
+         )pbdoc"
+      );
 }

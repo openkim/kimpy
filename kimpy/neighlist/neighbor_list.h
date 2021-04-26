@@ -21,7 +21,6 @@ struct NeighList
   NeighListOne * lists = nullptr;
 };
 
-
 void nbl_initialize(NeighList ** const nl);
 
 int nbl_create_paddings(int const numberOfParticles,
@@ -53,5 +52,4 @@ int nbl_get_neigh(void const * const nl,
 
 void nbl_clean(NeighList ** const nl);
 
-
-#endif
+#endif  // NEIGHBOR_LIST_H_

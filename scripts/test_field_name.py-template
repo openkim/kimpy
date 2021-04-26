@@ -4,25 +4,27 @@ rpls_attributes
 
 rpls_str_names
 
+
 def test_main():
     """Main test function."""
-
     N = kimpy.field_name.get_number_of_field_names()
+
     assert N == rpls_num_attributes
 
     all_instances = []
     for i in range(N):
-        inst,error = kimpy.field_name.get_field_name(i)
+        inst = kimpy.field_name.get_field_name(i)
+
         all_instances.append(inst)
 
-        assert error == False
         assert inst == attributes[i]
         assert str(inst) == str_names[i]
 
     # test operator overloading
     for i in range(N):
         assert all_instances[i] == all_instances[i]
-        for j in range(i+1, N):
+
+        for j in range(i + 1, N):
             assert all_instances[i] != all_instances[j]
 
     # test known
@@ -30,8 +32,15 @@ def test_main():
         assert inst.known() == True
 
     # test out of bound
-    inst,error = kimpy.field_name.get_field_name(N)
-    assert error == True
+    capture_out_of_bound_error = False
+
+    try:
+        inst = kimpy.field_name.get_field_name(N)
+    except RuntimeError:
+        capture_out_of_bound_error = True
+
+    assert capture_out_of_bound_error
+
 
 if __name__ == '__main__':
     test_main()

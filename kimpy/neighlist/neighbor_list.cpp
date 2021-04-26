@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-#define DIM 3
 #define TOL 1.0e-10
 
 
@@ -57,10 +56,7 @@ void nbl_allocate_memory(NeighList * const nl,
 }
 
 
-void nbl_initialize(NeighList ** const nl)
-{
-  *nl = new NeighList;
-}
+void nbl_initialize(NeighList ** const nl) { *nl = new NeighList; }
 
 
 void nbl_clean(NeighList ** const nl)
@@ -86,35 +82,43 @@ int nbl_build(NeighList * const nl,
               int const * needNeighbors)
 {
   // find max and min extend of coordinates
-  double min[DIM];
-  double max[DIM];
+  double min[3];
+  double max[3];
 
   // init max and min of coordinates to that of the first atom
-  for (int k = 0; k < DIM; k++)
+  min[0] = coordinates[0];
+  min[1] = coordinates[1];
+  min[2] = coordinates[2];
+  // +1 to prevent max==min
+  max[0] = coordinates[0] + 1.0;
+  max[1] = coordinates[1] + 1.0;
+  max[2] = coordinates[2] + 1.0;
+
+  for (int i = 0, l = 0; i < numberOfParticles; i++)
   {
-    min[k] = coordinates[k];
-    max[k] = coordinates[k] + 1.0;  // +1 to prevent max==min for 1D and 2D case
-  }
-  
-  for (int i = 0; i < numberOfParticles; i++)
-  {
-    for (int j = 0; j < DIM; j++)
-    {
-      int const l = DIM * i + j;
-      if (max[j] < coordinates[l]) {max[j] = coordinates[l]; }
-      if (min[j] > coordinates[l]) {min[j] = coordinates[l]; }
-    }
+    if (max[0] < coordinates[l]) { max[0] = coordinates[l]; }
+    if (min[0] > coordinates[l]) { min[0] = coordinates[l]; }
+    ++l;
+    if (max[1] < coordinates[l]) { max[1] = coordinates[l]; }
+    if (min[1] > coordinates[l]) { min[1] = coordinates[l]; }
+    ++l;
+    if (max[2] < coordinates[l]) { max[2] = coordinates[l]; }
+    if (min[2] > coordinates[l]) { min[2] = coordinates[l]; }
+    ++l;
   }
 
   // make the cell box
-  int size_total = 1;
-  int size[DIM];
-  for (int i = 0; i < DIM; i++)
-  {
-    size[i] = static_cast<int>((max[i] - min[i]) / influenceDistance);
-    if (size[i] <= 0) size[i] = 1;
-    size_total *= size[i];
-  }
+  int size[3];
+
+  size[0] = static_cast<int>((max[0] - min[0]) / influenceDistance);
+  size[1] = static_cast<int>((max[1] - min[1]) / influenceDistance);
+  size[2] = static_cast<int>((max[2] - min[2]) / influenceDistance);
+
+  if (size[0] <= 0) size[0] = 1;
+  if (size[1] <= 0) size[1] = 1;
+  if (size[2] <= 0) size[2] = 1;
+
+  int size_total = size[0] * size[1] * size[2];
   if (size_total > 1000000000)
   {
     MY_WARNING("Cell size too large. Check if you have partilces fly away.");
@@ -125,9 +129,13 @@ int nbl_build(NeighList * const nl,
   std::vector<std::vector<int> > cells(size_total);
   for (int i = 0; i < numberOfParticles; i++)
   {
-    int index[DIM];
-    coords_to_index(&coordinates[DIM * i], size, max, min, index);
-    int idx = index[0] + index[1] * size[0] + index[2] * size[0] * size[1];
+    int index[3];
+
+    coords_to_index(&coordinates[3 * i], size, max, min, index);
+
+    int const idx
+        = index[0] + index[1] * size[0] + index[2] * size[0] * size[1];
+
     cells[idx].push_back(i);
   }
 
@@ -139,10 +147,12 @@ int nbl_build(NeighList * const nl,
 
   std::vector<double> cutsqs(numberOfCutoffs);
   for (int i = 0; i < numberOfCutoffs; i++)
-  { cutsqs[i] = cutoffs[i] * cutoffs[i]; }
+  {
+    cutsqs[i] = cutoffs[i] * cutoffs[i];
+  }
 
   // temporary neigh container
-  std::vector<int> * tmp_neigh = new std::vector<int>[numberOfCutoffs];
+  std::vector<std::vector<int> > tmp_neigh(numberOfCutoffs);
   std::vector<int> total(numberOfCutoffs, 0);
   std::vector<int> num_neigh(numberOfCutoffs);
 
@@ -152,8 +162,12 @@ int nbl_build(NeighList * const nl,
 
     if (needNeighbors[i])
     {
-      int index[DIM];
-      coords_to_index(&coordinates[DIM * i], size, max, min, index);
+      double const coordinates_i_x = coordinates[3 * i];
+      double const coordinates_i_y = coordinates[3 * i + 1];
+      double const coordinates_i_z = coordinates[3 * i + 2];
+
+      int index[3];
+      coords_to_index(&coordinates[3 * i], size, max, min, index);
 
       // loop over neighborling cells and the cell atom i resides
       for (int ii = std::max(0, index[0] - 1);
@@ -168,21 +182,18 @@ int nbl_build(NeighList * const nl,
                kk <= std::min(index[2] + 1, size[2] - 1);
                kk++)
           {
-            int idx = ii + jj * size[0] + kk * size[0] * size[1];
+            int const idx = ii + jj * size[0] + kk * size[0] * size[1];
 
             for (std::size_t m = 0; m < cells[idx].size(); m++)
             {
               int n = cells[idx][m];
               if (n != i)
               {
-                double rsq = 0.0;
+                double const dx = coordinates[3 * n] - coordinates_i_x;
+                double const dy = coordinates[3 * n + 1] - coordinates_i_y;
+                double const dz = coordinates[3 * n + 2] - coordinates_i_z;
+                double const rsq = dx * dx + dy * dy + dz * dz;
 
-                for (int k = 0; k < DIM; k++)
-                {
-                  double del
-                      = coordinates[DIM * n + k] - coordinates[DIM * i + k];
-                  rsq += del * del;
-                }
                 if (rsq < TOL)
                 {
                   std::ostringstream stringStream;
@@ -226,8 +237,6 @@ int nbl_build(NeighList * const nl,
         nl->lists[k].neighborList, tmp_neigh[k].data(), sizeof(int) * total[k]);
   }
 
-  delete[] tmp_neigh;
-
   return 0;
 }
 
@@ -240,20 +249,21 @@ int nbl_get_neigh(void const * const dataObject,
                   int * const numberOfNeighbors,
                   int const ** const neighborsOfParticle)
 {
-  int error = 1;
   NeighList * nl = (NeighList *) dataObject;
 
-  if (neighborListIndex >= nl->numberOfNeighborLists) { return error; }
+  if (neighborListIndex >= nl->numberOfNeighborLists) { return 1; }
+
   NeighListOne * cnl = &(nl->lists[neighborListIndex]);
 
-  if (cutoffs[neighborListIndex] > cnl->cutoff + TOL) { return error; }
+  if (cutoffs[neighborListIndex] > cnl->cutoff + TOL) { return 1; }
 
   // invalid id
   int numberOfParticles = cnl->numberOfParticles;
+
   if ((particleNumber >= numberOfParticles) || (particleNumber < 0))
   {
     MY_WARNING("Invalid part ID in nbl_get_neigh");
-    return error;
+    return 1;
   }
 
   // number of neighbors
@@ -261,6 +271,7 @@ int nbl_get_neigh(void const * const dataObject,
 
   // neighbor list starting point
   int idx = cnl->beginIndex[particleNumber];
+
   *neighborsOfParticle = cnl->neighborList + idx;
 
   return 0;
@@ -283,21 +294,27 @@ int nbl_create_paddings(int const numberOfParticles,
   double fcell[9];
 
   transpose(cell, tcell);
+
   int error = inverse(tcell, fcell);
   if (error) { return error; }
 
-  double frac_coords[DIM * numberOfParticles];
-  double min[DIM] = {1e10, 1e10, 1e10};
-  double max[DIM] = {-1e10, -1e10, -1e10};
+  double frac_coords[3 * numberOfParticles];
+
+  double min[3] = {1e10, 1e10, 1e10};
+  double max[3] = {-1e10, -1e10, -1e10};
+
   for (int i = 0; i < numberOfParticles; i++)
   {
-    const double * atom_coords = coordinates + (DIM * i);
+    const double * atom_coords = coordinates + (3 * i);
+
     double x = dot(fcell, atom_coords);
     double y = dot(fcell + 3, atom_coords);
     double z = dot(fcell + 6, atom_coords);
-    frac_coords[DIM * i + 0] = x;
-    frac_coords[DIM * i + 1] = y;
-    frac_coords[DIM * i + 2] = z;
+
+    frac_coords[3 * i + 0] = x;
+    frac_coords[3 * i + 1] = y;
+    frac_coords[3 * i + 2] = z;
+
     if (x < min[0]) { min[0] = x; }
     if (y < min[1]) { min[1] = y; }
     if (z < min[2]) { min[2] = z; }
@@ -307,34 +324,44 @@ int nbl_create_paddings(int const numberOfParticles,
   }
 
   // add some extra value to deal with edge case
-  for (int i = 0; i < DIM; i++)
-  {
-    min[i] -= 1e-10;
-    max[i] += 1e-10;
-  }
+  min[0] -= TOL;
+  min[1] -= TOL;
+  min[2] -= TOL;
+  max[0] += TOL;
+  max[1] += TOL;
+  max[2] += TOL;
 
   // volume of cell
-  double xprod[DIM];
+  double xprod[3];
+
   cross(cell + 3, cell + 6, xprod);
+
   double volume = std::abs(dot(cell, xprod));
 
   // distance between parallelpiped cell faces
-  double dist[DIM];
+  double dist[3];
+
   cross(cell + 3, cell + 6, xprod);
   dist[0] = volume / norm(xprod);
+
   cross(cell + 6, cell + 0, xprod);
   dist[1] = volume / norm(xprod);
+
   cross(cell, cell + 3, xprod);
   dist[2] = volume / norm(xprod);
 
   // number of cells in each direction
-  double ratio[DIM];
-  int size[DIM];
-  for (int i = 0; i < DIM; i++)
-  {
-    ratio[i] = cutoff / dist[i];
-    size[i] = static_cast<int>(std::ceil(ratio[i]));
-  }
+  double const ratio[3]
+      = {cutoff / dist[0], cutoff / dist[1], cutoff / dist[2]};
+
+  int const size[3] = {static_cast<int>(std::ceil(ratio[0])),
+                       static_cast<int>(std::ceil(ratio[1])),
+                       static_cast<int>(std::ceil(ratio[2]))};
+
+  double const size_ratio_diff_x = static_cast<double>(size[0]) - ratio[0];
+  double const size_ratio_diff_y = static_cast<double>(size[1]) - ratio[1];
+  double const size_ratio_diff_z = static_cast<double>(size[2]) - ratio[2];
+
 
   // creating padding atoms
   for (int i = -size[0]; i <= size[0]; i++)
@@ -353,31 +380,19 @@ int nbl_create_paddings(int const numberOfParticles,
 
         for (int at = 0; at < numberOfParticles; at++)
         {
-          double x = frac_coords[DIM * at + 0];
-          double y = frac_coords[DIM * at + 1];
-          double z = frac_coords[DIM * at + 2];
+          double const x = frac_coords[3 * at + 0];
+          double const y = frac_coords[3 * at + 1];
+          double const z = frac_coords[3 * at + 2];
 
           // select the necessary atoms to repeate for the most outside bins
           // the follwing few lines can be easily understood when assuming
           // size=1
-          if (i == -size[0]
-              && x - min[0] < static_cast<double>(size[0]) - ratio[0])
-          { continue; }
-          if (i == size[0]
-              && max[0] - x < static_cast<double>(size[0]) - ratio[0])
-          { continue; }
-          if (j == -size[1]
-              && y - min[1] < static_cast<double>(size[1]) - ratio[1])
-          { continue; }
-          if (j == size[1]
-              && max[1] - y < static_cast<double>(size[1]) - ratio[1])
-          { continue; }
-          if (k == -size[2]
-              && z - min[2] < static_cast<double>(size[2]) - ratio[2])
-          { continue; }
-          if (k == size[2]
-              && max[2] - z < static_cast<double>(size[2]) - ratio[2])
-          { continue; }
+          if (i == -size[0] && x - min[0] < size_ratio_diff_x) { continue; }
+          if (i == size[0] && max[0] - x < size_ratio_diff_x) { continue; }
+          if (j == -size[1] && y - min[1] < size_ratio_diff_y) { continue; }
+          if (j == size[1] && max[1] - y < size_ratio_diff_y) { continue; }
+          if (k == -size[2] && z - min[2] < size_ratio_diff_z) { continue; }
+          if (k == size[2] && max[2] - z < size_ratio_diff_z) { continue; }
 
           // fractional coordinates of padding atom at
           double atom_coords[3] = {i + x, j + y, k + z};

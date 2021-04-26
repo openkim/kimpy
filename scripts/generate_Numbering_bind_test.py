@@ -7,10 +7,7 @@ fields = {
     'field_name': 'numbering',
 }
 
-attributes = [
-    'zeroBased',
-    'oneBased'
-]
+attributes = ['zeroBased', 'oneBased']
 
 generate_bind(fields, attributes)
 generate_test(fields, attributes)
