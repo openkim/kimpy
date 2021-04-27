@@ -64,7 +64,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install gcc
-      run: brew install gcc@9
+      run: brew install gcc@10
     - if: matrix.compiler == 'clang'
       name: Set clang env
       run: |
@@ -74,9 +74,9 @@ jobs:
     - if: matrix.compiler == 'gcc'
       name: Set gcc env
       run: |
-        echo "CC=gcc-9" >> $GITHUB_ENV
-        echo "CXX=g++-9" >> $GITHUB_ENV
-        echo "FC=gfortran-9" >> $GITHUB_ENV
+        echo "CC=gcc-10" >> $GITHUB_ENV
+        echo "CXX=g++-10" >> $GITHUB_ENV
+        echo "FC=gfortran-10" >> $GITHUB_ENV
     - name: Install kim-api
       run: |
         export KIMPY_DIR=${PWD}
@@ -90,7 +90,7 @@ jobs:
         tar Jxvf kim-api-$KIM_API_VERSION.txz
         cd kim-api-$KIM_API_VERSION
         mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$KIM_API_DIR" -DCMAKE_Fortran_COMPILER=gfortran-9
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$KIM_API_DIR" -DCMAKE_Fortran_COMPILER=gfortran-10
         make -j2
         make install
         source "$KIM_API_DIR/bin/kim-api-activate"
