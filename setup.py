@@ -1,12 +1,12 @@
 """Setup."""
 
-from distutils.sysconfig import get_config_vars
 import os
 import subprocess
 import sys
 
 from setuptools import setup, Extension, find_packages, distutils
 from setuptools.command.build_ext import build_ext
+from sysconfig import get_config_vars
 
 from api_compatibility import check_kim_api_compatibility
 
