@@ -2,7 +2,7 @@
 Change Log
 ==========
 
-v2.0.0 (2021/04/26)	 
+v2.0.0 (2021/04/26)
 ===================
 
 This release is not backward compatible.
@@ -10,8 +10,9 @@ This release is not backward compatible.
 - remove the manual memory management. There is no need to destroy the KIM-API objects in Python explicitly. By using smart pointers with custom deleters, Python controls the ownership of newly created objects, and the garbage collector module is tracking their status.
 - the interface is updated, and no error message returns from the KIM-API to the users. It throws a RuntimeError exception with a print indicating what went wrong in case of an error.
 - input and return arguments are now in lower case.
-- methods are provided with a docstring explaining the purpose. 
+- methods are provided with a docstring explaining the purpose.
 - NeighList module is updated. One uses NeighList() class to create an instance of the NeighList object and calls its methods.
+- find example usage at kimpy/examples/
 
 
 v0.3.3 (2019/10/28)

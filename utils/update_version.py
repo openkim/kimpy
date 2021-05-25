@@ -1,3 +1,8 @@
+"""
+To update version:
+1. update compatibility table ../api_compatibility.txt
+2. $ python update_version.py
+"""
 import os
 
 
