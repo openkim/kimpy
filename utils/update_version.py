@@ -51,7 +51,15 @@ def update_version(version, path, key, in_quotes=False, extra_space=False):
 if __name__ == '__main__':
     kimpy_v, api_v = get_kimpy_kimapi_versions()
     kimpy_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
     path = os.path.join(kimpy_dir, 'kimpy', '__init__.py')
     update_version(kimpy_v, path, '__version__', True, True)
+
     path = os.path.join(kimpy_dir, '.travis.yml')
-    update_version(api_v, path, 'export KIM_API_VERSION')
+    update_version(api_v, path, 'export KIM_API_VERSION', in_quotes=True)
+
+    path = os.path.join(kimpy_dir, '.github/workflows/pythonpackage.yml')
+    update_version(api_v, path, 'export KIM_API_VERSION', in_quotes=True)
+    path = os.path.join(kimpy_dir, '.github/workflows/pythonpublish.yml')
+    update_version(api_v, path, 'export KIM_API_VERSION', in_quotes=True)
+
