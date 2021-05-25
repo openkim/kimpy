@@ -1,6 +1,6 @@
 # kimpy
 
-[![Build Status](https://travis-ci.org/openkim/kimpy.svg?branch=master)](https://travis-ci.org/openkim/kimpy)
+[![Build Status](https://travis-ci.com/openkim/kimpy.svg?branch=master)](https://travis-ci.com/openkim/kimpy)
 [![Python package](https://github.com/openkim/kimpy/workflows/Python%20package/badge.svg)](https://github.com/openkim/kimpy/actions)
 [![Anaconda-Server Badge](https://img.shields.io/conda/vn/conda-forge/kimpy.svg)](https://anaconda.org/conda-forge/kimpy)
 [![PyPI](https://img.shields.io/pypi/v/kimpy.svg)](https://pypi.python.org/pypi/kimpy)
