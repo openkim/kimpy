@@ -56,5 +56,5 @@ def test_main():
     assert capture_out_of_bound_error
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_main()

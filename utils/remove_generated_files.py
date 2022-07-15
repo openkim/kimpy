@@ -70,7 +70,11 @@ def remove_generated_files(path):
             "cpp_example",
             "test_graphite.py",
         ],
-        "utils": ["format_sources.py", "remove_generated_files.py", "update_version.py"],
+        "utils": [
+            "format_sources.py",
+            "remove_generated_files.py",
+            "update_version.py",
+        ],
     }
 
     temp_files = [
