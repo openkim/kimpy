@@ -307,7 +307,7 @@ setup(
     version=get_kimpy_version(),
     packages=find_packages(),
     setup_requires=["pybind11"],
-    install_requires=["pybind11", "numpy", "pytest"],
+    install_requires=["pybind11", "numpy", "pytest", "python>=3.7"],
     cmdclass={"build_ext": BuildExt},
     ext_modules=get_kimpy_ext_modules(),
     author="Mingjian Wen, Yaser Afshar",
