@@ -18,13 +18,6 @@ for _key, _value in cfg_vars.items():
         cfg_vars[_key] = _value.replace("-Wstrict-prototypes", "")
 
 
-def generate_files():
-    """Run scripts to generate files."""
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    generate_script = os.path.join(dir_path, "scripts", "generate_all.py")
-    subprocess.call([sys.executable, generate_script])
-
-
 def inquire_kim_api(kim_api_key):
     """Get compile and link flags of kim-api package."""
     try:
@@ -308,9 +301,6 @@ def chech_kim_api_compatibility():
 
 # Check kim-api compatibility
 chech_kim_api_compatibility()
-
-# Run scripts to generate files.
-generate_files()
 
 setup(
     name="kimpy",
