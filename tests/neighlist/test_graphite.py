@@ -26,34 +26,34 @@ def create_graphite_unit_cell(alat=2.46, d=3.35):
 
 def write_XYZ(fname, lat_vec, species, coords):
 
-    with open(fname, 'w') as fout:
+    with open(fname, "w") as fout:
 
         # first line (num of atoms)
         natoms = len(species)
-        fout.write('{}\n'.format(natoms))
+        fout.write("{}\n".format(natoms))
 
         # second line
         # lattice
         fout.write('Lattice="')
         for line in lat_vec:
             for item in line:
-                fout.write('{:.15g} '.format(item))  # g removes trailing zero
+                fout.write("{:.15g} ".format(item))  # g removes trailing zero
 
         fout.write('" ')
         # PBC
         fout.write('PBC="1 1 1" ')
         # properties
-        fout.write('Properties=species:S:1:pos:R:3\n')
+        fout.write("Properties=species:S:1:pos:R:3\n")
 
         # body
         for i in range(len(species)):
-            fout.write('{:3d} '.format(species[i]))
+            fout.write("{:3d} ".format(species[i]))
             fout.write(
-                '{:13.5e} {:13.5e} {:13.5e}'.format(
+                "{:13.5e} {:13.5e} {:13.5e}".format(
                     coords[i][0], coords[i][1], coords[i][2]
                 )
             )
-            fout.write('\n')
+            fout.write("\n")
 
 
 def test_main():
@@ -87,7 +87,7 @@ def test_main():
     species = np.concatenate((contrib_species, pad_species))
     species = np.asarray(species, dtype=np.intc)
 
-    fname = 'atoms.xyz'
+    fname = "atoms.xyz"
     write_XYZ(fname, cell, species, coords)
 
     # flag to indicate wheter create neighbor list for an atom
@@ -139,10 +139,10 @@ def test_main():
     # remove the created file
     try:
         os.remove(fname)
-        os.remove('kim.log')
+        os.remove("kim.log")
     except:
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_main()

@@ -194,6 +194,3 @@ Contributors:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mingjian Wen\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Yaser Afshar
 
-## Contact
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mingjian Wen (wenxx151@umn.edu)

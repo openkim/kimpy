@@ -1,19 +1,37 @@
+# This file is generated automatically by generate_UnitSystem_bind_test.py.
+# Do not modify this file, but modify the script instead.
 import kimpy
 
-rpls_attributes
+attributes = [
+  kimpy.length_unit.unused,
+  kimpy.length_unit.A,
+  kimpy.length_unit.Bohr,
+  kimpy.length_unit.cm,
+  kimpy.length_unit.m,
+  kimpy.length_unit.nm,
+]
 
-rpls_str_names
+
+str_names = [
+  "unused",
+  "A",
+  "Bohr",
+  "cm",
+  "m",
+  "nm",
+]
+
 
 
 def test_main():
     """Main test function."""
-    N = kimpy.field_name.get_number_of_field_names()
+    N = kimpy.length_unit.get_number_of_length_units()
 
-    assert N == rpls_num_attributes
+    assert N == 6
 
     all_instances = []
     for i in range(N):
-        inst = kimpy.field_name.get_field_name(i)
+        inst = kimpy.length_unit.get_length_unit(i)
 
         all_instances.append(inst)
 
@@ -35,7 +53,7 @@ def test_main():
     capture_out_of_bound_error = False
 
     try:
-        inst = kimpy.field_name.get_field_name(N)
+        inst = kimpy.length_unit.get_length_unit(N)
     except RuntimeError:
         capture_out_of_bound_error = True
 

@@ -1,19 +1,29 @@
+# This file is generated automatically by generate_UnitSystem_bind_test.py.
+# Do not modify this file, but modify the script instead.
 import kimpy
 
-rpls_attributes
+attributes = [
+  kimpy.temperature_unit.unused,
+  kimpy.temperature_unit.K,
+]
 
-rpls_str_names
+
+str_names = [
+  "unused",
+  "K",
+]
+
 
 
 def test_main():
     """Main test function."""
-    N = kimpy.field_name.get_number_of_field_names()
+    N = kimpy.temperature_unit.get_number_of_temperature_units()
 
-    assert N == rpls_num_attributes
+    assert N == 2
 
     all_instances = []
     for i in range(N):
-        inst = kimpy.field_name.get_field_name(i)
+        inst = kimpy.temperature_unit.get_temperature_unit(i)
 
         all_instances.append(inst)
 
@@ -35,7 +45,7 @@ def test_main():
     capture_out_of_bound_error = False
 
     try:
-        inst = kimpy.field_name.get_field_name(N)
+        inst = kimpy.temperature_unit.get_temperature_unit(N)
     except RuntimeError:
         capture_out_of_bound_error = True
 

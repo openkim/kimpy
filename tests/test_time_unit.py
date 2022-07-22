@@ -1,19 +1,35 @@
+# This file is generated automatically by generate_UnitSystem_bind_test.py.
+# Do not modify this file, but modify the script instead.
 import kimpy
 
-rpls_attributes
+attributes = [
+  kimpy.time_unit.unused,
+  kimpy.time_unit.fs,
+  kimpy.time_unit.ps,
+  kimpy.time_unit.ns,
+  kimpy.time_unit.s,
+]
 
-rpls_str_names
+
+str_names = [
+  "unused",
+  "fs",
+  "ps",
+  "ns",
+  "s",
+]
+
 
 
 def test_main():
     """Main test function."""
-    N = kimpy.field_name.get_number_of_field_names()
+    N = kimpy.time_unit.get_number_of_time_units()
 
-    assert N == rpls_num_attributes
+    assert N == 5
 
     all_instances = []
     for i in range(N):
-        inst = kimpy.field_name.get_field_name(i)
+        inst = kimpy.time_unit.get_time_unit(i)
 
         all_instances.append(inst)
 
@@ -35,7 +51,7 @@ def test_main():
     capture_out_of_bound_error = False
 
     try:
-        inst = kimpy.field_name.get_field_name(N)
+        inst = kimpy.time_unit.get_time_unit(N)
     except RuntimeError:
         capture_out_of_bound_error = True
 

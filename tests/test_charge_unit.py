@@ -1,19 +1,33 @@
+# This file is generated automatically by generate_UnitSystem_bind_test.py.
+# Do not modify this file, but modify the script instead.
 import kimpy
 
-rpls_attributes
+attributes = [
+  kimpy.charge_unit.unused,
+  kimpy.charge_unit.C,
+  kimpy.charge_unit.e,
+  kimpy.charge_unit.statC,
+]
 
-rpls_str_names
+
+str_names = [
+  "unused",
+  "C",
+  "e",
+  "statC",
+]
+
 
 
 def test_main():
     """Main test function."""
-    N = kimpy.field_name.get_number_of_field_names()
+    N = kimpy.charge_unit.get_number_of_charge_units()
 
-    assert N == rpls_num_attributes
+    assert N == 4
 
     all_instances = []
     for i in range(N):
-        inst = kimpy.field_name.get_field_name(i)
+        inst = kimpy.charge_unit.get_charge_unit(i)
 
         all_instances.append(inst)
 
@@ -35,7 +49,7 @@ def test_main():
     capture_out_of_bound_error = False
 
     try:
-        inst = kimpy.field_name.get_field_name(N)
+        inst = kimpy.charge_unit.get_charge_unit(N)
     except RuntimeError:
         capture_out_of_bound_error = True
 

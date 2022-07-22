@@ -11,33 +11,7 @@ build/
 dist/
 ase_kim_calculator.egg-info/
 
-kimpy/SpeciesName_attributes.cpp
-kimpy/*Unit_bind.cpp
-kimpy/KIM_DataType_bind.cpp
-kimpy/KIM_Numbering_bind.cpp
-kimpy/KIM_SpeciesName_bind.cpp
-kimpy/KIM_LanguageName_bind.cpp
-kimpy/KIM_ModelRoutineName_bind.cpp
-kimpy/KIM_ComputeCallbackName_bind.cpp
-kimpy/KIM_SupportStatus_bind.cpp
-kimpy/KIM_LogVerbosity_bind.cpp
-kimpy/KIM_Collection_bind.cpp
-kimpy/KIM_CollectionItemType_bind.cpp
-
-tests/species_name_attributes.py
-tests/*_unit.py
-tests/test_data_type.py
-tests/test_numbering.py
-tests/test_species_name.py
-tests/test_language_name.py
-tests/test_model_routine_name.py
-tests/test_compute_callback_name.py
-tests/test_support_status.py
-tests/test_log_verbosity.py
-tests/test_collection.py
-tests/test_collection_item_type.py
-
-# Precompiled Headers
+# Pre-compiled Headers
 *.gch
 *.pch
 
@@ -70,3 +44,4 @@ kimpy.egg-info
 kim.log
 .cache
 .pytest_cache/
+.DS_Store

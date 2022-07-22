@@ -1,19 +1,31 @@
+# This file is generated automatically by generate_ComputeCallbackName_bind_test.py.
+# Do not modify this file, but modify the script instead.
 import kimpy
 
-rpls_attributes
+attributes = [
+  kimpy.compute_callback_name.GetNeighborList,
+  kimpy.compute_callback_name.ProcessDEDrTerm,
+  kimpy.compute_callback_name.ProcessD2EDr2Term,
+]
 
-rpls_str_names
+
+str_names = [
+  "GetNeighborList",
+  "ProcessDEDrTerm",
+  "ProcessD2EDr2Term",
+]
+
 
 
 def test_main():
     """Main test function."""
-    N = kimpy.field_name.get_number_of_field_names()
+    N = kimpy.compute_callback_name.get_number_of_compute_callback_names()
 
-    assert N == rpls_num_attributes
+    assert N == 3
 
     all_instances = []
     for i in range(N):
-        inst = kimpy.field_name.get_field_name(i)
+        inst = kimpy.compute_callback_name.get_compute_callback_name(i)
 
         all_instances.append(inst)
 
@@ -35,7 +47,7 @@ def test_main():
     capture_out_of_bound_error = False
 
     try:
-        inst = kimpy.field_name.get_field_name(N)
+        inst = kimpy.compute_callback_name.get_compute_callback_name(N)
     except RuntimeError:
         capture_out_of_bound_error = True
 

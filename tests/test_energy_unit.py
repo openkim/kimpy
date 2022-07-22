@@ -1,19 +1,39 @@
+# This file is generated automatically by generate_UnitSystem_bind_test.py.
+# Do not modify this file, but modify the script instead.
 import kimpy
 
-rpls_attributes
+attributes = [
+  kimpy.energy_unit.unused,
+  kimpy.energy_unit.amu_A2_per_ps2,
+  kimpy.energy_unit.erg,
+  kimpy.energy_unit.eV,
+  kimpy.energy_unit.Hartree,
+  kimpy.energy_unit.J,
+  kimpy.energy_unit.kcal_mol,
+]
 
-rpls_str_names
+
+str_names = [
+  "unused",
+  "amu_A2_per_ps2",
+  "erg",
+  "eV",
+  "Hartree",
+  "J",
+  "kcal_mol",
+]
+
 
 
 def test_main():
     """Main test function."""
-    N = kimpy.field_name.get_number_of_field_names()
+    N = kimpy.energy_unit.get_number_of_energy_units()
 
-    assert N == rpls_num_attributes
+    assert N == 7
 
     all_instances = []
     for i in range(N):
-        inst = kimpy.field_name.get_field_name(i)
+        inst = kimpy.energy_unit.get_energy_unit(i)
 
         all_instances.append(inst)
 
@@ -35,7 +55,7 @@ def test_main():
     capture_out_of_bound_error = False
 
     try:
-        inst = kimpy.field_name.get_field_name(N)
+        inst = kimpy.energy_unit.get_energy_unit(N)
     except RuntimeError:
         capture_out_of_bound_error = True
 

@@ -1,19 +1,33 @@
+# This file is generated automatically by generate_Collection_bind_test.py.
+# Do not modify this file, but modify the script instead.
 import kimpy
 
-rpls_attributes
+attributes = [
+  kimpy.collection.system,
+  kimpy.collection.user,
+  kimpy.collection.environmentVariable,
+  kimpy.collection.currentWorkingDirectory,
+]
 
-rpls_str_names
+
+str_names = [
+  "system",
+  "user",
+  "environmentVariable",
+  "currentWorkingDirectory",
+]
+
 
 
 def test_main():
     """Main test function."""
-    N = kimpy.field_name.get_number_of_field_names()
+    N = kimpy.collection.get_number_of_collections()
 
-    assert N == rpls_num_attributes
+    assert N == 4
 
     all_instances = []
     for i in range(N):
-        inst = kimpy.field_name.get_field_name(i)
+        inst = kimpy.collection.get_collection(i)
 
         all_instances.append(inst)
 
@@ -35,7 +49,7 @@ def test_main():
     capture_out_of_bound_error = False
 
     try:
-        inst = kimpy.field_name.get_field_name(N)
+        inst = kimpy.collection.get_collection(N)
     except RuntimeError:
         capture_out_of_bound_error = True
 

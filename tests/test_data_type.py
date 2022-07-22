@@ -1,19 +1,29 @@
+# This file is generated automatically by generate_DataType_bind_test.py.
+# Do not modify this file, but modify the script instead.
 import kimpy
 
-rpls_attributes
+attributes = [
+  kimpy.data_type.Integer,
+  kimpy.data_type.Double,
+]
 
-rpls_str_names
+
+str_names = [
+  "Integer",
+  "Double",
+]
+
 
 
 def test_main():
     """Main test function."""
-    N = kimpy.field_name.get_number_of_field_names()
+    N = kimpy.data_type.get_number_of_data_types()
 
-    assert N == rpls_num_attributes
+    assert N == 2
 
     all_instances = []
     for i in range(N):
-        inst = kimpy.field_name.get_field_name(i)
+        inst = kimpy.data_type.get_data_type(i)
 
         all_instances.append(inst)
 
@@ -35,7 +45,7 @@ def test_main():
     capture_out_of_bound_error = False
 
     try:
-        inst = kimpy.field_name.get_field_name(N)
+        inst = kimpy.data_type.get_data_type(N)
     except RuntimeError:
         capture_out_of_bound_error = True
 
