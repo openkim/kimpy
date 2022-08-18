@@ -174,7 +174,7 @@ def check_kim_api_compatibility(kimpy_version, kim_api_version):
             msg3 += "latest kimpy, which is not compatible "
             msg3 += "with this\n      KIM-API version "
             msg3 += '"{}" yet. Please contact\n      '.format(kim_api_version)
-            msg3 += "Mingjian Wen (wenxx151@umn.edu)  or\n      "
+            msg3 += "Mingjian Wen (wenxx151@gmail.com)  or\n      "
             msg3 += "raise an issue on github so we update the kimpy.\n"
         else:
             compatible_kimpy = suggest_kimpy(kim_api_version, compatible_table)
@@ -190,5 +190,5 @@ def check_kim_api_compatibility(kimpy_version, kim_api_version):
 
 
 if __name__ == "__main__":
-    kim_api_compatibility = check_kim_api_compatibility("0.2.3", "2.0.1")
+    kim_api_compatibility = check_kim_api_compatibility("2.0.1", "2.3.0")
     print(kim_api_compatibility)

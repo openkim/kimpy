@@ -58,7 +58,7 @@ if __name__ == "__main__":
     path = os.path.join(kimpy_dir, ".travis.yml")
     update_version(api_v, path, "export KIM_API_VERSION", in_quotes=True)
 
-    path = os.path.join(kimpy_dir, ".github/workflows/pythonpackage.yml")
+    path = os.path.join(kimpy_dir, ".github/workflows/testing.yml")
     update_version(api_v, path, "export KIM_API_VERSION", in_quotes=True)
     path = os.path.join(kimpy_dir, ".github/workflows/pythonpublish.yml")
     update_version(api_v, path, "export KIM_API_VERSION", in_quotes=True)
