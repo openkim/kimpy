@@ -45,3 +45,4 @@ kim.log
 .cache
 .pytest_cache/
 .DS_Store
+.idea
