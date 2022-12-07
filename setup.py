@@ -1,14 +1,17 @@
-"""Setup."""
-
 import os
 import subprocess
 import sys
-
-from setuptools import setup, Extension, find_packages, distutils
-from setuptools.command.build_ext import build_ext
 from sysconfig import get_config_vars
 
-from api_compatibility import check_kim_api_compatibility
+from setuptools import Extension, distutils, find_packages, setup
+from setuptools.command.build_ext import build_ext
+
+try:
+    from api_compatibility import check_kim_api_compatibility
+except ImportError:
+    # new version of pip does not add cwd to path
+    sys.path.append(os.getcwd())
+    from api_compatibility import check_kim_api_compatibility
 
 
 # remove `-Wstrict-prototypes' that is for C not C++
@@ -306,8 +309,10 @@ setup(
     name="kimpy",
     version=get_kimpy_version(),
     packages=find_packages(),
-    setup_requires=["pybind11"],
-    install_requires=["pybind11", "numpy", "pytest"],
+    install_requires=["numpy"],
+    extras_require={
+        "test": ["pytest", "ase"],
+    },
     python_requires=">=3.7",
     cmdclass={"build_ext": BuildExt},
     ext_modules=get_kimpy_ext_modules(),
