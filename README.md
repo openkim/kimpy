@@ -1,7 +1,6 @@
 # kimpy
 
-[![Build Status](https://travis-ci.com/openkim/kimpy.svg?branch=master)](https://travis-ci.com/openkim/kimpy)
-[![Python package](https://github.com/openkim/kimpy/workflows/Python%20package/badge.svg)](https://github.com/openkim/kimpy/actions)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/openkim/kimpy/testing.yml)
 [![Anaconda-Server Badge](https://img.shields.io/conda/vn/conda-forge/kimpy.svg)](https://anaconda.org/conda-forge/kimpy)
 [![PyPI](https://img.shields.io/pypi/v/kimpy.svg)](https://pypi.python.org/pypi/kimpy)
 [![License](https://img.shields.io/badge/license-CDDL--1.0-blue)](LICENSE.CDDL)
@@ -110,78 +109,78 @@ For exampe:
 
 1. To list all the modules in the package, do
 
-    ```sh
-    $ python
-    >>> import kimpy
-    >>> help(kimpy)
-    ```
+   ```sh
+   $ python
+   >>> import kimpy
+   >>> help(kimpy)
+   ```
 
-    and then you can find all the available modules under `PACKAGE CONTENTS` as
+   and then you can find all the available modules under `PACKAGE CONTENTS` as
 
-    ```sh
-    PACKAGE CONTENTS
-        charge_unit
-        collection
-        collection_item_type
-        collections
-        compute_argument_name
-        ...
-        temperature_unit
-        time_unit
-    ```
+   ```sh
+   PACKAGE CONTENTS
+       charge_unit
+       collection
+       collection_item_type
+       collections
+       compute_argument_name
+       ...
+       temperature_unit
+       time_unit
+   ```
 
 2. To inspect the `compute_argument_name` module, do
 
-    ```sh
-    $ python
-    >>> import kimpy
-    >>> help(kimpy.compute_argument_name)
-    ```
+   ```sh
+   $ python
+   >>> import kimpy
+   >>> help(kimpy.compute_argument_name)
+   ```
 
-    All the functions are listed under `FUNCTIONS`. For example,
+   All the functions are listed under `FUNCTIONS`. For example,
 
-    ```sh
-    FUNCTIONS
-        get_compute_argument_data_type(...) method of builtins.PyCapsule instance
-            get_compute_argument_data_type(compute_argument_name: kimpy.compute_argument_name.ComputeArgumentName) -> KIM::DataType
-
-
-            Get the data_type of each defined standard compute_argument_name.
-
-            Returns:
-                DataType: data_type
-        get_compute_argument_name(...) method of builtins.PyCapsule instance
-            get_compute_argument_name(index: int) -> kimpy.compute_argument_name.ComputeArgumentName
+   ```sh
+   FUNCTIONS
+       get_compute_argument_data_type(...) method of builtins.PyCapsule instance
+           get_compute_argument_data_type(compute_argument_name: kimpy.compute_argument_name.ComputeArgumentName) -> KIM::DataType
 
 
-            Get the identity of each defined standard compute_argument_name.
+           Get the data_type of each defined standard compute_argument_name.
 
-            Returns:
-                ComputeArgumentName: compute_argument_name
+           Returns:
+               DataType: data_type
+       get_compute_argument_name(...) method of builtins.PyCapsule instance
+           get_compute_argument_name(index: int) -> kimpy.compute_argument_name.ComputeArgumentName
 
-        get_number_of_compute_argument_names(...) method of builtins.PyCapsule instance
-            get_number_of_compute_argument_names() -> int
+
+           Get the identity of each defined standard compute_argument_name.
+
+           Returns:
+               ComputeArgumentName: compute_argument_name
+
+       get_number_of_compute_argument_names(...) method of builtins.PyCapsule instance
+           get_number_of_compute_argument_names() -> int
 
 
-            Get the number of standard compute_argument_name's defined by the KIM-API.
+           Get the number of standard compute_argument_name's defined by the KIM-API.
 
-            Returns:
-                int: number_of_compute_arguments
-    ```
+           Returns:
+               int: number_of_compute_arguments
+   ```
 
-    shows that the function `get_compute_argument_name` takes an integer
-    `index` as input, and returns an output: `compute_argument_name`. You can
-    refer to `KIM API` docs for further information on the input and outputs.
+   shows that the function `get_compute_argument_name` takes an integer
+   `index` as input, and returns an output: `compute_argument_name`. You can
+   refer to `KIM API` docs for further information on the input and outputs.
 
-    All the attributes of the module are listed under `DATA`. For example,
+   All the attributes of the module are listed under `DATA`. For example,
 
-    ```sh
-    DATA
-        coordinates = coordinates
-        numberOfParticles = numberOfParticles
-        ...
-        particleSpeciesCodes = particleSpeciesCodes
-    ```
+   ```sh
+   DATA
+       coordinates = coordinates
+       numberOfParticles = numberOfParticles
+       ...
+       particleSpeciesCodes = particleSpeciesCodes
+   ```
 
 ## Copyright
 
@@ -193,4 +192,3 @@ All Rights Reserved
 Contributors:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mingjian Wen\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Yaser Afshar
-
