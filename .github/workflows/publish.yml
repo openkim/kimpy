@@ -11,10 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up micromamba
+        uses: mamba-org/setup-micromamba@v1.7.3
         with:
-          python-version: "3.x"
+          # the create command looks like this:
+          # `micromamba create -n test-env python=<the corresponding version>`
+          environment-name: test-env
+          cache-environment: true
+          create-args: >-
+            python=3.10
+            kim-api=2.3.0
 
       - name: Install dependencies
         run: |

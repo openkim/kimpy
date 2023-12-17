@@ -50,3 +50,6 @@ if __name__ == "__main__":
 
     path = kimpy_dir / ".github/workflows/testing.yml"
     update_version(api_v, path, "kim-api", in_quotes=False)
+
+    path = kimpy_dir / ".github/workflows/publish.yml"
+    update_version(api_v, path, "kim-api", in_quotes=False)
