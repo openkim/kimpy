@@ -1,7 +1,10 @@
 #
-# To update kimpy version (in kimpy/__init__.py) and kim-api version (in .travis.yml),
+# To update kimpy version in:
+# - kimpy/__init__.py
+# and kim-api version in:
+# - .github/*
 # append to this table and then run:
-# $ python utils/update_version.py
+# $ python devtools/update_version.py
 #
 
 # kimpy-version  target-api-version  backward-compatible-api-version
@@ -22,3 +25,4 @@
   2.0.0          2.2.1               2.2.1
   2.0.1          2.3.0               2.2.1
   2.1.0          2.3.0               2.2.1
+  2.1.1          2.3.0               2.2.1
