@@ -1,16 +1,12 @@
-==========
-Change Log
-==========
+# Change Log
 
-v2.1.0 (2022/12/06)
-===================
+## v2.1.0 (2022/12/06)
 
 - Fixing inverse function bug in neighbor list, which can result in incorrect
   padding
 - Using pyproject.toml, and refactoring build and test requires
 
-v2.0.1 (2022/08/18)
-===================
+## v2.0.1 (2022/08/18)
 
 - Include generated binding and testing file in the repo, instead of generating
   them in the setup.py file. This means each time we modify the source template
@@ -18,9 +14,7 @@ v2.0.1 (2022/08/18)
 - Drop python3.6 support
 - Update to be compatible with kim-api-2.3.0
 
-
-v2.0.0 (2021/04/26)
-===================
+## v2.0.0 (2021/04/26)
 
 This release is not backward compatible.
 
@@ -37,9 +31,7 @@ This release is not backward compatible.
   of the NeighList object and calls its methods.
 - Find example usage at kimpy/examples/
 
-
-v0.3.3 (2019/10/28)
-==================
+## v0.3.3 (2019/10/28)
 
 - Update setup.py to not explicitly use `pip` and `python`
 
