@@ -3,188 +3,227 @@ name: test
 on: [push]
 
 jobs:
-  linux:
-    runs-on: ubuntu-latest
+  test:
     strategy:
       matrix:
+        os: [ubuntu-latest, macos-latest]
         python-version: ["3.8", "3.9", "3.10"]
+
+    runs-on: ${{ matrix.os }}
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Install gcc
-      run: |
-        sudo apt-get update
-        sudo apt-get install -yq gcc
-        sudo apt-get install -yq gfortran
-    - name: Install kim-api
-      run: |
-        export KIMPY_DIR=${PWD}
-        export KIM_API_VERSION="2.3.0"
-        cd $KIMPY_DIR && cd ..
-        wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
-        tar Jxvf kim-api-$KIM_API_VERSION.txz
-        cd kim-api-$KIM_API_VERSION
-        mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release
-        make -j2
-        sudo make install
-        sudo ldconfig
-        cd $KIMPY_DIR
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install ase
-        python -m pip install pytest
-    - name: Install
-      run: |
-        python -m pip install .
-    - name: Lint with flake8
-      run: |
-        pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        cd scripts
-        python generate_all.py
-        cd ..
-        cd tests
-        pytest
-  mac:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-        compiler: [clang, gcc]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install gcc
-      run: brew install gcc@10
-    - if: matrix.compiler == 'clang'
-      name: Set clang env
-      run: |
-        echo "CC=clang" >> $GITHUB_ENV
-        echo "CXX=clang++" >> $GITHUB_ENV
-        echo "FC=gfortran" >> $GITHUB_ENV
-    - if: matrix.compiler == 'gcc'
-      name: Set gcc env
-      run: |
-        echo "CC=gcc-10" >> $GITHUB_ENV
-        echo "CXX=g++-10" >> $GITHUB_ENV
-        echo "FC=gfortran-10" >> $GITHUB_ENV
-    - name: Install kim-api
-      run: |
-        export KIMPY_DIR=${PWD}
-        export KIM_API_VERSION="2.3.0"
-        cd $KIMPY_DIR && cd ..
-        mkdir -p KIM_API && cd KIM_API
-        export KIM_API_DIR=$PWD
-        echo "KIM_API_DIR=$PWD" >> $GITHUB_ENV
-        cd ..
-        wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
-        tar Jxvf kim-api-$KIM_API_VERSION.txz
-        cd kim-api-$KIM_API_VERSION
-        mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$KIM_API_DIR" -DCMAKE_Fortran_COMPILER=gfortran-10
-        make -j2
-        make install
-        source "$KIM_API_DIR/bin/kim-api-activate"
-        cd $KIMPY_DIR
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install ase
-        python3 -m pip install pytest
-    - name: Install
-      run: |
-        source "$KIM_API_DIR/bin/kim-api-activate"
-        python3 -m pip install .
-    - name: Lint with flake8
-      run: |
-        python3 -m pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        cd scripts
-        python generate_all.py
-        cd ..
-        cd tests
-        pytest
-  windows:
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-        compiler: [gcc]
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-    - uses: actions/checkout@v2
-    - uses: msys2/setup-msys2@v2
-      with:
-        msystem: MINGW64
-        install: git tar vim base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - if: matrix.compiler == 'clang'
-      name: Set clang env
-      run: |
-        pacman --noconfirm -S mingw-w64-x86_64-clang
-        echo "CC=clang" >> $GITHUB_ENV
-        echo "CXX=clang++" >> $GITHUB_ENV
-        echo "FC=gfortran" >> $GITHUB_ENV
-    - if: matrix.compiler == 'gcc'
-      name: Set gcc env
-      run: |
-        echo "CC=gcc" >> $GITHUB_ENV
-        echo "CXX=g++" >> $GITHUB_ENV
-        echo "FC=gfortran" >> $GITHUB_ENV
-    - name: Install KIM-API
-      run: |
-        export KIMPY_DIR=${PWD}
-        export KIM_API_VERSION="2.3.0"
-        cd $KIMPY_DIR && cd ..
-        wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
-        tar Jxvf kim-api-$KIM_API_VERSION.txz
-        cd kim-api-$KIM_API_VERSION
-        mkdir build && cd build
-        cmake.exe -G"MSYS Makefiles" .. -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=gfortran
-        make -j2
-        make install
-        cd ${MINGW_PREFIX} && cd lib && cd pkgconfig
-        export PKG_CONFIG_PATH=${PWD}
-        export PKG_CONFIG_PATH=$(python -c 'import os; print(os.environ.get("PKG_CONFIG_PATH"))')
-        $(sed -s "s|\${pcfiledir}|${PKG_CONFIG_PATH}|g" -i ./libkim-api.pc)
-        echo "PKG_CONFIG_PATH=${PKG_CONFIG_PATH}" >> $GITHUB_ENV
-        cd $KIMPY_DIR
-    - name: Install dependencies
-      run: pacman --noconfirm -S mingw-w64-x86_64-python-pip mingw-w64-x86_64-python-pytest mingw-w64-x86_64-python-numpy mingw-w64-x86_64-python-scipy mingw-w64-x86_64-python-matplotlib
-    - name: Install ASE
-      run: pip3 install ase
-    - name: Install kimpy
-      run: |
-        export PATH=${MINGW_PREFIX}/bin:$PATH
-        export LD_LIBRARY_PATH=${MINGW_PREFIX}/lib:$LD_LIBRARY_PATH
-        pip3 install .
-    - name: Test with pytest
-      run: |
-        cd scripts
-        python generate_all.py
-        cd ..
-        cd tests
-        pytest
+      - uses: actions/checkout@v4
+      - name: Set up micromamba
+        uses: mamba-org/setup-micromamba@v1.7.3
+        with:
+          # the create command looks like this:
+          # `micromamba create -n test-env python=<the corresponding version> kim-api=2.3.0`
+          environment-name: test-env
+          cache-environment: true
+          create-args: >-
+            python=${{ matrix.python-version }}
+            kim-api=2.3.0
+
+      - name: Install KIM model
+        shell: bash -el {0}
+        run: |
+          kim-api-collections-management install user SW_StillingerWeber_1985_Si__MO_405512056662_006
+
+      - name: Install
+        shell: bash -el {0}
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .[test]
+
+      - name: Test with pytest
+        shell: bash -el {0}
+        run: |
+          cd tests
+          pytest
+
+#
+#  linux:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        python-version: ["3.8", "3.9", "3.10"]
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Install gcc
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -yq gcc
+#          sudo apt-get install -yq gfortran
+#      - name: Install kim-api
+#        run: |
+#          export KIMPY_DIR=${PWD}
+#          export KIM_API_VERSION="2.3.0"
+#          cd $KIMPY_DIR && cd ..
+#          wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
+#          tar Jxvf kim-api-$KIM_API_VERSION.txz
+#          cd kim-api-$KIM_API_VERSION
+#          mkdir build && cd build
+#          cmake .. -DCMAKE_BUILD_TYPE=Release
+#          make -j2
+#          sudo make install
+#          sudo ldconfig
+#          cd $KIMPY_DIR
+#      - name: Set up Python ${{ matrix.python-version }}
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: ${{ matrix.python-version }}
+#      - name: Install dependencies
+#        run: |
+#          python -m pip install --upgrade pip
+#          python -m pip install ase
+#          python -m pip install pytest
+#      - name: Install
+#        run: |
+#          python -m pip install .
+#      - name: Lint with flake8
+#        run: |
+#          pip install flake8
+#          # stop the build if there are Python syntax errors or undefined names
+#          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+#          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+#          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+#      - name: Test with pytest
+#        run: |
+#          cd scripts
+#          python generate_all.py
+#          cd ..
+#          cd tests
+#          pytest
+#  mac:
+#    runs-on: macos-latest
+#    strategy:
+#      matrix:
+#        python-version: ["3.8", "3.9", "3.10"]
+#        compiler: [clang, gcc]
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Install gcc
+#        run: brew install gcc@10
+#      - if: matrix.compiler == 'clang'
+#        name: Set clang env
+#        run: |
+#          echo "CC=clang" >> $GITHUB_ENV
+#          echo "CXX=clang++" >> $GITHUB_ENV
+#          echo "FC=gfortran" >> $GITHUB_ENV
+#      - if: matrix.compiler == 'gcc'
+#        name: Set gcc env
+#        run: |
+#          echo "CC=gcc-10" >> $GITHUB_ENV
+#          echo "CXX=g++-10" >> $GITHUB_ENV
+#          echo "FC=gfortran-10" >> $GITHUB_ENV
+#      - name: Install kim-api
+#        run: |
+#          export KIMPY_DIR=${PWD}
+#          export KIM_API_VERSION="2.3.0"
+#          cd $KIMPY_DIR && cd ..
+#          mkdir -p KIM_API && cd KIM_API
+#          export KIM_API_DIR=$PWD
+#          echo "KIM_API_DIR=$PWD" >> $GITHUB_ENV
+#          cd ..
+#          wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
+#          tar Jxvf kim-api-$KIM_API_VERSION.txz
+#          cd kim-api-$KIM_API_VERSION
+#          mkdir build && cd build
+#          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$KIM_API_DIR" -DCMAKE_Fortran_COMPILER=gfortran-10
+#          make -j2
+#          make install
+#          source "$KIM_API_DIR/bin/kim-api-activate"
+#          cd $KIMPY_DIR
+#      - name: Set up Python ${{ matrix.python-version }}
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: ${{ matrix.python-version }}
+#      - name: Install dependencies
+#        run: |
+#          python3 -m pip install --upgrade pip
+#          python3 -m pip install ase
+#          python3 -m pip install pytest
+#      - name: Install
+#        run: |
+#          source "$KIM_API_DIR/bin/kim-api-activate"
+#          python3 -m pip install .
+#      - name: Lint with flake8
+#        run: |
+#          python3 -m pip install flake8
+#          # stop the build if there are Python syntax errors or undefined names
+#          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+#          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+#          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+#      - name: Test with pytest
+#        run: |
+#          cd scripts
+#          python generate_all.py
+#          cd ..
+#          cd tests
+#          pytest
+#  windows:
+#    runs-on: windows-latest
+#    strategy:
+#      matrix:
+#        python-version: ["3.8", "3.9", "3.10"]
+#        compiler: [gcc]
+#    defaults:
+#      run:
+#        shell: msys2 {0}
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: msys2/setup-msys2@v2
+#        with:
+#          msystem: MINGW64
+#          install: git tar vim base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake
+#      - name: Set up Python ${{ matrix.python-version }}
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: ${{ matrix.python-version }}
+#      - if: matrix.compiler == 'clang'
+#        name: Set clang env
+#        run: |
+#          pacman --noconfirm -S mingw-w64-x86_64-clang
+#          echo "CC=clang" >> $GITHUB_ENV
+#          echo "CXX=clang++" >> $GITHUB_ENV
+#          echo "FC=gfortran" >> $GITHUB_ENV
+#      - if: matrix.compiler == 'gcc'
+#        name: Set gcc env
+#        run: |
+#          echo "CC=gcc" >> $GITHUB_ENV
+#          echo "CXX=g++" >> $GITHUB_ENV
+#          echo "FC=gfortran" >> $GITHUB_ENV
+#      - name: Install KIM-API
+#        run: |
+#          export KIMPY_DIR=${PWD}
+#          export KIM_API_VERSION="2.3.0"
+#          cd $KIMPY_DIR && cd ..
+#          wget http://s3.openkim.org/kim-api/kim-api-$KIM_API_VERSION.txz
+#          tar Jxvf kim-api-$KIM_API_VERSION.txz
+#          cd kim-api-$KIM_API_VERSION
+#          mkdir build && cd build
+#          cmake.exe -G"MSYS Makefiles" .. -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=gfortran
+#          make -j2
+#          make install
+#          cd ${MINGW_PREFIX} && cd lib && cd pkgconfig
+#          export PKG_CONFIG_PATH=${PWD}
+#          export PKG_CONFIG_PATH=$(python -c 'import os; print(os.environ.get("PKG_CONFIG_PATH"))')
+#          $(sed -s "s|\${pcfiledir}|${PKG_CONFIG_PATH}|g" -i ./libkim-api.pc)
+#          echo "PKG_CONFIG_PATH=${PKG_CONFIG_PATH}" >> $GITHUB_ENV
+#          cd $KIMPY_DIR
+#      - name: Install dependencies
+#        run: pacman --noconfirm -S mingw-w64-x86_64-python-pip mingw-w64-x86_64-python-pytest mingw-w64-x86_64-python-numpy mingw-w64-x86_64-python-scipy mingw-w64-x86_64-python-matplotlib
+#      - name: Install ASE
+#        run: pip3 install ase
+#      - name: Install kimpy
+#        run: |
+#          export PATH=${MINGW_PREFIX}/bin:$PATH
+#          export LD_LIBRARY_PATH=${MINGW_PREFIX}/lib:$LD_LIBRARY_PATH
+#          pip3 install .
+#      - name: Test with pytest
+#        run: |
+#          cd scripts
+#          python generate_all.py
+#          cd ..
+#          cd tests
+#          pytest
