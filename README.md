@@ -9,90 +9,31 @@ kimpy is a Python interface to the [KIM API](https://openkim.org/kim-api).
 
 ## Installing kimpy
 
-### Requirements
+`kimpy` requires [KIM AIP](https://openkim.org/kim-api/) and `Python 3.7` or later.
 
-- KIM API 2 package
+### Using conda
 
-To install `kimpy`, you need [KIM API](https://openkim.org/kim-api). The
-easiest option for obtaining the KIM API is to install the `kim-api`
-pre-compiled binary package for your preferred operating system or package
-manager. See
-[Obtaining KIM Models](https://openkim.org/doc/usage/obtaining-models) for
-instructions to install the KIM API and the models from OpenKIM on your system.
+The recommended (and the easiest) way to install `kimpy` is to use the conda package manager to install both the KIM API and kimpy from the conda-forge channel.
 
-You can
-[install](https://openkim.org/doc/usage/obtaining-models#installing_api)
-the KIM API from source.
-
-- Python 3.6 or later
-
-You need Python 3.6 or later to run `kimpy`. You can have multiple
-Python versions (2.x and 3.x) installed on the same system without problems.
-
-To install Python 3 for different Linux flavors, macOS and Windows, packages
-are available at\
-[https://www.python.org/getit/](https://www.python.org/getit/)
+```sh
+conda install -c conda-forge kim-api kimpy
+```
 
 ### Using pip
 
-**pip** is the most popular tool for installing Python packages, and the one
-included with modern versions of Python.
-
-`kimpy` can be installed with `pip`:
+This requires that the KIM API alreay be installed on your system. See the KIM-API [docs](https://openkim.org/kim-api/) for instructions on how to do this.
 
 ```sh
 pip install kimpy
 ```
 
-**Note:**
+### From source
 
-Depending on your Python installation, you may need to use `pip3` instead of
-`pip`.
-
-```sh
-pip3 install kimpy
-```
-
-Depending on your configuration, you may have to run `pip` like this:
+This also requires that the KIM API alreay be installed on your system. See above.
 
 ```sh
-python3 -m pip install kimpy
-```
-
-### Using pip (GIT Support)
-
-`pip` currently supports cloning over `git`
-
-```sh
-pip install git+https://github.com/openkim/kimpy.git
-```
-
-For more information and examples, see the
-[pip install](https://pip.pypa.io/en/stable/reference/pip_install/#id18)
-reference.
-
-### Using conda
-
-**conda** is the package management tool for Anaconda Python installations.
-
-Installing `kimpy` from the `conda-forge` channel can be achieved by adding
-`conda-forge` to your channels with:
-
-```sh
-conda config --add channels conda-forge
-```
-
-Once the `conda-forge` channel has been enabled, `kimpy` can be installed with:
-
-```sh
-conda install kimpy
-```
-
-It is possible to list all of the versions of `kimpy` available on your
-platform with:
-
-```sh
-conda search kimpy --channel conda-forge
+git clone https://github.com/openkim/kimpy.git
+pip install -e ./kimpy
 ```
 
 ## Example
@@ -184,7 +125,7 @@ For exampe:
 
 ## Copyright
 
-Copyright (c) 2017-2021, Regents of the University of Minnesota.\
+Copyright (c) 2017-2023, Regents of the University of Minnesota.\
 All Rights Reserved
 
 ## Contributing
