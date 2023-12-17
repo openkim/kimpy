@@ -27,7 +27,10 @@ def update_version(version, path, key, in_quotes=False, extra_space=False):
     with path.open("w") as fout:
         for line in lines:
             if key in line:
-                idx = line.index("=")
+                try:
+                    idx = line.index("=")
+                except ValueError:
+                    continue
                 line = line[: idx + 1]
                 if extra_space:
                     line += " "
