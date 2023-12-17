@@ -30,6 +30,7 @@ def update_version(version, path, key, in_quotes=False, extra_space=False):
                 try:
                     idx = line.index("=")
                 except ValueError:
+                    fout.write(line + "\n")
                     continue
                 line = line[: idx + 1]
                 if extra_space:
