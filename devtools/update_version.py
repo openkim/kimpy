@@ -48,8 +48,5 @@ if __name__ == "__main__":
     path = kimpy_dir / "kimpy" / "__init__.py"
     update_version(kimpy_v, path, "__version__", True, True)
 
-    path = kimpy_dir / ".travis.yml"
-    update_version(api_v, path, "export KIM_API_VERSION", in_quotes=True)
-
     path = kimpy_dir / ".github/workflows/testing.yml"
     update_version(api_v, path, "kim-api", in_quotes=False)
