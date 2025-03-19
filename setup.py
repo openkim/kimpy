@@ -309,7 +309,8 @@ setup(
     name="kimpy",
     version=get_kimpy_version(),
     packages=find_packages(),
-    install_requires=["numpy"],
+    setup_requires=["pybind11"],
+    install_requires=["numpy", "pybind11"],
     extras_require={
         "test": ["pytest", "ase"],
     },
