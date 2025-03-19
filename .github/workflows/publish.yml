@@ -20,7 +20,7 @@ jobs:
           cache-environment: true
           create-args: >-
             python=3.10
-            kim-api=2.4.0
+            kim-api=2.3.0
 
       - name: Install dependencies
         shell: bash -el {0}
