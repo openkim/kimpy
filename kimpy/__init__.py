@@ -1,4 +1,4 @@
-__version__ = "2.1.1"
+__version__ = "2.1.2"
 
 # import all modules
 from . import model
