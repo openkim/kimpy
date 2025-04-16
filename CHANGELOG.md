@@ -1,10 +1,32 @@
 # Change Log
 
+
+## v2.1.3 (2025/04/16)
+
+- Update version to be compatible with kim-api v2.4.1
+
+
+## v2.1.2 (2025/03/20)
+
+- Update version to be compatible with kim-api v2.4.0
+
+
+## v2.1.1 (2023/12/17)
+
+### Bug Fixes 🐛
+* Use kim-api in publish by @mjwen in https://github.com/openkim/kimpy/pull/22
+* Fix publish actions by @mjwen in https://github.com/openkim/kimpy/pull/23
+
+### Enhancements 🛠
+* Use conda-forge kim-api for GH testing by @mjwen in https://github.com/openkim/kimpy/pull/20
+
+
 ## v2.1.0 (2022/12/06)
 
 - Fixing inverse function bug in neighbor list, which can result in incorrect
   padding
 - Using pyproject.toml, and refactoring build and test requires
+
 
 ## v2.0.1 (2022/08/18)
 
@@ -13,6 +35,7 @@
   file, we need to run `$ python scripts/generate_all.py` manually
 - Drop python3.6 support
 - Update to be compatible with kim-api-2.3.0
+
 
 ## v2.0.0 (2021/04/26)
 
@@ -30,6 +53,7 @@ This release is not backward compatible.
 - NeighList module is updated. One uses NeighList() class to create an instance
   of the NeighList object and calls its methods.
 - Find example usage at kimpy/examples/
+
 
 ## v0.3.3 (2019/10/28)
 
