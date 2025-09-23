@@ -36,3 +36,19 @@ jobs:
         run: |
           python setup.py sdist
           twine upload dist/*
+  send-pull-request-to-kdp:
+    uses: openkim/reusable-workflows/.github/workflows/upversion-pypi-package-and-send-pr.yml@main
+    secrets: inherit
+    with:
+      target-repository: developer-platform
+      target-repository-base-branch: main
+      recipe-file-path: docker/install/Dockerfile
+    needs: deploy
+  send-pull-request-to-pipeline:
+    uses: openkim/reusable-workflows/.github/workflows/upversion-pypi-package-and-send-pr.yml@main
+    secrets: inherit
+    with:
+      target-repository: openkim-pipeline
+      target-repository-base-branch: devel
+      recipe-file-path: singularity/hpccm-recipe-cumulative.py
+    needs: deploy
