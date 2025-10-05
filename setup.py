@@ -133,11 +133,6 @@ class BuildExt(build_ext):
     def build_extensions(self):
         compiler_type = self.compiler.compiler_type
 
-        if sys.platform == "darwin":
-            if has_flag(self.compiler, "-stdlib=libc++"):
-                self.c_opts["unix"].append("-stdlib=libc++")
-                self.l_opts["unix"].append("-stdlib=libc++")
-
         opts = self.c_opts.get(compiler_type, [])
         opts.append(cpp_flag(compiler_type, self.compiler))
 
