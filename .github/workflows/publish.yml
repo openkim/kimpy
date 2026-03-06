@@ -20,7 +20,7 @@ jobs:
           cache-environment: true
           create-args: >-
             python=3.10
-            kim-api=2.3.0
+            kim-api=2.4.2
 
       - name: Install dependencies
         shell: bash -el {0}
@@ -36,3 +36,11 @@ jobs:
         run: |
           python setup.py sdist
           twine upload dist/*
+  send-pull-request-to-kdp:
+    uses: openkim/reusable-workflows/.github/workflows/upversion-pypi-package-and-send-pr.yml@main
+    secrets: inherit
+    with:
+      target-repository: developer-platform
+      target-repository-base-branch: main
+      recipe-file-path: docker/install/Dockerfile
+    needs: deploy
