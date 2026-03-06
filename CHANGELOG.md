@@ -1,6 +1,10 @@
 # Change Log
 
 
+## v2.1.4 (2026/03/06)
+
+- Update version to be compatible with kim-api v2.4.2
+
 ## v2.1.3 (2025/04/16)
 
 - Update version to be compatible with kim-api v2.4.1
